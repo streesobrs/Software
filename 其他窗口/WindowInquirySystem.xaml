@@ -1,0 +1,87 @@
+﻿<Window x:Class="Software.其他窗口.WindowInquirySystem"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Software.ViewModels"
+        mc:Ignorable="d"
+        Title="WindowInquirySystem" Height="450" Width="800" FontFamily="../resources/Fonts/#得意黑">
+    <Window.DataContext>
+        <vm:WindowInquiryViewModel/>
+    </Window.DataContext>
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel>
+            <TextBlock Margin="5,0,0,0" 
+                       HorizontalAlignment="Left" 
+                       TextWrapping="Wrap" 
+                       VerticalAlignment="Top" 
+                       Text="输入UP的uid"/>
+            <TextBox   Margin="5,0,0,0" 
+                       Name="TextBox1" 
+                       HorizontalAlignment="Left"  
+                       TextWrapping="Wrap" 
+                       VerticalAlignment="Top" 
+                       Text="" Width="160"/>
+            <Button    Margin="170,-18,0,0" 
+                       Name="Button1"
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top" 
+                       Width="50" Height="20"
+                       CommandParameter="332872375"
+                       Command="{Binding LoadCityCommand}">搜索</Button>
+            <TextBlock Margin="240,-18,0,0" 
+                       HorizontalAlignment="Left" 
+                       TextWrapping="Wrap" 
+                       VerticalAlignment="Top" 
+                       Text="有BUG，不要点 先看看预览图"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left" DockPanel.Dock="Right">
+
+            <!--头像名称简介-->
+            <StackPanel>
+                <Image d:Source="{Binding SelectinQuirySystem.face}"
+                       Height="64" Width="64"
+                       Source="https://i1.hdslb.com/bfs/face/4f0db0b35e286e81318df27610d445f199b01add.jpg"/>
+                <TextBlock Text="你八点半下班"
+                           Width="64"
+                           Margin="0,5,0,0"
+                           TextWrapping="Wrap"
+                           d:Text="{Binding SelectinQuirySystem.name}" 
+                           Name="Name"/>
+                <TextBlock Text="我懒得投币，懒得收藏，懒得点赞"
+                           Width="64"
+                           Margin="0,5,0,0"
+                           TextWrapping="Wrap"
+                           d:Text="{Binding SelectinQuirySystem.sign}" 
+                           Name="sign"/>
+            </StackPanel>
+            
+            <!--B站等级-->
+            <StackPanel>
+                <TextBlock Text="{Binding SelectinQuirySystem.level}"
+                           Name="level"/>
+            </StackPanel>
+            
+            <!--头像名称简介-->
+            <StackPanel>
+
+            </StackPanel>
+            
+            <!--头像名称简介-->
+            <StackPanel>
+
+            </StackPanel>
+            
+        </StackPanel>
+        
+
+    </Grid>
+
+</Window>

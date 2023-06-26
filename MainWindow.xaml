@@ -1,0 +1,399 @@
+﻿<Window x:Class="Software.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Software"
+        xmlns:viewModels="clr-namespace:Software.ViewModels"
+        xmlns:resx="clr-namespace:Software.Properties"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Width="900" Height="550"
+        MinWidth="589" MinHeight="440"
+        FontFamily="../resources/Fonts/#得意黑"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition></RowDefinition>
+
+        </Grid.RowDefinitions>
+
+        <!--上面的栏-->
+        <Grid Grid.Row="0" Background="#116ECC">
+
+            <MediaElement Name="mediaElement"
+              LoadedBehavior="Manual" 
+              UnloadedBehavior="Manual"
+              Volume="{Binding ElementName=volumeSlider, Path=Value}"
+              MediaOpened="MediaElement_MediaOpened" 
+              IsMuted="{Binding ElementName=bgm, Path=IsChecked}"/>
+
+            <StackPanel HorizontalAlignment="Left" Height="50" Margin="0,0" 
+                        VerticalAlignment="Top" Width="50" Grid.Column="1">
+                <Ellipse Width="50" Height="50" StrokeThickness="2" Stroke="AliceBlue">
+                    <Ellipse.Fill>
+                        <VisualBrush>
+                            <VisualBrush.Visual>
+                                <Image Source ="resources/image/cxk.png"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+            </StackPanel>
+            <Button HorizontalAlignment="Left" Width="50" Padding="0,1,0,1"
+                    Click="Button_Click"  Background="#116ECC" Opacity="0"/>
+
+            <!-- 音量按钮 -->
+            <ToggleButton x:Name="bgm"
+                      Margin="140,10"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Top"
+                      Panel.ZIndex="1"
+                      FocusVisualStyle="{x:Null}"
+                      Foreground="#9FFF"
+                      IsChecked="True"
+                      Cursor="Hand">
+                <ToggleButton.Effect>
+                    <BlurEffect Radius="1" />
+                </ToggleButton.Effect>
+                <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Ellipse Width="25"
+                                 Height="25"
+                                 Stroke="{TemplateBinding Foreground}"
+                                 StrokeThickness="2" />
+                            <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Text="&#xEC4F;"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   RenderTransformOrigin="0.5,0.5"
+                                   Foreground="{TemplateBinding Foreground}">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform Angle="-15" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock x:Name="block"
+                                   Margin="0,0,4,5"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Bottom"
+                                   Visibility="Hidden"
+                                   Text="&#xF140;"
+                                   FontWeight="SemiBold"
+                                   FontSize="10"
+                                   Foreground="LightCoral"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   RenderTransformOrigin="0.5,0.5">
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleX="-1" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="block" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </ToggleButton.Template>
+            </ToggleButton>
+
+            <DockPanel Grid.Column="2" LastChildFill="False">
+
+                <Menu DockPanel.Dock="Right" Background="Transparent"
+                      VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9">
+                    <MenuItem Header="关于" Padding="10" Click="MenuItem_Click_1"></MenuItem>
+                    <MenuItem Header="别点" Padding="10" Click="MenuItem_Click_2"></MenuItem>
+                </Menu>
+
+            </DockPanel>
+
+        </Grid>
+
+        <!--下面的栏-->
+        <Grid Grid.Row="1" Background="#CADFF6">
+
+            <DockPanel LastChildFill="True">
+                <!--左侧的栏-->
+                <DockPanel DockPanel.Dock="Left" Background="#F5F7FB" Width="100" LastChildFill="False">
+
+                    <StackPanel DockPanel.Dock="Right" Width="92">
+
+                        <!--左边菜单的选项-->
+
+                        <ListBox Background="Transparent" Margin="0,10,10,10" BorderThickness="0" Height="450">
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_Home">
+                                <TextBlock VerticalAlignment="Center" FontSize="18"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="没用的按钮……" 
+                                           Text="{x:Static resx:Resource.Button_Home}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_GenshinMap">
+                                <TextBlock VerticalAlignment="Center" FontSize="16"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="打开地图界面" 
+                                           Text="{x:Static resx:Resource.Button_GenshinMap}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_SelectUP">
+                                <TextBlock VerticalAlignment="Center" FontSize="16"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="打开查询界面" 
+                                           Text="{x:Static resx:Resource.Button_SelectUP}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_PlayGames">
+                                <TextBlock VerticalAlignment="Center" FontSize="14"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="启动游戏" 
+                                           Text="{x:Static resx:Resource.Button_PlayGames}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_GenshinRole">
+                                <TextBlock VerticalAlignment="Center" FontSize="14"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="打开原神角色界面" 
+                                           Text="{x:Static resx:Resource.Button_GenshinRole}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_HonkaiImpact3">
+                                <TextBlock VerticalAlignment="Center" FontSize="14"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="打开崩坏三角色界面"
+                                           Text="{x:Static resx:Resource.Button_HonkaiImpact3}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_StarRail">
+                                <TextBlock VerticalAlignment="Center" FontSize="14"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="打开崩坏星穹铁道角色界面"
+                                           Text="{x:Static resx:Resource.Button_StarRail}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_Bing">
+                                <TextBlock VerticalAlignment="Center" FontSize="14"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="你猜猜Bing一下是干什么的"
+                                           Text="{x:Static resx:Resource.Button_Bing}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_Updata">
+                                <TextBlock VerticalAlignment="Center" FontSize="16"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="字面意思"
+                                           Text="{x:Static resx:Resource.Button_Updata}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_Version">
+                                <TextBlock VerticalAlignment="Center" FontSize="18"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="打开历史版本更新内容界面"
+                                           Text="{x:Static resx:Resource.Button_Version}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_BuildJson">
+                                <TextBlock VerticalAlignment="Center" FontSize="17"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="输出一个没有什么用但又没有什么用的json文件"
+                                           Text="{x:Static resx:Resource.Button_BuildJson}"/>
+                            </Button>
+
+                        </ListBox>
+
+                    </StackPanel>
+
+                </DockPanel>
+
+                <!--右边大点的栏-->
+                <StackPanel>
+
+                    <DockPanel>
+                        <StackPanel Height="400">
+                            <DockPanel>
+                                <Menu Width="62" BorderThickness="0,0,0,0" VerticalAlignment="Top">
+                                    <MenuItem Header="复制帮助">
+                                        <MenuItem Command="ApplicationCommands.Copy"/>
+                                        <MenuItem Command="ApplicationCommands.Cut"/>
+                                        <MenuItem Command="ApplicationCommands.Paste"/>
+                                    </MenuItem>
+                                </Menu >
+
+                                <TextBox Width="300" Height="200" 
+                                 TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" 
+                                 VerticalScrollBarVisibility="Visible" x:Name="ContentTextBox">
+
+                                </TextBox>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Right" >
+                            更新地址：
+                                </TextBlock>
+                                <TextBox Name="Update_IP_address" Width="90" HorizontalAlignment="Left">
+                                    1.14.58.59
+                                </TextBox>
+                            </DockPanel>
+
+                            <UniformGrid Rows="1" Columns="3">
+                                <UniformGrid.Resources>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Width" Value="80"/>
+                                        <Setter Property="Margin" Value="0,0,8,0"/>
+                                    </Style>
+                                </UniformGrid.Resources>
+
+                                <Button x:Name="playPauseButton" 
+                                        Content="播放" 
+                                        ToolTip="字面意思，播放"
+                                        Click="Button_Click_MusicPlay_MusicPause"/>
+                                <Button Content="停止" 
+                                        ToolTip="顾名思义，把整个停下来"
+                                        Click="Button_Click_MusicStop"/>
+                                <Button Content="切歌" 
+                                        ToolTip="点快了报错"
+                                        Click="Button_Click_MusicHandOff"/>
+                            </UniformGrid>
+
+
+
+                            <DockPanel>
+                                <TextBlock>
+                                    控制音量
+                                </TextBlock>
+                                <Slider x:Name="volumeSlider"
+                                    Width="200"
+                                    HorizontalAlignment="Left"
+                                    Minimum="0" Maximum="1" Value="0.2"
+                                    SmallChange="0.1" LargeChange="0.2"
+                                    ValueChanged="volumeSlider_ValueChanged"
+                                    ToolTip="音量调节"/>
+                                <TextBox Name="music_name" Width="124">
+                                    无
+                                </TextBox>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Slider x:Name="mediaPositionSlider" Minimum="0" Value="0"
+                                        IsEnabled="{Binding ElementName=mediaElement, Path=IsLoaded}" 
+                                        AutoToolTipPlacement="TopLeft"
+                                        TickFrequency="5"
+                                        TickPlacement="BottomRight"
+                                        ValueChanged="MediaPositionSlider_ValueChanged"/>
+                            </DockPanel>
+
+                        </StackPanel>
+
+                        <DockPanel Height="180" VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False">
+                            <ListBox DockPanel.Dock="Top" VerticalAlignment="Top" HorizontalAlignment="Left" Width="110" Height="77">
+                                <TextBlock IsEnabled="False">原神启动选择服务</TextBlock>
+                                <RadioButton Content="官服" IsChecked="True"
+                                     Click="RadioButton_Click_1"
+                                     CommandParameter="0"/>
+                                <RadioButton Content="B服"
+                                     Click="RadioButton_Click_2"
+                                     CommandParameter="1"/>
+                                <RadioButton Content="国际服"
+                                     Click="RadioButton_Click_3"
+                                     CommandParameter="2"/>
+                            </ListBox>
+
+                            <Button Margin="0,0,0,0" Width="100" Height="18" 
+                                DockPanel.Dock="Top"
+                                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                Click="Button_Click_ColourEgg">
+                                别点我
+                            </Button>
+
+                            <ListBox DockPanel.Dock="Top">
+                                <RadioButton Content="英文" Click="RadioButton_Click_English"/>
+                                <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese"/>
+                            </ListBox>
+
+                        </DockPanel>
+
+                        <StackPanel Width="auto" Height="Auto">
+                            <StackPanel Margin="0,10,0,0">
+                                <!-- 省份和城市 -->
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="省份：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Province}" FontSize="18" x:Name="Data_Province" Margin="5,0,0,0"/>
+                                    <Border Background="Transparent" Width="25"/>
+                                    <TextBlock Text="城市：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_City}" FontSize="18" x:Name="Data_City" Margin="5,0,0,0"/>
+                                </StackPanel>
+
+                                <!-- 行政编码 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="行政编码：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Adcode}" FontSize="18" x:Name="Data_Adcode" Margin="5,0,0,0"/>
+                                </StackPanel>
+
+                                <!-- 天气状况 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="天气状况：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Weather}" FontSize="18" x:Name="Data_Weather" Margin="5,0,0,0"/>
+                                </StackPanel>
+
+                                <!-- 当前温度和相对湿度 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="当前温度：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Temperature}" FontSize="18" x:Name="Data_Temperature" Margin="5,0,0,0" />
+                                    <TextBlock Text="℃" FontSize="18" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                    <Border Background="Transparent" Width="25"/>
+                                    <TextBlock Text="当前相对湿度：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Humidity}" FontSize="18" x:Name="Data_Humidity" Margin="5,0,0,0"/>
+                                    <TextBlock Text="%" FontSize="18" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- 当前风向和风力 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="当前风向：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Winddirection}" FontSize="18" x:Name="Data_Winddirection" Margin="5,0,0,0"/>
+                                    <TextBlock Text="|" FontSize="18" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="当前风力：" FontSize="16" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    <TextBlock Text="{Binding Data_Windpower}" FontSize="18" x:Name="Data_Windpower" Margin="5,0,0,0"/>
+                                </StackPanel>
+
+                                <!-- 数据更新时间 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="数据更新时间：" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Data_Reporttime}" FontSize="18"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </DockPanel>
+
+                </StackPanel>
+
+            </DockPanel>
+
+            <DockPanel Width="300" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+
+                <Label FontSize="20"
+                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                               Content="{x:Static resx:Resource.Ts}"/>
+            </DockPanel>
+
+        </Grid>
+
+    </Grid>
+</Window>

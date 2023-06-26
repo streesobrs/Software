@@ -1,0 +1,75 @@
+﻿<Window x:Class="Software.其他窗口.WindowStarRail"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Software.其他窗口"
+        mc:Ignorable="d"
+        Title="WindowStarRail" Height="450" Width="800">
+    <Grid ShowGridLines="True">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <!--地图选择-->
+        <ListBox Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical"
+                       ItemWidth="100" ItemHeight="100"
+                       VirtualizingStackPanel.IsVirtualizing="True"
+                       VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/08/08/7d3da9cf78ee58ec8d0bbfd9f55e95ab_1685781465416663994.png"/>
+            
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/08/08/f82d6faffc4431c4d71be9e2458b11fa_4316224791165930417.png"/>
+            
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/08/08/f5574a52f19da6a8e1ed07e3e252ea0f_1699217136390042155.png"/>
+            
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/08/10/cdd7f8d10733124247142a2f66bc5619_5267170387541704414.png"/>
+            
+        </ListBox>
+
+        <!--角色选择-->
+        <ListBox ItemsSource="{Binding YourList}" Grid.Row="1" Grid.Column="0">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <!--其他属性和绑定-->
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/09/14/cf5fcc0d92c18ee789f4f8356c588edf_5908328713944000843.png"/>
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2023/01/13/1eee10d5bb4ebd0a82b6bf40ec43931d_7239498625122521124.png"/>
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/09/14/8d1e339c07abb7ab48e57182e89a1101_7402213442670582066.png"/>
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/09/14/f47a42336ef4bb2c74c7d1f7f6ec25b0_6089535407740813685.png"/>
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/09/14/895122803227f6a7986c8331553185f5_3698827418585037680.png"/>
+            <Image Width="90" 
+                   Source="https://webstatic.mihoyo.com/upload/op-public/2022/09/14/1ee49d71d9726be05c4b322655ef7b69_860512692668038532.png"/>
+        </ListBox>
+
+        <TextBox Grid.Row="1" Grid.Column="1">
+            我是懂摆烂的
+        </TextBox>
+
+    </Grid>
+</Window>

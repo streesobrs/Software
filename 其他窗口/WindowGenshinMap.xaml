@@ -1,0 +1,46 @@
+﻿<Window x:Class="Software.其他窗口.WindowGenshinMap"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:Software.ViewModels"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="WindowGenshinMap" Height="450" Width="800">
+    <Grid Name="root" Background="#121921">
+        <DockPanel>
+            <Canvas x:Name="canvas" 
+                Grid.Row="1"
+                MouseDown="canvas_MouseDown" 
+                MouseMove="canvas_MouseMove" 
+                MouseUp="canvas_MouseUp"
+                PreviewMouseWheel="Image_MouseWheel"
+                >
+                <!--PreviewMouseWheel="Image_MouseWheel"-->
+                <!--Source="/resources/image/Teyvat.jpg"-->
+                <Image x:Name="image" RenderTransformOrigin="0.5,0.5"
+                   Stretch="Uniform" Source="/resources/image/Teyvat.jpg"
+                   Canvas.Left="-8781" Canvas.Top="-6024" 
+                   HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image.RenderTransform>
+                        <ScaleTransform x:Name="scaleTransform" />
+                    </Image.RenderTransform>
+                </Image>
+            </Canvas>
+        </DockPanel>
+        <DockPanel Width="auto" Height="40" VerticalAlignment="Top">
+            <Button Content="提瓦特地图" 
+                    Width="90" 
+                    HorizontalAlignment="Left" 
+                    Click="Button_Teyvat"/>
+            <Button Content="层岩巨渊" 
+                    Width="75" 
+                    HorizontalAlignment="Left"
+                    Click="Button_TheChasm"/>
+            <Button Content="渊下宫" 
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Click="Button_Enkanomiya"/>
+        </DockPanel>
+
+    </Grid>
+</Window>

@@ -1,0 +1,149 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <WebView2UseWinRT>False</WebView2UseWinRT>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>resources\image\cxk.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+    <PackageIcon>cxk.png</PackageIcon>
+    <FileVersion>0.0.018</FileVersion>
+    <AssemblyVersion>0.0.018</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove=".Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove=".resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Delete_file.bat" />
+    <None Remove="MainWindow.xaml.cs~RF10164d2.TMP" />
+    <None Remove="resources\fonts\qweather-icons.ttf" />
+    <None Remove="resources\fonts\SmileySans-Oblique.ttf" />
+    <None Remove="resources\fonts\华康少女文字W5-P.ttf" />
+    <None Remove="resources\image\cxk.png" />
+    <None Remove="resources\image\Enkanomiya.jpg" />
+    <None Remove="resources\image\Teyvat.jpg" />
+    <None Remove="resources\image\TheChasm.jpg" />
+    <None Remove="resources\sound\music\music_001.mp3" />
+    <None Remove="resources\sound\music\xxxCr3 - Illusionary Daytime.flac" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="resources\fonts\qweather-icons.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\cxk.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Delete_file.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\TheChasm.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\Enkanomiya.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\sound\music\music_001.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\fonts\SmileySans-Oblique.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.0.1" />
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1774.30" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="resources\fonts\华康少女文字W5-P.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="resources\image\cxk.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </Resource>
+    <Content Include="resources\image\Teyvat.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resource.zh-CN.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="resources\image\Teyvat.bmp">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter64.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\DirectShowLib-2005.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter32.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter32.dll" />
+  </ItemGroup>
+
+</Project>

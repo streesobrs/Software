@@ -1,0 +1,321 @@
+﻿<Window x:Class="Software.其他窗口.WindowVersion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Software.其他窗口"
+        mc:Ignorable="d"
+        Title="WindowVersion" Height="450" Width="800" FontFamily="../resources/Fonts/#得意黑">
+    <Grid>
+        <Grid Grid.Row="0" Height="58" VerticalAlignment="Top" Background="Wheat">
+            
+            <StackPanel>
+                <TextBlock FontSize="40">
+                版本内容
+                </TextBlock>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right" Margin="380,14,0,0" Width="245">
+                <TextBlock HorizontalAlignment="Right" FontSize="27" Width="240" Height="34">
+                当前版本：0.0.018
+                </TextBlock>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <FlowDocumentScrollViewer Margin="0,58,0,0">
+                <FlowDocument Background="Snow">
+                    <Section FontSize="14">
+                        <!--版本更新内容，就写到下面-->
+                        <Paragraph FontFamily="/resources/fonts/#得意黑">
+
+                            版本：0.0.019
+                            <LineBreak/>
+                            对版本更新增加了版本更新时间
+                            <LineBreak/>
+                            删除了版本内容中重复的0.0.003版本
+                            <LineBreak/>
+                            对WindowHonkaiImpact3进行了更多修补
+                            <LineBreak/>
+                            新增同步系统时间选项
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.018
+                            <LineBreak/>
+                            更新时间：2023/05/8 21:30
+                            <LineBreak/>
+                            对代码进行了部分细节调整
+                            <LineBreak/>
+                            增加了星铁角色选项
+                            <LineBreak/>
+                            增加了主界面的英文
+                            <LineBreak/>
+                            增加了主界面的天气数据
+                            <LineBreak/>
+                            增加了打开指定文件夹的功能
+                            <LineBreak/>
+                            合并了删除文件夹的功能
+                            <LineBreak/>
+                            对输出的Json文件进行了修改
+                            <LineBreak/>
+                            对软件的下载地址进行了默认且可自定义的功能
+                            <LineBreak/>
+                            切歌功能完善
+                            <LineBreak/>
+                            增加音量调节/进度条功能
+                            <LineBreak/>
+                            显示正在播放的歌名
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.017
+                            <LineBreak/>
+                            更新时间：2023/04/08 18:33
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了输出Json选项
+                            <LineBreak/>
+                            可以对当前版本的部分数据进行输出
+                            <LineBreak/>
+                            输出的文件在软件根目录下的log文件夹中
+                            <LineBreak/>
+                            修改了每次打开随机的音乐
+                            <LineBreak/>
+                            可以将音乐文件塞到软件根目录下的resources\sound\music文件夹中
+                            <LineBreak/>
+                            切歌暂时搞不出来
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.016
+                            <LineBreak/>
+                            更新时间：2023/04/04 22:40
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了主界面播放音乐的功能
+                            <LineBreak/>
+                            修改了将没有任何用的WindowMoveBlock换成了有一点点用的WindowGenshinMap
+                            <LineBreak/>
+                            但现在不能对他进行放大缩小
+                            <LineBreak/>
+                            共三个区域（提瓦特/层岩巨渊/渊下宫）
+                            <LineBreak/>
+                            打开一次1.4G，鬼知道怎么搞的，后面再想办法
+                            <LineBreak/>
+                            删除更新文件不再使用bat文件，可以选择手动移除
+                            <LineBreak/>
+                            <Button Click="Button_Click_delete_file">点此删除Delete__file.bat</Button> 
+                            <LineBreak/>
+                            <Button Click="Button_Click_win_x64">点此删除win-x64文件夹</Button>
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.015
+                            <LineBreak/>
+                            更新时间：2023/03/16 22:04
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了崩坏三选项
+                            <LineBreak/>
+                            增加了删除更新版本后遗留的名为"win-x64"文件夹(目前用的bat文件
+                            <LineBreak/>
+                            删除了已知问题按钮
+                            <LineBreak/>
+                            检测更新按钮目前不再提示
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.014
+                            <LineBreak/>
+                            更新时间：2023/03/12 12:09
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            修改了WindowGenshinRole窗口的布局
+                            <LineBreak/>
+                            给检查更新留了3秒的检测时间
+                            <LineBreak/>
+                            修改了检查更新的提示文本
+                            <LineBreak/>
+                            修复了WindowGenshinRole切换地区造成的闪屏
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.013
+                            <LineBreak/>
+                            更新时间：2023/02/04 20:24
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了检查更新选项
+                            <LineBreak/>
+                            修复了网页跳不出去的问题(不让他跳出去
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.012
+                            <LineBreak/>
+                            更新时间：2023/01/20 22:23
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了Bing一下选项(没错 经典的内置浏览器
+                            <LineBreak/>
+                            修复了启动游戏会跳出WindowGenshinRole页面
+                            <LineBreak/>
+                            启动游戏功能回炉重造
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.011
+                            <LineBreak/>
+                            更新时间：2023/01/12 13:38
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了原神角色选项
+                            <LineBreak/>
+                            增加了选择启动游戏服务的功能(没用
+                            <LineBreak/>
+                            将字体修改为得意黑
+                            <LineBreak/>
+                            <Button Click="Button_Click_1">点此前往得意黑下载页面</Button>
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.010
+                            <LineBreak/>
+                            更新时间：2023/01/09 13:35
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            重做了媒体播放
+                            <LineBreak/>
+                            软件从.NET framework 4.8 转到.NET 6
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.009
+                            <LineBreak/>
+                            更新时间：2022/12/27 17:17
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了启动游戏选项
+                            <LineBreak/>
+                            增加了图片查看功能
+                            <LineBreak/>
+                            删除了已知内容按钮(懒得管)
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.008
+                            <LineBreak/>
+                            更新时间：2022/11/29 14:31
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了文本框的滚动条
+                            <LineBreak/>
+                            修复了版本内容无法下拉的bug
+                            <LineBreak/>
+                            修复了版本栏会移动的bug
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.007
+                            <LineBreak/>
+                            更新时间：2022/11/28 20:15
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了版本内容页面
+                            <LineBreak/>
+                            修改了部分细节
+                            <LineBreak/>
+                            删除了临时版本界面
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.006
+                            <LineBreak/>
+                            更新时间：2022/11/25 17:17
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了数据查询选项
+                            <LineBreak/>
+                            增加了数据查询页面
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.005
+                            <LineBreak/>
+                            更新时间：2022/11/23 17:57
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了视频播放页面
+                            <LineBreak/>
+                            增加了已有内容选项
+                            <LineBreak/>
+                            修复了方块选项无法使用的BUG
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.004
+                            <LineBreak/>
+                            更新时间：2022/11/21 16:15
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            修复了文本框无法换行的BUG
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.003
+                            <LineBreak/>
+                            更新时间：2022/10/24 19:37
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了文本框
+                            <LineBreak/>
+                            增加了复制选项
+                            <LineBreak/>
+                            增加了已知问题选项
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.002
+                            <LineBreak/>
+                            更新时间：2022/10/21 17:26
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            修改了主页部分细节
+                            <LineBreak/>
+                            <LineBreak/>
+
+                            版本：0.0.001
+                            <LineBreak/>
+                            更新时间：2022/10/20 15:18
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            增加了主页选项
+                            <LineBreak/>
+                            增加了方块选项
+                            <LineBreak/>
+
+                        </Paragraph>
+                    </Section>
+                </FlowDocument>
+            </FlowDocumentScrollViewer>
+        </Grid>
+        
+    </Grid>
+</Window>
