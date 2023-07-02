@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Software"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:viewModels="clr-namespace:Software.ViewModels"
         xmlns:resx="clr-namespace:Software.Properties"
         mc:Ignorable="d"
@@ -222,6 +223,10 @@
                     </StackPanel>
 
                 </DockPanel>
+
+                <ContentControl x:Name="contentcon">
+                    
+                </ContentControl>
 
                 <!--右边大点的栏-->
                 <StackPanel>

@@ -1,16 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Shapes;
 
-namespace Software.其他窗口
+namespace Software.其他界面
 {
     /// <summary>
-    /// WindowEdition.xaml 的交互逻辑
+    /// PageVersion.xaml 的交互逻辑
     /// </summary>
-    public partial class WindowVersion : Window
+    public partial class PageVersion : Page
     {
-        public WindowVersion()
+        public PageVersion()
         {
             InitializeComponent();
         }

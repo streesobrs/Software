@@ -22,6 +22,8 @@ namespace Software
     /// </summary>
     public partial class MainWindow : Window
     {
+        Frame frameVersion = new Frame() { Content = new 其他界面.PageVersion() };
+        Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
 
         public MainWindow()
         {
@@ -91,7 +93,11 @@ namespace Software
 
         private void Button_Click_Home(object sender, RoutedEventArgs e)
         {
+            // 创建并设置主页内容（这里是一个字符串）
+            string homeContent = "";
 
+            // 将主页内容分配给 ContentControl 的 Content 属性
+            contentcon.Content = homeContent;
         }
 
         private void Button_Click_GenshinMap(object sender, RoutedEventArgs e)
@@ -132,6 +138,7 @@ namespace Software
 
         private void Button_Click_Bing(object sender, RoutedEventArgs e)
         {
+            contentcon.Content = frameBing;
             其他窗口.WindowBing nextwindow = new();
             nextwindow.Show();
         }
@@ -156,8 +163,7 @@ namespace Software
 
         private void Button_Click_Version(object sender, RoutedEventArgs e)
         {
-            其他窗口.WindowVersion nextwindow = new();
-            nextwindow.Show();
+            contentcon.Content = frameVersion;
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
