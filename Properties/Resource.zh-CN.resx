@@ -153,4 +153,7 @@
   <data name="Button_StarRail" xml:space="preserve">
     <value>星铁角色</value>
   </data>
+  <data name="Button_MoveChest" xml:space="preserve">
+    <value>推箱子</value>
+  </data>
 </root>

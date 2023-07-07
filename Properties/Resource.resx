@@ -153,4 +153,7 @@
   <data name="Button_StarRail" xml:space="preserve">
     <value>StarRail</value>
   </data>
+  <data name="Button_MoveChest" xml:space="preserve">
+    <value>MoveChest</value>
+  </data>
 </root>

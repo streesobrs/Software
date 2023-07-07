@@ -115,6 +115,15 @@ namespace Software.Properties {
         }
         
         /// <summary>
+        ///   查找类似 MoveChest 的本地化字符串。
+        /// </summary>
+        public static string Button_MoveChest {
+            get {
+                return ResourceManager.GetString("Button_MoveChest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 PlayGames 的本地化字符串。
         /// </summary>
         public static string Button_PlayGames {

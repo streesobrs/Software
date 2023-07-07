@@ -187,6 +187,14 @@
                             </Button>
 
                             <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
+                                    Click="Button_Click_MoveChest">
+                                <TextBlock VerticalAlignment="Center" FontSize="14"
+                                           Foreground="#ff363232" Width="auto" 
+                                           ToolTip="开始推箱子"
+                                           Text="{x:Static resx:Resource.Button_MoveChest}"/>
+                            </Button>
+
+                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
                                     Click="Button_Click_Bing">
                                 <TextBlock VerticalAlignment="Center" FontSize="14"
                                            Foreground="#ff363232" Width="auto" 

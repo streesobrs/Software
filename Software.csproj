@@ -38,16 +38,25 @@
     <None Remove="resources\fonts\qweather-icons.ttf" />
     <None Remove="resources\fonts\SmileySans-Oblique.ttf" />
     <None Remove="resources\fonts\华康少女文字W5-P.ttf" />
+    <None Remove="resources\image\apple-green.png" />
+    <None Remove="resources\image\apple-red.png" />
     <None Remove="resources\image\cxk.png" />
     <None Remove="resources\image\Enkanomiya.jpg" />
+    <None Remove="resources\image\lemon.png" />
+    <None Remove="resources\image\octopus.png" />
     <None Remove="resources\image\Teyvat.jpg" />
     <None Remove="resources\image\TheChasm.jpg" />
+    <None Remove="resources\image\tree.png" />
+    <None Remove="resources\movechest\Level.json" />
     <None Remove="resources\sound\music\music_001.mp3" />
     <None Remove="resources\sound\music\xxxCr3 - Illusionary Daytime.flac" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="resources\fonts\qweather-icons.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\apple-red.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="resources\image\cxk.ico" />
@@ -57,10 +66,22 @@
     <Content Include="Delete_file.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="resources\image\lemon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\octopus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="resources\image\TheChasm.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="resources\image\Enkanomiya.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\tree.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\movechest\Level.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="resources\sound\music\music_001.mp3">
@@ -83,6 +104,9 @@
 
   <ItemGroup>
     <Content Include="resources\fonts\华康少女文字W5-P.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\image\apple-green.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="resources\image\cxk.png">

@@ -24,6 +24,7 @@ namespace Software
     {
         Frame frameVersion = new Frame() { Content = new 其他界面.PageVersion() };
         Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
+        Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
 
         public MainWindow()
         {
@@ -134,6 +135,11 @@ namespace Software
         {
             其他窗口.WindowStarRail nextwindow = new();
             nextwindow.Show();
+        }
+
+        private void Button_Click_MoveChest(object sender, RoutedEventArgs e)
+        {
+            contentcon.Content = frameMoveChest;
         }
 
         private void Button_Click_Bing(object sender, RoutedEventArgs e)
