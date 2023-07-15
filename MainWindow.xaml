@@ -232,9 +232,9 @@
 
                 </DockPanel>
 
-                <ContentControl x:Name="contentcon">
+                <Frame x:Name="contentcon">
                     
-                </ContentControl>
+                </Frame>
 
                 <!--右边大点的栏-->
                 <StackPanel>

@@ -146,19 +146,19 @@ internal partial class Level : ObservableObject
         (int x, int y) offset;
         switch (key)
         {
-            case Key.Up:
+            case Key.W:
                 offset = (0, -1);
                 break;
 
-            case Key.Down:
+            case Key.S:
                 offset = (0, 1);
                 break;
 
-            case Key.Left:
+            case Key.A:
                 offset = (-1, 0);
                 break;
 
-            case Key.Right:
+            case Key.D:
                 offset = (1, 0);
                 break;
 

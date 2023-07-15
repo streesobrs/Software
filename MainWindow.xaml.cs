@@ -14,6 +14,7 @@ using Software.ViewModels;
 using System.Windows.Threading;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using Software.其他界面;
 
 namespace Software
 {
@@ -139,7 +140,9 @@ namespace Software
 
         private void Button_Click_MoveChest(object sender, RoutedEventArgs e)
         {
-            contentcon.Content = frameMoveChest;
+            PageMoveChest page = new PageMoveChest(); // 创建PageMoveChest实例
+
+            contentcon.Content = page; // 将PageMoveChest实例设置为contentcon的内容
         }
 
         private void Button_Click_Bing(object sender, RoutedEventArgs e)
