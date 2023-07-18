@@ -41,6 +41,33 @@ namespace Software.其他界面
                 // 在这里处理向右移动的逻辑
             }
         }
-    }
 
+        private void Up_Click(object sender, RoutedEventArgs e)
+        {
+            var keyEvent = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(this), 0, Key.Up);
+            keyEvent.RoutedEvent = Keyboard.KeyDownEvent;
+            InputManager.Current.ProcessInput(keyEvent);
+        }
+
+        private void Left_Click(object sender, RoutedEventArgs e)
+        {
+            var keyEvent = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(this), 0, Key.Left);
+            keyEvent.RoutedEvent = Keyboard.KeyDownEvent;
+            InputManager.Current.ProcessInput(keyEvent);
+        }
+
+        private void Right_Click(object sender, RoutedEventArgs e)
+        {
+            var keyEvent = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(this), 0, Key.Right);
+            keyEvent.RoutedEvent = Keyboard.KeyDownEvent;
+            InputManager.Current.ProcessInput(keyEvent);
+        }
+
+        private void Down_Click(object sender, RoutedEventArgs e)
+        {
+            var keyEvent = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(this), 0, Key.Down);
+            keyEvent.RoutedEvent = Keyboard.KeyDownEvent;
+            InputManager.Current.ProcessInput(keyEvent);
+        }
+    }
 }

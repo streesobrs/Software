@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Software.其他界面;
+using System.Windows.Input;
 
 namespace Software
 {
@@ -587,6 +588,14 @@ namespace Software
             ContentTextBox.Text = contentText;
 
             mediaElement.Source = playmusicpath;
+        }
+
+        private void listBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Left || e.Key == Key.Right)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

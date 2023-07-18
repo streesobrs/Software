@@ -30,7 +30,7 @@ internal partial class MoveChest : ObservableObject
     [RelayCommand]
     private void MovePlayer(KeyEventArgs e)
     {
-        if (e.Key is Key.W or Key.S or Key.A or Key.D)
+        if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right)
         {
             Level.MovePlayer(e.Key);
         }
