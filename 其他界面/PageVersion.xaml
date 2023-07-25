@@ -18,7 +18,7 @@
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" Margin="380,14,0,0" Width="245">
                 <TextBlock HorizontalAlignment="Right" FontSize="27" Width="240" Height="34">
-                当前版本：0.0.019
+                当前版本：0.0.020
                 </TextBlock>
             </StackPanel>
         </Grid>
@@ -31,6 +31,8 @@
                         <Paragraph FontFamily="/resources/fonts/#得意黑">
 
                             版本：0.0.020
+                            <LineBreak/>
+                            ·更新时间：2023/07/25 16:00
                             <LineBreak/>
                             更新内容:
                             <LineBreak/>
@@ -45,6 +47,8 @@
                             - 新增推箱子按钮
                             <LineBreak/>
                             - 将很久以前移除的移动箱子重做
+                            <LineBreak/>
+                            - 经典的bug修不动 未来再说
                             <LineBreak/>
                             <LineBreak/>
 
