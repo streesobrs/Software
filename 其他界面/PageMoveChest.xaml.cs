@@ -69,5 +69,10 @@ namespace Software.其他界面
             keyEvent.RoutedEvent = Keyboard.KeyDownEvent;
             InputManager.Current.ProcessInput(keyEvent);
         }
+
+        private void Set_Click(object sender, RoutedEventArgs e)
+        {
+            Focus();
+        }
     }
 }

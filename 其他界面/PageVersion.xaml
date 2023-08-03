@@ -30,6 +30,15 @@
                         <!--版本更新内容，就写到下面-->
                         <Paragraph FontFamily="/resources/fonts/#得意黑">
 
+                            版本：0.1.000
+                            <LineBreak/>
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            - 我不管了 我就要跳版本
+                            <LineBreak/>
+                            <LineBreak/>
+
                             版本：0.0.020
                             <LineBreak/>
                             ·更新时间：2023/07/25 16:00
