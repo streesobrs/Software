@@ -16,6 +16,9 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 using Software.其他界面;
 using System.Windows.Input;
+using System.Configuration;
+using Microsoft.Win32;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Software
 {
@@ -28,9 +31,13 @@ namespace Software
         Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
         Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
 
+        private Window dialog;
+        private TextBox txtGamePath;
+
         public MainWindow()
         {
             InitializeComponent();
+            txtGamePath = new TextBox();
             Loaded += async (_, __) =>
             {
                 var weather = new Weather();
@@ -101,6 +108,8 @@ namespace Software
 
             // 将主页内容分配给 ContentControl 的 Content 属性
             contentcon.Content = homeContent;
+
+            this.Test_Label.Visibility = Visibility.Visible;
         }
 
         private void Button_Click_GenshinMap(object sender, RoutedEventArgs e)
@@ -117,8 +126,34 @@ namespace Software
 
         private void Button_Click_PlayGames(object sender, RoutedEventArgs e)
         {
-            //_ = System.Diagnostics.Process.Start(@"E:\原神\B服\Genshin Impact\launcher.exe");
-            _ = MessageBox.Show("正在回炉重造", "启动游戏");
+            string gamePath = ConfigurationManager.AppSettings["GamePath"];
+            if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
+            {
+                // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
+                var dialog = new OpenFileDialog();
+                dialog.ValidateNames = false;
+                dialog.CheckFileExists = true;
+                dialog.CheckPathExists = true;
+                dialog.FileName = "Select Game";
+                if (dialog.ShowDialog() == true)
+                {
+                    gamePath = dialog.FileName;
+                    UpdateGamePath(gamePath);  // 保存新的游戏路径
+                }
+            }
+            if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
+            {
+                _ = System.Diagnostics.Process.Start(gamePath);
+            }
+        }
+
+
+        private void UpdateGamePath(string newPath)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["GamePath"].Value = newPath;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         private void Button_Click_GenshinRole(object sender, RoutedEventArgs e)
@@ -141,9 +176,11 @@ namespace Software
 
         private void Button_Click_MoveChest(object sender, RoutedEventArgs e)
         {
-            PageMoveChest page = new PageMoveChest(); // 创建PageMoveChest实例
+            其他窗口.WindowMoveChest nextwindow = new();
+            nextwindow.Show();
+            //PageMoveChest page = new PageMoveChest(); // 创建PageMoveChest实例
 
-            contentcon.Content = page; // 将PageMoveChest实例设置为contentcon的内容
+            //contentcon.Content = page; // 将PageMoveChest实例设置为contentcon的内容
         }
 
         private void Button_Click_Bing(object sender, RoutedEventArgs e)
@@ -174,6 +211,7 @@ namespace Software
         private void Button_Click_Version(object sender, RoutedEventArgs e)
         {
             contentcon.Content = frameVersion;
+            this.Test_Label.Visibility = Visibility.Hidden;
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
@@ -251,10 +289,10 @@ namespace Software
         private void Button_Click_ColourEgg(object sender, RoutedEventArgs e)
         {
             // 创建提示框
-            var dialog = new Window
+            dialog = new Window
             {
-                Width = 300,
-                Height = 240,
+                Width = 400,
+                Height = 300,
                 Title = "请选择要打开的文件夹目录",
                 ShowInTaskbar = false,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
@@ -381,7 +419,49 @@ namespace Software
                 }
             };
 
+            // 从配置文件中读取当前保存的路径
+            string currentPath = ConfigurationManager.AppSettings["GamePath"];
 
+            // 创建一个新的文本框用于输入路径
+            var txtGamePath = new TextBox
+            {
+                Width = 250,
+                Name = "txtGamePath"
+            };
+
+            // 设置文本框的值为当前保存的路径
+            txtGamePath.Text = currentPath;
+
+            // 创建一个新的按钮用于选择文件
+            var selectFileButton = new Button
+            {
+                Content = "选择文件",
+                Padding = new Thickness(5),
+                Margin = new Thickness(5),
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            selectFileButton.Click += SelectFileButton_Click;
+
+            // 创建一个新的按钮用于保存路径
+            var savePathButton = new Button
+            {
+                Content = "保存路径",
+                Padding = new Thickness(5),
+                Margin = new Thickness(5),
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            savePathButton.Click += Button_Click_SavePath;
+
+            // 创建一个新的StackPanel，将txtGamePath和selectFileButton放在同一行
+            var pathPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            pathPanel.Children.Add(txtGamePath);
+            pathPanel.Children.Add(selectFileButton);
 
             // 将所有按钮添加到提示框中
             var stackPanel = new StackPanel();
@@ -390,26 +470,53 @@ namespace Software
             stackPanel.Children.Add(musicButton);
             stackPanel.Children.Add(syncButton);
             stackPanel.Children.Add(deleteFoldersButton);
+            stackPanel.Children.Add(pathPanel);
+            stackPanel.Children.Add(savePathButton);
             dialog.Content = stackPanel;
 
             // 打开提示框
             dialog.ShowDialog();
         }
 
-
-        private void RadioButton_Click_1(object sender, RoutedEventArgs e)//官服
+        private void Button_Click_SavePath(object sender, RoutedEventArgs e)
         {
+            if (txtGamePath != null)
+            {
+                string newPath = txtGamePath.Text;
+                if (System.IO.File.Exists(newPath))
+                {
+                    UpdateGamePath(newPath);
+                    MessageBox.Show("路径已经成功保存。", "成功");
 
+                    // 关闭对话框
+                    if (dialog != null)
+                    {
+                        dialog.Close();
+                        dialog = null;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("文件不存在，请输入一个有效的文件路径。", "错误");
+                }
+            }
+            else
+            {
+                MessageBox.Show("文本框不存在。", "错误");
+            }
         }
 
-        private void RadioButton_Click_2(object sender, RoutedEventArgs e)//B服
+        private void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void RadioButton_Click_3(object sender, RoutedEventArgs e)//国际服
-        {
-
+            var dialog = new OpenFileDialog();
+            dialog.ValidateNames = false;
+            dialog.CheckFileExists = true;
+            dialog.CheckPathExists = true;
+            dialog.Filter = "Executable Files (*.exe)|*.exe";
+            if (dialog.ShowDialog() == true)
+            {
+                txtGamePath.Text = dialog.FileName;
+            }
         }
 
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
@@ -571,13 +678,13 @@ namespace Software
             //构造文件名
             string date = DateTime.Now.ToString("yyyyMMdd");
             string folderPath = "./log/";
-            string fileName = $"output_{date}.json";
+            string fileName = $"SoftwareMessage_{date}.json";
 
             //如果文件已存在，则在后面加上数字
             int count = 1;
             while (File.Exists(Path.Combine(folderPath, fileName)))
             {
-                fileName = $"output_{date}_{count}.json";
+                fileName = $"SoftwareMessage_{date}_{count}.json";
                 count++;
             }
 

@@ -12,8 +12,8 @@
     <ApplicationIcon>resources\image\cxk.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <PackageIcon>cxk.png</PackageIcon>
-    <FileVersion>0.0.020</FileVersion>
-    <AssemblyVersion>0.0.020</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -94,9 +94,9 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.0.4" />
-    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.3" />
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />

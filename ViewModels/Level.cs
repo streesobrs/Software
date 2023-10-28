@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json.Linq;
+using Software.GameObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using Software.GameObjects;
-using System.IO;
-using Newtonsoft.Json.Linq;
 
 namespace Software.ViewModels;
 
@@ -82,59 +82,55 @@ internal partial class Level : ObservableObject
     /// </summary>
     private void ParseLevelText(string levelText)
     {
-        Reset();
-
         try
         {
             JObject levelJson = JObject.Parse(levelText);
 
-            var blocks = new List<Sprite>();
-            var crates = new List<MoveableObject>();
-
-            JArray lines = (JArray)levelJson["lines"];
-
-            for (int i = 0; i < lines.Count; i++)
+            int currentLevel = 1;
+            int totalLevel = levelJson.Count;
+            while (currentLevel <= totalLevel)
             {
-                string lineData = lines[i].ToString();
+                Reset();
 
-                for (int j = 0; j < lineData.Length; j++)
+                JArray lines = (JArray)levelJson[currentLevel.ToString()];
+                var blocks = new List<Sprite>();
+                var crates = new List<MoveableObject>();
+                for (int i = 0; i < lines.Count; i++)
                 {
-                    char character = lineData[j];
-
-                    switch (character)
+                    string lineData = lines[i].ToString();
+                    for (int j = 0; j < lineData.Length; j++)
                     {
-                        case '#':
-                            blocks.Add(new Sprite(j, i, SpriteType.Wall));
-                            break;
-
-                        case '_':
-                            blocks.Add(new Sprite(j, i, SpriteType.Floor));
-                            break;
-
-                        case '.':
-                            blocks.Add(new Sprite(j, i, SpriteType.Target));
-                            break;
-
-                        case '$':
-                            crates.Add(new MoveableObject(j, i, SpriteType.Crate));
-                            break;
-
-                        case '@':
-                            Player = new MoveableObject(j, i, SpriteType.Player);
-                            break;
+                        char character = lineData[j];
+                        switch (character)
+                        {
+                            case '#':
+                                blocks.Add(new Sprite(j, i, SpriteType.Wall));
+                                break;
+                            case '_':
+                                blocks.Add(new Sprite(j, i, SpriteType.Floor));
+                                break;
+                            case '.':
+                                blocks.Add(new Sprite(j, i, SpriteType.Target));
+                                break;
+                            case '$':
+                                crates.Add(new MoveableObject(j, i, SpriteType.Crate));
+                                break;
+                            case '@':
+                                Player = new MoveableObject(j, i, SpriteType.Player);
+                                break;
+                        }
                     }
                 }
+                Blocks = blocks;
+                Crates = crates;
+                currentLevel++; // 将变量加一
             }
-
-            Blocks = blocks;
-            Crates = crates;
         }
         catch (Exception ex)
         {
             throw new Exception($"Failed to parse level JSON: {ex.Message}");
         }
     }
-
 
     internal void MovePlayer(Key key)
     {

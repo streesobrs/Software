@@ -3,20 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="clr-namespace:Software.ViewModels"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="WindowGenshinMap" Height="450" Width="800">
+        Title="WindowGenshinMap" Height="700" Width="1270">
     <Grid Name="root" Background="#121921">
-        <DockPanel>
+        <wv2:WebView2 Source = "https://webstatic.mihoyo.com/ys/app/interactive-map/index.html"></wv2:WebView2>
+        <!--<DockPanel>
             <Canvas x:Name="canvas" 
                 Grid.Row="1"
                 MouseDown="canvas_MouseDown" 
                 MouseMove="canvas_MouseMove" 
                 MouseUp="canvas_MouseUp"
-                PreviewMouseWheel="Image_MouseWheel"
+                PreviewMouseWheel="Image_MouseWheel" 
                 >
-                <!--PreviewMouseWheel="Image_MouseWheel"-->
-                <!--Source="/resources/image/Teyvat.jpg"-->
+                --><!--PreviewMouseWheel="Image_MouseWheel"-->
+                <!--Source="/resources/image/Teyvat.jpg"--><!--
                 <Image x:Name="image" RenderTransformOrigin="0.5,0.5"
                    Stretch="Uniform" Source="/resources/image/Teyvat.jpg"
                    Canvas.Left="-8781" Canvas.Top="-6024" 
@@ -40,7 +42,11 @@
                     Width="60"
                     HorizontalAlignment="Left"
                     Click="Button_Enkanomiya"/>
-        </DockPanel>
+            <Button Content="mys" 
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Click="Button_MiyousheMap"/>
+        </DockPanel>-->
 
     </Grid>
 </Window>
