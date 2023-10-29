@@ -320,7 +320,7 @@
                                 DockPanel.Dock="Top"
                                 HorizontalAlignment="Left" VerticalAlignment="Top" 
                                 Click="Button_Click_ColourEgg">
-                                别点我
+                                更多选项
                             </Button>
 
                             <ListBox DockPanel.Dock="Top">

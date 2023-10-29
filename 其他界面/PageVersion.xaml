@@ -12,11 +12,11 @@
         <Grid Grid.Row="0" Height="58" VerticalAlignment="Top" Background="AliceBlue">
 
             <StackPanel>
-                <TextBlock FontSize="40">
+                <TextBlock FontSize="40" Width="160" HorizontalAlignment="Left">
                 版本内容
                 </TextBlock>
             </StackPanel>
-            <StackPanel HorizontalAlignment="Right" Margin="380,14,0,0" Width="245">
+            <StackPanel HorizontalAlignment="Right" Width="245">
                 <TextBlock HorizontalAlignment="Right" FontSize="27" Width="240" Height="34">
                 当前版本：0.1.0.0
                 </TextBlock>
@@ -29,6 +29,16 @@
                     <Section FontSize="14">
                         <!--版本更新内容，就写到下面-->
                         <Paragraph FontFamily="/resources/fonts/#得意黑">
+
+                            版本：0.1.1.0
+                            <LineBreak/>
+                            ·更新时间：YYYY/MM/DD
+                            <LineBreak/>
+                            更新内容:
+                            <LineBreak/>
+                            - 修改了部分代码使其更加和谐
+                            <LineBreak/>
+                            <LineBreak/>
 
                             版本：0.1.0.0
                             <LineBreak/>
