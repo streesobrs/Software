@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/resources/image/Enkanomiya.jpg
+/resources/image/Teyvat.bmp
+/resources/image/Teyvat.jpg
+/resources/image/TheChasm.jpg
+/resources/fonts/qweather-icons.ttf
+/resources/fonts/华康少女文字W5-P.ttf
