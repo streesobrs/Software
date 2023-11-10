@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Configuration;
 using Microsoft.Win32;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using Windows.Devices.Geolocation;
 
 namespace Software
 {
@@ -44,11 +45,23 @@ namespace Software
                 await weather.LoadAsync();
                 DataContext = weather;
             };
-
             DataContext = this;
 
+
         }
-        
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 读取配置文件
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            // 获取TextContent的值
+            string text = config.AppSettings.Settings["TextContent"].Value;
+
+            // 设置TextBox的文本
+            ContentTextBox.Text = text;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public struct SYSTEMTIME
         {
@@ -517,6 +530,18 @@ namespace Software
             {
                 txtGamePath.Text = dialog.FileName;
             }
+        }
+
+        private void ContentTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // 获取TextBox的文本
+            string text = ContentTextBox.Text;
+
+            // 保存到配置文件
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["TextContent"].Value = text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)

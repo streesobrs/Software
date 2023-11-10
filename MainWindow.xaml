@@ -13,6 +13,7 @@
         Width="900" Height="550"
         MinWidth="589" MinHeight="440"
         FontFamily="../resources/Fonts/#得意黑"
+        Loaded="Window_Loaded"
         WindowStartupLocation="CenterScreen">
 
     <Grid>
@@ -252,8 +253,12 @@
                                 </Menu >
 
                                 <TextBox Width="300" Height="200" 
-                                 TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" 
-                                 VerticalScrollBarVisibility="Visible" x:Name="ContentTextBox">
+                                         TextWrapping="Wrap" 
+                                         VerticalAlignment="Top" 
+                                         AcceptsReturn="True" 
+                                         VerticalScrollBarVisibility="Visible" 
+                                         x:Name="ContentTextBox" 
+                                         TextChanged="ContentTextBox_TextChanged">
 
                                 </TextBox>
                             </DockPanel>
@@ -315,7 +320,7 @@
 
                         </StackPanel>
 
-                        <DockPanel Height="180" VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False">
+                        <DockPanel VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False">
                             <Button Margin="0,0,0,0" Width="100" Height="18" 
                                 DockPanel.Dock="Top"
                                 HorizontalAlignment="Left" VerticalAlignment="Top" 
