@@ -56,10 +56,11 @@ namespace Software
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             // 获取TextContent的值
-            string text = config.AppSettings.Settings["TextContent"].Value;
-
+            string contentTextBox = config.AppSettings.Settings["TextContent"].Value;
+            string updatePath = config.AppSettings.Settings["updatePath"].Value;
             // 设置TextBox的文本
-            ContentTextBox.Text = text;
+            ContentTextBox.Text = contentTextBox;
+            Update_IP_address.Text = updatePath;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -213,7 +214,7 @@ namespace Software
         {
             var UpdateIP = this.Update_IP_address.Text;
             
-            AutoUpdater.Start($"http://{UpdateIP}/updata.xml");
+            AutoUpdater.Start($"{UpdateIP}");
 
             // 获取软件版本号
             string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -544,6 +545,16 @@ namespace Software
             ConfigurationManager.RefreshSection("appSettings");
         }
 
+        private void Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string text = Update_IP_address.Text;
+            // 保存到配置文件
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["UpdatePath"].Value = text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo(name: "en-US");
@@ -729,5 +740,7 @@ namespace Software
                 e.Handled = true;
             }
         }
+
+        
     }
 }

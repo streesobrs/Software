@@ -24,6 +24,16 @@ namespace Software.其他界面
         public PageVersion()
         {
             InitializeComponent();
+
+            // 获取当前正在执行的程序集
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            // 获取版本信息
+            System.Version version = assembly.GetName().Version;
+            // 将版本信息转换为字符串
+            string versionString = version.ToString();
+
+            // 在文本块中显示版本信息
+            VersionTextBlock.Text = "当前版本：" + versionString;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

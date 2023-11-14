@@ -244,17 +244,9 @@
                     <DockPanel>
                         <StackPanel Height="400">
                             <DockPanel>
-                                <Menu Width="62" BorderThickness="0,0,0,0" VerticalAlignment="Top">
-                                    <MenuItem Header="复制帮助">
-                                        <MenuItem Command="ApplicationCommands.Copy"/>
-                                        <MenuItem Command="ApplicationCommands.Cut"/>
-                                        <MenuItem Command="ApplicationCommands.Paste"/>
-                                    </MenuItem>
-                                </Menu >
-
-                                <TextBox Width="300" Height="200" 
+                                <TextBox Width="400" Height="200" 
                                          TextWrapping="Wrap" 
-                                         VerticalAlignment="Top" 
+                                         VerticalAlignment="Top"
                                          AcceptsReturn="True" 
                                          VerticalScrollBarVisibility="Visible" 
                                          x:Name="ContentTextBox" 
@@ -266,8 +258,7 @@
                                 <TextBlock HorizontalAlignment="Right" >
                             更新地址：
                                 </TextBlock>
-                                <TextBox Name="Update_IP_address" Width="90" HorizontalAlignment="Left">
-                                    1.14.58.59
+                                <TextBox Name="Update_IP_address" Width="307" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged">
                                 </TextBox>
                             </DockPanel>
 

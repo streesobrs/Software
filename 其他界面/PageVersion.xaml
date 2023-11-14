@@ -17,9 +17,7 @@
                 </TextBlock>
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" Width="245">
-                <TextBlock HorizontalAlignment="Right" FontSize="27" Width="240" Height="34">
-                当前版本：0.1.0.0
-                </TextBlock>
+                <TextBlock Name="VersionTextBlock" HorizontalAlignment="Right" FontSize="27" Width="240" Height="34"/>
             </StackPanel>
         </Grid>
 
@@ -41,6 +39,8 @@
                             - 移除了部分无用资源
                             <LineBreak/>
                             - 将文本框内容实时保存
+                            <LineBreak/>
+                            - 再次对更新路径进行更新，现在需输入完整的更新链接，但会自动保存，以供后续使用
                             <LineBreak/>
                             <LineBreak/>
 
