@@ -20,6 +20,10 @@ using System.Configuration;
 using Microsoft.Win32;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using Windows.Devices.Geolocation;
+using System.Reflection;
+using System.Xml.Linq;
+using System.Net.Http;
+using System.Linq;
 
 namespace Software
 {
@@ -204,22 +208,36 @@ namespace Software
             nextwindow.Show();
         }
 
-        private async void UpdataMessageBox()
+        private async void Button_Click_Updata(object sender, RoutedEventArgs e)
         {
-            await Task.Delay(3000);
-            //MessageBox.Show("没有找到可以更新的版本/已是新版本","检查更新");
-        }
+            try
+            {
+                var UpdateIP = this.Update_IP_address.Text;
 
-        private void Button_Click_Updata(object sender, RoutedEventArgs e)
-        {
-            var UpdateIP = this.Update_IP_address.Text;
-            
-            AutoUpdater.Start($"{UpdateIP}");
+                var httpClient = new HttpClient();
+                var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
 
-            // 获取软件版本号
-            string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                var xdoc = XDocument.Parse(xmlString);
+                var versionElement = xdoc.Descendants("version").FirstOrDefault();
+                if (versionElement != null)
+                {
+                    var version = Version.Parse(versionElement.Value);
 
-            UpdataMessageBox();
+                    if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                    {
+                        AutoUpdater.Start($"{UpdateIP}");
+                    }
+                    else
+                    {
+                        MessageBox.Show("当前已是最新版本");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // 在这里处理异常，例如显示错误消息
+                MessageBox.Show($"更新检查失败：{ex.Message}");
+            }
         }
 
         private void Button_Click_Version(object sender, RoutedEventArgs e)
