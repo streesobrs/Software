@@ -319,6 +319,13 @@
                                 更多选项
                             </Button>
 
+                            <CheckBox DockPanel.Dock="Top" 
+                                      Name="EnableCountingCheckBox" 
+                                      Content="启用计数" 
+                                      Checked="EnableCountingCheckBox_Checked" 
+                                      Unchecked="EnableCountingCheckBox_Unchecked"/>
+
+
                             <ListBox DockPanel.Dock="Top">
                                 <RadioButton Content="英文" Click="RadioButton_Click_English"/>
                                 <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese"/>
@@ -383,7 +390,12 @@
 
             </DockPanel>
 
-            <DockPanel Width="300" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <DockPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Name="beta_tabel">
+                <Label FontSize="20" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Bottom" 
+                       Name="LaunchCount" 
+                       Content=""/>
 
                 <Label FontSize="20"
                        Name="Test_Label"

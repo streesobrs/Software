@@ -65,6 +65,41 @@ namespace Software
             // 设置TextBox的文本
             ContentTextBox.Text = contentTextBox;
             Update_IP_address.Text = updatePath;
+
+
+            // 读取"EnableCounting"的值
+            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
+
+            // 设置CheckBox的状态
+            EnableCountingCheckBox.IsChecked = enableCounting;
+
+            // 如果启用计数，则执行计数逻辑
+            if (enableCounting)
+            {
+                // 读取并增加启动次数
+                int launchCount = int.Parse(ConfigurationManager.AppSettings["LaunchCount"]) + 1;
+
+                // 更新启动次数
+                UpdateEnableCounting(launchCount);
+
+                // 显示启动次数
+                LaunchCount.Content = $"软件已启动 {launchCount} 次";
+            }
+        }
+
+        private void UpdateEnableCounting(int launchCount)
+        {
+            // 打开配置文件
+            Configuration config1 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            // 更新启动次数
+            config1.AppSettings.Settings["LaunchCount"].Value = launchCount.ToString();
+
+            // 保存配置文件
+            config1.Save(ConfigurationSaveMode.Modified);
+
+            // 刷新配置文件
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -127,7 +162,7 @@ namespace Software
             // 将主页内容分配给 ContentControl 的 Content 属性
             contentcon.Content = homeContent;
 
-            this.Test_Label.Visibility = Visibility.Visible;
+            this.beta_tabel.Visibility = Visibility.Visible;
         }
 
         private void Button_Click_GenshinMap(object sender, RoutedEventArgs e)
@@ -243,7 +278,7 @@ namespace Software
         private void Button_Click_Version(object sender, RoutedEventArgs e)
         {
             contentcon.Content = frameVersion;
-            this.Test_Label.Visibility = Visibility.Hidden;
+            this.beta_tabel.Visibility = Visibility.Hidden;
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
@@ -570,6 +605,26 @@ namespace Software
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["UpdatePath"].Value = text;
             config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void EnableCountingCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateEnableCounting(true);
+            this.LaunchCount.Visibility = Visibility.Visible;
+        }
+
+        private void EnableCountingCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateEnableCounting(false);
+            this.LaunchCount.Visibility = Visibility.Hidden;
+        }
+
+        private void UpdateEnableCounting(bool enableCounting)
+        {
+            Configuration config1 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config1.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
+            config1.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
         }
 

@@ -10,6 +10,6 @@
       Title="PageDetails">
 
     <Grid>
-        <wv2:WebView2 Name = "webView" Source="../resources/html/index.html"/>
+        <wv2:WebView2 Name = "webView" Source=""/>
     </Grid>
 </Page>

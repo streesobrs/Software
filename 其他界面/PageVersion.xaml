@@ -44,6 +44,8 @@
                             <LineBreak/>
                             - 添加了检查更新提示
                             <LineBreak/>
+                            - 添加了显示软件启动次数的功能(默认关闭
+                            <LineBreak/>
                             <LineBreak/>
 
                             版本：0.1.0.0
