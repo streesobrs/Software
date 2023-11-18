@@ -313,10 +313,17 @@
 
                         <DockPanel VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False">
                             <Button Margin="0,0,0,0" Width="100" Height="18" 
-                                DockPanel.Dock="Top"
-                                HorizontalAlignment="Left" VerticalAlignment="Top" 
-                                Click="Button_Click_ColourEgg">
-                                更多选项
+                                    DockPanel.Dock="Top"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                    Click="Button_Click_ColourEgg">
+                                    更多选项
+                            </Button>
+
+                            <Button Margin="0,0,0,0" Width="100" Height="18" 
+                                    DockPanel.Dock="Top"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                    Click="Button_Click_RefreshWeather">
+                                    天气刷新
                             </Button>
 
                             <CheckBox DockPanel.Dock="Top" 

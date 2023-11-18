@@ -4,10 +4,12 @@ using Newtonsoft.Json.Linq;
 using PropertyChanged;
 using Software.Helpers;
 using Software.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Software.ViewModels;
 
@@ -43,10 +45,17 @@ public class WindowHonkaiImpact3ViewModel : ObservableObject
 
     async Task LoadAllAsync()
     {
-        valkyrieData = await WebHelper.GetValkyrieInfosAsync();
+        try
+        {
+            valkyrieData = await WebHelper.GetValkyrieInfosAsync();
 
-        var results = await WebHelper.GetValkyriesAsync();
-        Valkyries = new ObservableCollection<Valkyrie>(results);
+            var results = await WebHelper.GetValkyriesAsync();
+            Valkyries = new ObservableCollection<Valkyrie>(results);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("数据获取失败：" + ex.Message);
+        }
     }
 
     async Task SelectionChanged(Valkyrie v)
@@ -55,41 +64,49 @@ public class WindowHonkaiImpact3ViewModel : ObservableObject
 
         var (armor, birthday) = await WebHelper.GetArmorBirthdayAsync(v.Url);
 
-        var info =
+        try
+        {
+            var info =
             valkyrieData
             .First(v => v["ext"]
             .First(v => v["arrtName"].ToString() == "装甲名")["value"]
             .ToString() == armor)["ext"];
 
-        var skills = new List<Skill>();
-        var indexes = "一二三四五";
-        foreach (var index in indexes)
-        {
-            var title = info.FirstOrDefault(v => v["arrtName"].ToString() == $"技能{index}名称")?["value"].ToString();
-            if (string.IsNullOrEmpty(title)) continue;
+            var skills = new List<Skill>();
+            var indexes = "一二三四五";
+            foreach (var index in indexes)
+            {
+                var title = info.FirstOrDefault(v => v["arrtName"].ToString() == $"技能{index}名称")?["value"].ToString();
+                if (string.IsNullOrEmpty(title)) continue;
 
-            var desc = info.First(v => v["arrtName"].ToString() == $"技能{index}描述")["value"].ToString();
-            var icon = info.First(v => v["arrtName"].ToString() == $"技能{index}图标（选中）")["value"][0]["url"].ToString();
-            var prev = info.First(v => v["arrtName"].ToString() == $"技能{index}pc视频封面")["value"][0]["url"].ToString();
-            var video = info.First(v => v["arrtName"].ToString() == $"技能{index}视频")["value"][0]["url"].ToString();
+                var desc = info.First(v => v["arrtName"].ToString() == $"技能{index}描述")["value"].ToString();
+                var icon = info.First(v => v["arrtName"].ToString() == $"技能{index}图标（选中）")["value"][0]["url"].ToString();
+                var prev = info.First(v => v["arrtName"].ToString() == $"技能{index}pc视频封面")["value"][0]["url"].ToString();
+                var video = info.First(v => v["arrtName"].ToString() == $"技能{index}视频")["value"][0]["url"].ToString();
 
-            skills.Add(new Skill(
-                title,
-                icon,
-                desc,
-                prev,
-                video
-            ));
+                skills.Add(new Skill(
+                    title,
+                    icon,
+                    desc,
+                    prev,
+                    video
+                ));
+            }
+
+            SelectedValkyrie = new ValkyrieInfo(
+                v.ChineseName,
+                armor,
+                birthday,
+                info.First(v => v["arrtName"].ToString() == "作战方式")["value"].ToString(),
+                info.First(v => v["arrtName"].ToString() == "角色大立绘图")["value"][0]["url"].ToString(),
+                skills.ToArray()
+            );
         }
-
-        SelectedValkyrie = new ValkyrieInfo(
-            v.ChineseName,
-            armor,
-            birthday,
-            info.First(v => v["arrtName"].ToString() == "作战方式")["value"].ToString(),
-            info.First(v => v["arrtName"].ToString() == "角色大立绘图")["value"][0]["url"].ToString(),
-            skills.ToArray()
-        );
+        catch(Exception ex)
+        {
+            MessageBox.Show("数据获取失败：" + ex.Message);
+        }
+        
     }
 
     void ShowSidePanel() => IsSidePanelVisible = true;

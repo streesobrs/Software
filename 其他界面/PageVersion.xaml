@@ -30,7 +30,7 @@
 
                             版本：0.1.1.0
                             <LineBreak/>
-                            ·更新时间：YYYY/MM/DD
+                            ·更新时间：2023/11/18
                             <LineBreak/>
                             更新内容:
                             <LineBreak/>
@@ -44,7 +44,15 @@
                             <LineBreak/>
                             - 添加了检查更新提示
                             <LineBreak/>
+                            - 配置文件会自动检测是否存在，不存在会自动生成,如果存在会检查是否完整，不完整会自动补上
+                            <LineBreak/>
                             - 添加了显示软件启动次数的功能(默认关闭
+                            <LineBreak/>
+                            - 修掉了没有网打开软件会因为天气获取原因闪退的问题
+                            <LineBreak/>
+                            - 修掉了所有因为网络获取不到导致软件闪退的问题
+                            <LineBreak/>
+                            - 添加了刷新天气的按钮
                             <LineBreak/>
                             <LineBreak/>
 

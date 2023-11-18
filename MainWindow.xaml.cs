@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Xml.Linq;
 using System.Net.Http;
 using System.Linq;
+using System.Text;
 
 namespace Software
 {
@@ -38,10 +39,55 @@ namespace Software
 
         private Window dialog;
         private TextBox txtGamePath;
+        private Weather weather = new Weather();
 
         public MainWindow()
         {
             InitializeComponent();
+
+            // 检查配置文件是否存在
+            if (!File.Exists("Software.dll.config"))
+            {
+                // 如果不存在，创建一个新的配置文件
+                using (var stream = File.Create("Software.dll.config"))
+                {
+                    // 写入默认的设置
+                    string defaultSettings = @"
+<configuration>
+    <appSettings>
+        <add key=""GamePath"" value=""""/>
+        <add key=""TextContent"" value=""""/>
+        <add key=""UpdatePath"" value=""http://1.14.58.59/updata.xml""/>
+        <add key=""LaunchCount"" value=""0""/>
+        <add key=""EnableCounting"" value=""false""/>
+        <add key=""RetryCount"" value=""5""/>
+        <add key=""RetryDelay"" value=""10""/>
+    </appSettings>
+</configuration>";
+                    byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
+                    stream.Write(data, 0, data.Length);
+                }
+            }
+            else
+            {
+                // 如果存在，检查是否缺少某些设置，并添加缺少的设置
+                XDocument doc = XDocument.Load("Software.dll.config");
+                XElement appSettings = doc.Root.Element("appSettings");
+
+                // 检查每个需要的设置
+                CheckAndAddSetting(appSettings, "GamePath", "");
+                CheckAndAddSetting(appSettings, "TextContent", "");
+                CheckAndAddSetting(appSettings, "UpdatePath", "http://1.14.58.59/updata.xml");
+                CheckAndAddSetting(appSettings, "LaunchCount", "0");
+                CheckAndAddSetting(appSettings, "EnableCounting", "false");
+                CheckAndAddSetting(appSettings, "RetryCount", "5");
+                CheckAndAddSetting(appSettings, "RetryDelay", "10");
+
+                // 保存修改后的配置文件
+                doc.Save("Software.dll.config");
+            }
+
+
             txtGamePath = new TextBox();
             Loaded += async (_, __) =>
             {
@@ -51,7 +97,17 @@ namespace Software
             };
             DataContext = this;
 
+        }
 
+        // 检查一个设置是否存在，如果不存在，就添加这个设置
+        void CheckAndAddSetting(XElement appSettings, string key, string value)
+        {
+            XElement setting = appSettings.Elements("add").FirstOrDefault(e => e.Attribute("key").Value == key);
+            if (setting == null)
+            {
+                // 如果设置不存在，添加这个设置
+                appSettings.Add(new XElement("add", new XAttribute("key", key), new XAttribute("value", value)));
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -245,26 +301,43 @@ namespace Software
 
         private async void Button_Click_Updata(object sender, RoutedEventArgs e)
         {
+            // 初始化一个空的字符串变量
+            string versionString = string.Empty;
+
             try
             {
+                // 获取更新服务器的IP地址
                 var UpdateIP = this.Update_IP_address.Text;
+                // 获取当前正在执行的程序集
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                // 获取版本信息
+                System.Version softwareversion = assembly.GetName().Version;
+                // 将版本信息转换为字符串
+                versionString = softwareversion.ToString();
 
+                // 创建一个新的HttpClient实例
                 var httpClient = new HttpClient();
+                // 从更新服务器获取XML字符串
                 var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
 
+                // 解析XML字符串
                 var xdoc = XDocument.Parse(xmlString);
+                // 获取XML中的"version"元素
                 var versionElement = xdoc.Descendants("version").FirstOrDefault();
                 if (versionElement != null)
                 {
+                    // 解析"version"元素的值为Version对象
                     var version = Version.Parse(versionElement.Value);
 
+                    // 如果服务器的版本高于当前版本，则启动自动更新
                     if (version > Assembly.GetExecutingAssembly().GetName().Version)
                     {
                         AutoUpdater.Start($"{UpdateIP}");
                     }
                     else
                     {
-                        MessageBox.Show("当前已是最新版本");
+                        // 如果当前版本已经是最新的，则显示消息框
+                        MessageBox.Show($"当前{versionString}已是最新版本");
                     }
                 }
             }
@@ -273,6 +346,7 @@ namespace Software
                 // 在这里处理异常，例如显示错误消息
                 MessageBox.Show($"更新检查失败：{ex.Message}");
             }
+
         }
 
         private void Button_Click_Version(object sender, RoutedEventArgs e)
@@ -571,6 +645,11 @@ namespace Software
             {
                 MessageBox.Show("文本框不存在。", "错误");
             }
+        }
+
+        private async void Button_Click_RefreshWeather(object sender, RoutedEventArgs e)
+        {
+            await weather.LoadAsync();
         }
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
