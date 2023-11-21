@@ -1,30 +1,26 @@
 ﻿using AutoUpdaterDotNET;
+using Microsoft.Win32;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Software.ViewModels;
 using System;
-using System.Windows;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Software.ViewModels;
-using System.Windows.Threading;
-using System.Net;
-using Newtonsoft.Json.Linq;
-using Software.其他界面;
-using System.Windows.Input;
-using System.Configuration;
-using Microsoft.Win32;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-using Windows.Devices.Geolocation;
-using System.Reflection;
-using System.Xml.Linq;
-using System.Net.Http;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Navigation;
+using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace Software
 {

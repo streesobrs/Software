@@ -149,12 +149,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="resources\image\Teyvat.bmp">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter64.dll" />
   </ItemGroup>
 

@@ -6,21 +6,117 @@ using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Windows;
 using System.Configuration; // 引用System.Configuration命名空间以读取App.config文件中的设置
+using System.ComponentModel; // 引用System.ComponentModel命名空间以使用INotifyPropertyChanged接口
 
 namespace Software.ViewModels
 {
-    class Weather
+    class Weather : INotifyPropertyChanged
     {
-        // 定义Weather类的属性
-        public string Data_Province { get; set; }
-        public string Data_City { get; set; }
-        public string Data_Adcode { get; set; }
-        public string Data_Weather { get; set; }
-        public string Data_Temperature { get; set; }
-        public string Data_Winddirection { get; set; }
-        public string Data_Windpower { get; set; }
-        public string Data_Humidity { get; set; }
-        public DateTime Data_Reporttime { get; set; }
+        private string _data_Province;
+        public string Data_Province
+        {
+            get { return _data_Province; }
+            set
+            {
+                _data_Province = value;
+                OnPropertyChanged("Data_Province");
+            }
+        }
+
+        private string _data_City;
+        public string Data_City
+        {
+            get { return _data_City; }
+            set
+            {
+                _data_City = value;
+                OnPropertyChanged("Data_City");
+            }
+        }
+
+        private string _data_Adcode;
+        public string Data_Adcode
+        {
+            get { return _data_Adcode; }
+            set
+            {
+                _data_Adcode = value;
+                OnPropertyChanged("Data_Adcode");
+            }
+        }
+
+        private string _data_Weather;
+        public string Data_Weather
+        {
+            get { return _data_Weather; }
+            set
+            {
+                _data_Weather = value;
+                OnPropertyChanged("Data_Weather");
+            }
+        }
+
+        private string _data_Temperature;
+        public string Data_Temperature
+        {
+            get { return _data_Temperature; }
+            set
+            {
+                _data_Temperature = value;
+                OnPropertyChanged("Data_Temperature");
+            }
+        }
+
+        private string _data_Winddirection;
+        public string Data_Winddirection
+        {
+            get { return _data_Winddirection; }
+            set
+            {
+                _data_Winddirection = value;
+                OnPropertyChanged("Data_Winddirection");
+            }
+        }
+
+        private string _data_Windpower;
+        public string Data_Windpower
+        {
+            get { return _data_Windpower; }
+            set
+            {
+                _data_Windpower = value;
+                OnPropertyChanged("Data_Windpower");
+            }
+        }
+
+        private string _data_Humidity;
+        public string Data_Humidity
+        {
+            get { return _data_Humidity; }
+            set
+            {
+                _data_Humidity = value;
+                OnPropertyChanged("Data_Humidity");
+            }
+        }
+
+        private string _data_Reporttime;
+        public string Data_Reporttime
+        {
+            get { return _data_Reporttime; }
+            set
+            {
+                _data_Reporttime = value;
+                OnPropertyChanged("Data_Reporttime");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         // 定义一个异步方法来加载天气信息
         public async Task LoadAsync()
@@ -71,7 +167,7 @@ namespace Software.ViewModels
                         Data_Winddirection = item["winddirection"].ToString();
                         Data_Windpower = item["windpower"].ToString();
                         Data_Humidity = item["humidity"].ToString();
-                        Data_Reporttime = DateTime.ParseExact(item["reporttime"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        Data_Reporttime = item["reporttime"].ToString();
                     }
 
                     break; // 如果成功获取到天气信息，跳出循环
