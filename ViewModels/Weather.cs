@@ -118,44 +118,66 @@ namespace Software.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // 定义一个异步方法来加载天气信息
         public async Task LoadAsync()
         {
-            await City(city: "500000");
+            string city = ConfigurationManager.AppSettings["adcode"];
+            if (string.IsNullOrEmpty(city))
+            {
+                city = await GetCityCodeAsync();
+                // 保存到配置文件
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                config.AppSettings.Settings["adcode"].Value = city;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+            await City(city);
         }
 
-        // 定义一个私有的异步方法来获取指定城市的天气信息
+        private async Task<string> GetCityCodeAsync()
+        {
+            try
+            {
+                var client = new HttpClient();
+                var request = new HttpRequestMessage
+                {
+                    RequestUri = new Uri("https://restapi.amap.com/v3/ip?output=json&key=71d6333d58f635ab3136a8955cec1e8c"),
+                    Method = HttpMethod.Get
+                };
+                var response = await client.SendAsync(request);
+                var result = await response.Content.ReadAsStringAsync();
+                return JObject.Parse(result)["adcode"].ToString();
+            }
+            catch (Exception ex)
+            {
+                return "500000";
+            }
+        }
+
         private async Task City(string city)
         {
-            // 从App.config文件中获取重试的次数和间隔时间
             int retryCount = 0;
             int maxRetryCount = int.Parse(ConfigurationManager.AppSettings["RetryCount"]);
             int retryDelay = int.Parse(ConfigurationManager.AppSettings["RetryDelay"]);
 
-            // 如果网络不可用，等待一段时间后重试
             while (retryCount < maxRetryCount)
             {
                 try
                 {
                     if (!NetworkInterface.GetIsNetworkAvailable())
                     {
-                        // No network connection, wait and retry
                         await Task.Delay(TimeSpan.FromSeconds(retryDelay));
                         retryCount++;
                         continue;
                     }
 
-                    // 创建一个HttpClient对象来发送HTTP请求
                     var client = new HttpClient();
                     var request = new HttpRequestMessage();
                     request.RequestUri = new Uri($"https://restapi.amap.com/v3/weather/weatherInfo?key=71d6333d58f635ab3136a8955cec1e8c&city={city}");
                     request.Method = HttpMethod.Get;
 
-                    // 发送HTTP请求并获取响应
                     var response = await client.SendAsync(request);
                     var result = await response.Content.ReadAsStringAsync();
 
-                    // 解析响应内容并更新Weather类的属性
                     var lives = JObject.Parse(result)["lives"];
                     foreach (var item in lives)
                     {
@@ -170,11 +192,10 @@ namespace Software.ViewModels
                         Data_Reporttime = item["reporttime"].ToString();
                     }
 
-                    break; // 如果成功获取到天气信息，跳出循环
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    // 如果发生异常，显示错误信息并等待一段时间后重试
                     MessageBox.Show($"天气信息获取失败：{ex.Message}");
                     await Task.Delay(TimeSpan.FromSeconds(retryDelay));
                     retryCount++;

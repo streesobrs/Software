@@ -58,6 +58,7 @@ namespace Software
         <add key=""EnableCounting"" value=""false""/>
         <add key=""RetryCount"" value=""5""/>
         <add key=""RetryDelay"" value=""10""/>
+        <add key=""adcode"" value=""""/>
     </appSettings>
 </configuration>";
                     byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
@@ -78,6 +79,7 @@ namespace Software
                 CheckAndAddSetting(appSettings, "EnableCounting", "false");
                 CheckAndAddSetting(appSettings, "RetryCount", "5");
                 CheckAndAddSetting(appSettings, "RetryDelay", "10");
+                CheckAndAddSetting(appSettings, "adcode", "");
 
                 // 保存修改后的配置文件
                 doc.Save("Software.dll.config");

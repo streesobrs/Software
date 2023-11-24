@@ -36,6 +36,9 @@
                             <LineBreak/>
                             - 修复了刷新天气不会刷新显示的问题
                             <LineBreak/>
+                            - 增加了第一次自动通过IP获取所在城市的天气信息
+                            <LineBreak/>
+                            <LineBreak/>
 
                             版本：0.1.1.0
                             <LineBreak/>

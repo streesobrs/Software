@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Width="900" Height="550"
-        MinWidth="589" MinHeight="440"
+        MinWidth="589" MinHeight="470"
         FontFamily="../resources/Fonts/#得意黑"
         Loaded="Window_Loaded"
         WindowStartupLocation="CenterScreen">
@@ -281,8 +281,6 @@
                                         ToolTip="点快了报错"
                                         Click="Button_Click_MusicHandOff"/>
                             </UniformGrid>
-
-
 
                             <DockPanel>
                                 <TextBlock>
