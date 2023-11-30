@@ -10,6 +10,37 @@
 
     <Grid>
         <Grid Grid.Row="0" Height="58" VerticalAlignment="Top" Background="AliceBlue">
+            <StackPanel>
+                <TextBlock FontSize="40" Width="160" HorizontalAlignment="Left">
+                版本内容
+                </TextBlock>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right" Width="245">
+                <TextBlock Name="VersionTextBlock" HorizontalAlignment="Right" MouseLeftButtonDown="VersionTextBlock_MouseLeftButtonDown"  FontSize="27" Width="240" Height="34"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <FlowDocumentScrollViewer Margin="0,58,0,0" FocusVisualStyle="{x:Null}">
+                <FlowDocument x:Name="historyDocument" Background="Snow" FontSize="14" FontFamily="/resources/fonts/#得意黑"/>
+            </FlowDocumentScrollViewer>
+        </Grid>
+
+    </Grid>
+</Page>
+
+<!--<Page x:Class="Software.其他界面.PageVersion"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Software.其他界面"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="PageVersion">
+
+    <Grid>
+        <Grid Grid.Row="0" Height="58" VerticalAlignment="Top" Background="AliceBlue">
 
             <StackPanel>
                 <TextBlock FontSize="40" Width="160" HorizontalAlignment="Left">
@@ -25,7 +56,7 @@
             <FlowDocumentScrollViewer Margin="0,58,0,0" FocusVisualStyle="{x:Null}">
                 <FlowDocument Background="Snow">
                     <Section FontSize="14">
-                        <!--版本更新内容，就写到下面-->
+                        --><!--版本更新内容，就写到下面--><!--
                         <Paragraph FontFamily="/resources/fonts/#得意黑">
 
                             版本：0.1.2.0
@@ -402,4 +433,4 @@
         </Grid>
 
     </Grid>
-</Page>
+</Page>-->

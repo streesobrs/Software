@@ -12,8 +12,8 @@
     <ApplicationIcon>resources\image\cxk.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <PackageIcon>cxk.png</PackageIcon>
-    <FileVersion>0.1.1.0</FileVersion>
-    <AssemblyVersion>0.1.1.0</AssemblyVersion>
+    <FileVersion>0.1.2.0</FileVersion>
+    <AssemblyVersion>0.1.2.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -41,15 +41,13 @@
     <None Remove="resources\image\apple-green.png" />
     <None Remove="resources\image\apple-red.png" />
     <None Remove="resources\image\cxk.png" />
-    <None Remove="resources\image\Enkanomiya.jpg" />
     <None Remove="resources\image\lemon.png" />
     <None Remove="resources\image\octopus.png" />
-    <None Remove="resources\image\Teyvat.jpg" />
-    <None Remove="resources\image\TheChasm.jpg" />
     <None Remove="resources\image\tree.png" />
     <None Remove="resources\movechest\Level.json" />
     <None Remove="resources\sound\music\music_001.mp3" />
     <None Remove="resources\sound\music\xxxCr3 - Illusionary Daytime.flac" />
+    <None Remove="resources\update_log.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,12 +70,6 @@
     <Content Include="resources\image\octopus.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="resources\image\TheChasm.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="resources\image\Enkanomiya.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="resources\image\tree.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -88,6 +80,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="resources\fonts\SmileySans-Oblique.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\update_log.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -113,9 +108,6 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </Resource>
-    <Content Include="resources\image\Teyvat.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -163,5 +155,5 @@
   <ItemGroup>
     <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter32.dll" />
   </ItemGroup>
-
+	
 </Project>

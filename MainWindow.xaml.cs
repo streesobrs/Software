@@ -59,6 +59,9 @@ namespace Software
         <add key=""RetryCount"" value=""5""/>
         <add key=""RetryDelay"" value=""10""/>
         <add key=""adcode"" value=""""/>
+        <add key=""UpdateLogUrl"" value=""https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json"" />
+        <add key=""VersionColor"" value=""Red""/>
+		<add key=""UpdateTimeColor"" value=""Blue""/>
     </appSettings>
 </configuration>";
                     byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
@@ -80,7 +83,9 @@ namespace Software
                 CheckAndAddSetting(appSettings, "RetryCount", "5");
                 CheckAndAddSetting(appSettings, "RetryDelay", "10");
                 CheckAndAddSetting(appSettings, "adcode", "");
-
+                CheckAndAddSetting(appSettings, "UpdateLogUrl", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json");
+                CheckAndAddSetting(appSettings, "VersionColor", "Red");
+                CheckAndAddSetting(appSettings, "UpdateTimeColor", "Blue");
                 // 保存修改后的配置文件
                 doc.Save("Software.dll.config");
             }

@@ -145,7 +145,12 @@ namespace Software.ViewModels
                 };
                 var response = await client.SendAsync(request);
                 var result = await response.Content.ReadAsStringAsync();
-                return JObject.Parse(result)["adcode"].ToString();
+                var jsonResult = JObject.Parse(result);
+                if (jsonResult["city"] is JArray cityArray && cityArray.Count == 0)
+                {
+                    return "500000";
+                }
+                return jsonResult["adcode"].ToString();
             }
             catch (Exception ex)
             {
