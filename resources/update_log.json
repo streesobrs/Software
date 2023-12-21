@@ -1,7 +1,16 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.1.2.0",
+  "version": "0.1.3.0",
   "updates": [
+    {
+      "version": "0.1.3.0",
+      "updateTime": "",
+      "updateContent": [
+        "修改了版本内容的刷新逻辑",
+        "添加了点击「版本内容」四个大字刷新本地读取的功能",
+        "修改了天气读取的错误提示"
+      ]
+    },
     {
       "version": "0.1.2.0",
       "updateTime": "2023/11/30",

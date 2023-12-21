@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Globalization;
-using System.Net.NetworkInformation;
-using System.Windows;
-using System.Configuration; // 引用System.Configuration命名空间以读取App.config文件中的设置
 using System.ComponentModel; // 引用System.ComponentModel命名空间以使用INotifyPropertyChanged接口
+using System.Configuration; // 引用System.Configuration命名空间以读取App.config文件中的设置
+using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Software.ViewModels
 {
@@ -154,6 +153,7 @@ namespace Software.ViewModels
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"错误代码为：{ex.Message}"+"\n默认返回了个值");
                 return "500000";
             }
         }

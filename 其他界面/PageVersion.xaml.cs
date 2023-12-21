@@ -1,22 +1,21 @@
-﻿using System;
+﻿using AutoUpdaterDotNET;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net;
+using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Configuration;
-using System.Net;
-using Newtonsoft.Json;
-using System.Net.NetworkInformation;
+using System.Xml.Linq;
 
 namespace Software.其他界面
 {
@@ -31,7 +30,7 @@ namespace Software.其他界面
     {
         public string newVersion { get; set; }
         public string version { get; set; }
-        public string jsonVersion {  get; set; }
+        public string jsonVersion { get; set; }
         public List<Update> updates { get; set; }
     }
     /// <summary>
@@ -63,46 +62,134 @@ namespace Software.其他界面
             DownloadUpdates();
         }
 
-        private async void DownloadUpdates()
+        //private async Task DownloadUpdates()
+        //{
+        //    refreshCount++;
+        //    if (refreshCount >= 5)
+        //    {
+        //        historyDocument.Blocks.Clear();
+        //    }
+
+        //    jsonFilePath = "resources\\update_log.json";
+        //    string json = "";
+
+        //    try
+        //    {
+        //        json = File.ReadAllText(jsonFilePath);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("本地读取更新失败，将尝试从网络下载更新。错误信息：\n" + ex.Message);
+        //    }
+
+        //    if (string.IsNullOrEmpty(json) && NetworkInterface.GetIsNetworkAvailable())
+        //    {
+        //        string tempFilePath = "resources\\temp_update_log.json";
+        //        try
+        //        {
+        //            WebClient client = new WebClient();
+        //            try
+        //            {
+        //                await client.DownloadFileTaskAsync(new Uri(ConfigurationManager.AppSettings["UpdateLogUrl"]), tempFilePath);
+        //                File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
+        //                json = File.ReadAllText(jsonFilePath);
+        //            }
+        //            finally
+        //            {
+        //                ((IDisposable)client)?.Dispose();
+        //                File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+        //            }
+        //        }
+        //        catch (Exception ex2)
+        //        {
+        //            Exception ex = ex2;
+        //            MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
+        //            // 如果下载失败，就不覆盖原文件
+        //        }
+        //    }
+
+
+        //    if (!string.IsNullOrEmpty(json))
+        //    {
+        //        Root root = JsonConvert.DeserializeObject<Root>(json);
+        //        version = root.version;
+        //        DisplayUpdates();
+        //    }
+        //}
+
+        // 读取本地文件的方法
+        private string ReadLocalFile(string filePath)
+        {
+            string json = "";
+            try
+            {
+                json = File.ReadAllText(filePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("本地读取更新失败，错误信息：\n" + ex.Message);
+            }
+            return json;
+        }
+
+        // 从网络下载文件的方法
+        private async Task<string> DownloadFileFromNetwork(string url, string tempFilePath)
+        {
+            string json = "";
+            WebClient client = new WebClient();
+            try
+            {
+                await client.DownloadFileTaskAsync(new Uri(url), tempFilePath);
+                json = File.ReadAllText(tempFilePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
+            }
+            finally
+            {
+                ((IDisposable)client)?.Dispose();
+                File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+            }
+            return json;
+        }
+
+        private async Task DownloadUpdates()
         {
             refreshCount++;
-            if (refreshCount >= 5)
+            if (refreshCount >= RefreshThreshold)
             {
                 historyDocument.Blocks.Clear();
             }
-            if (!NetworkInterface.GetIsNetworkAvailable())
-            {
-                MessageBox.Show("网络连接不可用，将尝试从本地读取更新。");
-                jsonFilePath = "resources\\update_log.json";
-            }
-            else
+
+            string json = ReadLocalFile(jsonFilePath);
+
+            if (string.IsNullOrEmpty(json) && NetworkInterface.GetIsNetworkAvailable())
             {
                 string tempFilePath = "resources\\temp_update_log.json";
                 try
                 {
-                    WebClient client = new WebClient();
-                    try
-                    {
-                        await client.DownloadFileTaskAsync(new Uri(ConfigurationManager.AppSettings["UpdateLogUrl"]), tempFilePath);
-                        File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
-                    }
-                    finally
-                    {
-                        ((IDisposable)client)?.Dispose();
-                        File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
-                    }
+                    json = await DownloadFileFromNetwork(JsonUrl, tempFilePath);
+                    File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
+                    json = File.ReadAllText(jsonFilePath);
                 }
-                catch (Exception ex2)
+                catch (Exception ex)
                 {
-                    Exception ex = ex2;
-                    MessageBox.Show("下载更新失败，将尝试从本地读取更新。错误信息：\n" + ex.Message);
+                    MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
                     // 如果下载失败，就不覆盖原文件
                 }
+                finally
+                {
+                    File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+                }
             }
-            string json = File.ReadAllText(jsonFilePath);
-            Root root = JsonConvert.DeserializeObject<Root>(json);
-            version = root.version;
-            DisplayUpdates();
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                Root root = JsonConvert.DeserializeObject<Root>(json);
+                version = root.version;
+                DisplayUpdates();
+            }
         }
 
         private void DisplayUpdates()
@@ -186,7 +273,7 @@ namespace Software.其他界面
                         historyDocument.Blocks.Add(paragraph);
                     }
                 }
-                else
+                else if(root.jsonVersion == null)
                 {
                     // 处理其他版本的 updates
                 }
@@ -197,24 +284,103 @@ namespace Software.其他界面
             }
         }
 
-        private void VersionTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private async void VersionTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            DownloadUpdates();
-
             // 获取当前正在执行的程序集
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             // 获取当前的软件版本
             System.Version currentVersion = assembly.GetName().Version;
 
+            // 下载文件
+            string jsonFilePath = "resources\\update_log.json";
+            string tempFilePath = "resources\\temp_update_log.json";
+            string jsonUrl = ConfigurationManager.AppSettings["UpdateLogUrl"];
+            WebClient client = new WebClient();
+            try
+            {
+                await client.DownloadFileTaskAsync(new Uri(jsonUrl), tempFilePath);
+                File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
+            }
+            finally
+            {
+                ((IDisposable)client)?.Dispose();
+                File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+            }
+
+            // 读取文件
+            string json = "";
+            try
+            {
+                json = File.ReadAllText(jsonFilePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("本地读取更新失败，错误信息：\n" + ex.Message);
+            }
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                Root root = JsonConvert.DeserializeObject<Root>(json);
+                version = root.version;
+                DisplayUpdates();
+            }
+
             // 将获取的最新版本转换为System.Version
             System.Version latestVersion = new System.Version(version);
-
             // 比较当前的软件版本和获取的最新版本
             int comparison = currentVersion.CompareTo(latestVersion);
             if (comparison < 0)
             {
                 // 如果当前的软件版本小于获取的最新版本，那么有更新可用
-                MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n发现新版本，建议您更新以获取最新功能和改进。");
+                MessageBoxResult result = MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n发现新版本，建议您更新以获取最新功能和改进。\n你想现在下载更新吗？", "有更新可用", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    // 初始化一个空的字符串变量
+                    string versionString = string.Empty;
+
+                    try
+                    {
+                        // 获取更新服务器的IP地址
+                        var UpdateIP = ConfigurationManager.AppSettings["UpdatePath"];
+                        // 获取版本信息
+                        System.Version softwareversion = assembly.GetName().Version;
+                        // 将版本信息转换为字符串
+                        versionString = softwareversion.ToString();
+                        // 创建一个新的HttpClient实例
+                        var httpClient = new HttpClient();
+                        // 从更新服务器获取XML字符串
+                        var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
+                        // 解析XML字符串
+                        var xdoc = XDocument.Parse(xmlString);
+                        // 获取XML中的"version"元素
+                        var versionElement = xdoc.Descendants("version").FirstOrDefault();
+                        if (versionElement != null)
+                        {
+                            // 解析"version"元素的值为Version对象
+                            var version = Version.Parse(versionElement.Value);
+
+                            // 如果服务器的版本高于当前版本，则启动自动更新
+                            if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                            {
+                                AutoUpdater.Start($"{UpdateIP}");
+                            }
+                            else
+                            {
+                                // 如果当前版本已经是最新的，则显示消息框
+                                MessageBox.Show($"当前{versionString}已是最新版本");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // 在这里处理异常，例如显示错误消息
+                        MessageBox.Show($"更新检查失败：{ex.Message}");
+                    }
+                }
             }
             else if (comparison > 0)
             {
@@ -227,5 +393,12 @@ namespace Software.其他界面
                 MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n您的软件已是最新版本，无需更新。");
             }
         }
+
+        private async void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            await DownloadUpdates();
+            DisplayUpdates();
+        }
+
     }
 }
