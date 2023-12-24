@@ -11,12 +11,12 @@
     <Grid>
         <Grid Grid.Row="0" Height="58" VerticalAlignment="Top" Background="AliceBlue">
             <StackPanel>
-                <TextBlock FontSize="40" Width="160" HorizontalAlignment="Left" MouseLeftButtonDown="TextBlock_MouseLeftButtonDown">
+                <TextBlock FontSize="40" Width="160" HorizontalAlignment="Left" MouseLeftButtonDown="TextBlock_MouseLeftButtonDown" ToolTip="点击刷新获取">
                 版本内容
                 </TextBlock>
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" Width="245">
-                <TextBlock Name="VersionTextBlock" HorizontalAlignment="Right" MouseLeftButtonDown="VersionTextBlock_MouseLeftButtonDown"  FontSize="27" Width="240" Height="34"/>
+                <TextBlock Name="VersionTextBlock" HorizontalAlignment="Right" MouseLeftButtonDown="VersionTextBlock_MouseLeftButtonDown" ToolTip="点击重新获取"  FontSize="27" Width="240" Height="34"/>
             </StackPanel>
         </Grid>
 

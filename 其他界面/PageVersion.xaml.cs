@@ -59,63 +59,8 @@ namespace Software.其他界面
             // 在文本块中显示版本信息
             VersionTextBlock.Text = "当前版本：" + versionString;
 
-            DownloadUpdates();
+            _ = DownloadUpdates();
         }
-
-        //private async Task DownloadUpdates()
-        //{
-        //    refreshCount++;
-        //    if (refreshCount >= 5)
-        //    {
-        //        historyDocument.Blocks.Clear();
-        //    }
-
-        //    jsonFilePath = "resources\\update_log.json";
-        //    string json = "";
-
-        //    try
-        //    {
-        //        json = File.ReadAllText(jsonFilePath);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("本地读取更新失败，将尝试从网络下载更新。错误信息：\n" + ex.Message);
-        //    }
-
-        //    if (string.IsNullOrEmpty(json) && NetworkInterface.GetIsNetworkAvailable())
-        //    {
-        //        string tempFilePath = "resources\\temp_update_log.json";
-        //        try
-        //        {
-        //            WebClient client = new WebClient();
-        //            try
-        //            {
-        //                await client.DownloadFileTaskAsync(new Uri(ConfigurationManager.AppSettings["UpdateLogUrl"]), tempFilePath);
-        //                File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
-        //                json = File.ReadAllText(jsonFilePath);
-        //            }
-        //            finally
-        //            {
-        //                ((IDisposable)client)?.Dispose();
-        //                File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
-        //            }
-        //        }
-        //        catch (Exception ex2)
-        //        {
-        //            Exception ex = ex2;
-        //            MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
-        //            // 如果下载失败，就不覆盖原文件
-        //        }
-        //    }
-
-
-        //    if (!string.IsNullOrEmpty(json))
-        //    {
-        //        Root root = JsonConvert.DeserializeObject<Root>(json);
-        //        version = root.version;
-        //        DisplayUpdates();
-        //    }
-        //}
 
         // 读取本地文件的方法
         private string ReadLocalFile(string filePath)
@@ -123,10 +68,12 @@ namespace Software.其他界面
             string json = "";
             try
             {
+                // 读取文件内容
                 json = File.ReadAllText(filePath);
             }
             catch (Exception ex)
             {
+                // 如果读取失败，显示错误信息
                 MessageBox.Show("本地读取更新失败，错误信息：\n" + ex.Message);
             }
             return json;
@@ -139,17 +86,22 @@ namespace Software.其他界面
             WebClient client = new WebClient();
             try
             {
+                // 异步下载文件
                 await client.DownloadFileTaskAsync(new Uri(url), tempFilePath);
+                // 读取下载的文件内容
                 json = File.ReadAllText(tempFilePath);
             }
             catch (Exception ex)
             {
+                // 如果下载失败，显示错误信息
                 MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
             }
             finally
             {
+                // 释放WebClient资源
                 ((IDisposable)client)?.Dispose();
-                File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+                // 删除临时文件
+                File.Delete(tempFilePath);
             }
             return json;
         }
@@ -159,9 +111,11 @@ namespace Software.其他界面
             refreshCount++;
             if (refreshCount >= RefreshThreshold)
             {
+                // 清空历史文档
                 historyDocument.Blocks.Clear();
             }
 
+            // 读取本地json文件
             string json = ReadLocalFile(jsonFilePath);
 
             if (string.IsNullOrEmpty(json) && NetworkInterface.GetIsNetworkAvailable())
@@ -169,31 +123,38 @@ namespace Software.其他界面
                 string tempFilePath = "resources\\temp_update_log.json";
                 try
                 {
+                    // 从网络下载json文件
                     json = await DownloadFileFromNetwork(JsonUrl, tempFilePath);
-                    File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
+                    // 如果下载成功，用临时文件覆盖原文件
+                    File.Copy(tempFilePath, jsonFilePath, true);
+                    // 读取json文件内容
                     json = File.ReadAllText(jsonFilePath);
                 }
                 catch (Exception ex)
                 {
+                    // 如果下载失败，显示错误信息
                     MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
-                    // 如果下载失败，就不覆盖原文件
                 }
                 finally
                 {
-                    File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+                    // 删除临时文件
+                    File.Delete(tempFilePath);
                 }
             }
 
             if (!string.IsNullOrEmpty(json))
             {
+                // 将json字符串反序列化为对象
                 Root root = JsonConvert.DeserializeObject<Root>(json);
                 version = root.version;
+                // 显示更新信息
                 DisplayUpdates();
             }
         }
 
         private void DisplayUpdates()
         {
+            // 清空历史文档
             historyDocument.Blocks.Clear();
             try
             {
@@ -206,11 +167,11 @@ namespace Software.其他界面
 
                 // 读取文件内容
                 string json = File.ReadAllText(jsonFilePath);
-                //获取颜色
+                // 获取颜色配置
                 string versionColor = ConfigurationManager.AppSettings["VersionColor"];
                 string updateTimeColor = ConfigurationManager.AppSettings["UpdateTimeColor"];
 
-                // 检查文件是否为空
+                // 检查文件内容是否为空
                 if (string.IsNullOrEmpty(json))
                 {
                     MessageBox.Show("文件内容为空：" + jsonFilePath);
@@ -255,31 +216,37 @@ namespace Software.其他界面
 
                         Paragraph paragraph = new Paragraph();
 
+                        // 创建并添加版本信息
                         Run versionRun = new Run($"版本：{update.version}\n");
                         versionRun.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(versionColor);  // 设置版本颜色为versionColor里的颜色
                         paragraph.Inlines.Add(versionRun);
 
+                        // 创建并添加更新时间信息
                         Run updateTimeRun = new Run($"·更新时间：{update.updateTime}\n");
                         updateTimeRun.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(updateTimeColor);  // 设置版本颜色为updateTimeColor里的颜色
                         paragraph.Inlines.Add(updateTimeRun);
 
+                        // 创建并添加更新内容标签
                         Run updateContentLabel = new Run("更新内容:\n");
                         paragraph.Inlines.Add(updateContentLabel);
 
+                        // 添加更新内容
                         foreach (string content in update.updateContent)
                         {
                             paragraph.Inlines.Add(new Run("- " + content + "\n"));
                         }
+                        // 将段落添加到历史文档
                         historyDocument.Blocks.Add(paragraph);
                     }
                 }
-                else if(root.jsonVersion == null)
+                else if (root.jsonVersion == null)
                 {
                     // 处理其他版本的 updates
                 }
             }
             catch (Exception ex)
             {
+                // 显示异常信息
                 MessageBox.Show("在解析 JSON 时出现异常：\n" + ex.ToString());
             }
         }
@@ -298,34 +265,43 @@ namespace Software.其他界面
             WebClient client = new WebClient();
             try
             {
+                // 异步下载文件
                 await client.DownloadFileTaskAsync(new Uri(jsonUrl), tempFilePath);
-                File.Copy(tempFilePath, jsonFilePath, true);  // 如果下载成功，用临时文件覆盖原文件
+                // 如果下载成功，用临时文件覆盖原文件
+                File.Copy(tempFilePath, jsonFilePath, true);
             }
             catch (Exception ex)
             {
+                // 如果下载失败，显示错误信息
                 MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
             }
             finally
             {
+                // 释放WebClient资源
                 ((IDisposable)client)?.Dispose();
-                File.Delete(tempFilePath);  // 无论下载是否成功，都删除临时文件
+                // 删除临时文件
+                File.Delete(tempFilePath);
             }
 
             // 读取文件
             string json = "";
             try
             {
+                // 读取文件内容
                 json = File.ReadAllText(jsonFilePath);
             }
             catch (Exception ex)
             {
+                // 如果读取失败，显示错误信息
                 MessageBox.Show("本地读取更新失败，错误信息：\n" + ex.Message);
             }
 
             if (!string.IsNullOrEmpty(json))
             {
+                // 将json字符串反序列化为对象
                 Root root = JsonConvert.DeserializeObject<Root>(json);
                 version = root.version;
+                // 显示更新信息
                 DisplayUpdates();
             }
 
@@ -394,10 +370,11 @@ namespace Software.其他界面
             }
         }
 
-        private async void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            await DownloadUpdates();
+            // 显示更新信息
             DisplayUpdates();
+            MessageBox.Show("刷新成功");
         }
 
     }
