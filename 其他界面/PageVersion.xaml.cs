@@ -239,7 +239,7 @@ namespace Software.其他界面
                         historyDocument.Blocks.Add(paragraph);
                     }
                 }
-                else if (root.jsonVersion == null)
+                else if (root.jsonVersion == "1.0.1")
                 {
                     // 处理其他版本的 updates
                 }

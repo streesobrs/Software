@@ -35,7 +35,7 @@ namespace Software
 
         private Window dialog;
         private TextBox txtGamePath;
-        private Weather weather = new Weather();
+        private Weather weather;
 
         public MainWindow()
         {
@@ -92,14 +92,14 @@ namespace Software
 
 
             txtGamePath = new TextBox();
+            weather = new Weather();
+            this.DataContext = weather;
+
             Loaded += async (_, __) =>
             {
-                var weather = new Weather();
                 await weather.LoadAsync();
-                DataContext = weather;
+                await weather.RefreshAsync();
             };
-            DataContext = this;
-
         }
 
         // 检查一个设置是否存在，如果不存在，就添加这个设置
@@ -652,7 +652,8 @@ namespace Software
 
         private async void Button_Click_RefreshWeather(object sender, RoutedEventArgs e)
         {
-            await weather.LoadAsync();
+            await weather.RefreshAsync();
+            MessageBox.Show("刷新成功");
         }
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
