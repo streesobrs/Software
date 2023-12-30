@@ -19,7 +19,7 @@
                 <TextBlock Name="VersionTextBlock" HorizontalAlignment="Right" MouseLeftButtonDown="VersionTextBlock_MouseLeftButtonDown" ToolTip="点击重新获取"  FontSize="27" Width="240" Height="34"/>
             </StackPanel>
         </Grid>
-
+        
         <Grid Grid.Row="1">
             <FlowDocumentScrollViewer Margin="0,58,0,0" FocusVisualStyle="{x:Null}">
                 <FlowDocument x:Name="historyDocument" Background="Snow" FontSize="14" FontFamily="/resources/fonts/#得意黑"/>

@@ -40,6 +40,7 @@ namespace Software
         public MainWindow()
         {
             InitializeComponent();
+            ApplySavedCultureInfo();
 
             // 检查配置文件是否存在
             if (!File.Exists("Software.dll.config"))
@@ -100,6 +101,16 @@ namespace Software
                 await weather.LoadAsync();
                 await weather.RefreshAsync();
             };
+        }
+
+        private void ApplySavedCultureInfo()
+        {
+            string cultureName = ConfigurationManager.AppSettings["Culture"];
+            if (!string.IsNullOrEmpty(cultureName))
+            {
+                Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
+                Thread.CurrentThread.CurrentUICulture = new CultureInfo(cultureName);
+            }
         }
 
         // 检查一个设置是否存在，如果不存在，就添加这个设置
@@ -705,22 +716,28 @@ namespace Software
 
         private void UpdateEnableCounting(bool enableCounting)
         {
-            Configuration config1 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config1.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
-            config1.Save(ConfigurationSaveMode.Modified);
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
+            config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
         }
 
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo(name: "en-US");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(name: "en-US");
+            SaveCultureInfo("en-US");
         }
 
         private void RadioButton_Click_Chinese(object sender, RoutedEventArgs e)
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo(name: "zh-CN");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(name: "zh-CN");
+            SaveCultureInfo("zh-CN");
+        }
+
+        private void SaveCultureInfo(string cultureName)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["Culture"].Value = cultureName;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         // 获取Music文件夹中的所有音乐文件路径
@@ -870,13 +887,13 @@ namespace Software
             //构造文件名
             string date = DateTime.Now.ToString("yyyyMMdd");
             string folderPath = "./log/";
-            string fileName = $"SoftwareMessage_{date}.json";
+            string fileName = $"SoftwareMessage_v{appVersion}_{date}.json";
 
             //如果文件已存在，则在后面加上数字
             int count = 1;
             while (File.Exists(Path.Combine(folderPath, fileName)))
             {
-                fileName = $"SoftwareMessage_{date}_{count}.json";
+                fileName = $"SoftwareMessage_v{appVersion}_{date}_{count}.json";
                 count++;
             }
 
