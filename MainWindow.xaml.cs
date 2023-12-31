@@ -63,6 +63,7 @@ namespace Software
         <add key=""UpdateLogUrl"" value=""https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json"" />
         <add key=""VersionColor"" value=""Red""/>
 		<add key=""UpdateTimeColor"" value=""Blue""/>
+        <add key=""Culture"" value=""zh-CN""/>
     </appSettings>
 </configuration>";
                     byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
@@ -87,6 +88,7 @@ namespace Software
                 CheckAndAddSetting(appSettings, "UpdateLogUrl", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json");
                 CheckAndAddSetting(appSettings, "VersionColor", "Red");
                 CheckAndAddSetting(appSettings, "UpdateTimeColor", "Blue");
+                CheckAndAddSetting(appSettings, "Culture", "zh-CN");
                 // 保存修改后的配置文件
                 doc.Save("Software.dll.config");
             }

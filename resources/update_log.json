@@ -1,10 +1,17 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.1.2.0",
+  "version": "0.1.3.0",
   "updates": [
     {
-      "version": "0.1.3.0",
+      "version": "0.1.4.0",
       "updateTime": "",
+      "updateContent": [
+        "修复了config中不存在Culture的问题"
+      ]
+    },
+    {
+      "version": "0.1.3.0",
+      "updateTime": "2023/12/31",
       "updateContent": [
         "修改了版本内容的刷新逻辑",
         "添加了点击「版本内容」四个大字刷新本地读取的功能",
