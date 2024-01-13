@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:local="clr-namespace:Software"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:viewModels="clr-namespace:Software.ViewModels"
@@ -11,7 +12,7 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Width="900" Height="550"
-        MinWidth="589" MinHeight="470"
+        MinWidth="589" MinHeight="495"
         FontFamily="../resources/Fonts/#得意黑"
         Loaded="Window_Loaded"
         WindowStartupLocation="CenterScreen">
@@ -41,15 +42,12 @@
                     <Ellipse.Fill>
                         <VisualBrush>
                             <VisualBrush.Visual>
-                                <Image Source ="resources/image/cxk.png"/>
+                                <Image Source ="resources/image/cxk.png" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
                             </VisualBrush.Visual>
                         </VisualBrush>
                     </Ellipse.Fill>
                 </Ellipse>
             </StackPanel>
-            <Button HorizontalAlignment="Left" Width="50" Padding="0,1,0,1"
-                    Click="Button_Click"  Background="#116ECC" Opacity="0"/>
-
             <!-- 音量按钮 -->
             <ToggleButton x:Name="bgm"
                       Margin="140,10"
@@ -109,127 +107,82 @@
 
             <DockPanel Grid.Column="2" LastChildFill="False">
 
-                <Menu DockPanel.Dock="Right" Background="Transparent"
-                      VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9">
-                    <MenuItem Header="关于" Padding="10" Click="MenuItem_Click_1"></MenuItem>
-                    <MenuItem Header="别点" Padding="10" Click="MenuItem_Click_2"></MenuItem>
-                </Menu>
-
+                <ui:Button DockPanel.Dock="Right" Background="Transparent" VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9" Content="关于"/>
+                <ui:Button DockPanel.Dock="Right" Background="Transparent" VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9" Content="别点" Click="Button_Click_PlayVideo"/>
+                
             </DockPanel>
 
         </Grid>
 
         <!--下面的栏-->
-        <Grid Grid.Row="1" Background="#CADFF6" Focusable="False">
+        <Grid Grid.Row="1" Background="#FFB1D0F3" Focusable="False">
 
             <DockPanel LastChildFill="True">
                 <!--左侧的栏-->
-                <DockPanel DockPanel.Dock="Left" Background="#F5F7FB" Width="100" LastChildFill="False">
+                <DockPanel DockPanel.Dock="Left" Background="#CADFF6" Width="100" LastChildFill="False">
 
-                    <StackPanel DockPanel.Dock="Right" Width="92">
+                    <StackPanel>
 
                         <!--左边菜单的选项-->
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_Home"
+                            Content="{x:Static resx:Resource.Button_Home}"
+                            ToolTip="没用的按钮……"/>
 
-                        <ListBox Background="Transparent" Margin="0,10,10,10" BorderThickness="0" Focusable="False" IsTabStop="False" Height="465" PreviewKeyDown="listBox_PreviewKeyDown">
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_GenshinMap"
+                            Content="{x:Static resx:Resource.Button_GenshinMap}"
+                            ToolTip="打开地图界面"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_Home" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="18"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="没用的按钮……" 
-                                           Text="{x:Static resx:Resource.Button_Home}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_SelectUP"
+                            Content="{x:Static resx:Resource.Button_SelectUP}"
+                            ToolTip="打开查询界面"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_GenshinMap" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="16"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="打开地图界面" 
-                                           Text="{x:Static resx:Resource.Button_GenshinMap}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_PlayGames"
+                            Content="{x:Static resx:Resource.Button_PlayGames}"
+                            ToolTip="启动游戏"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_SelectUP" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="16"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="打开查询界面" 
-                                           Text="{x:Static resx:Resource.Button_SelectUP}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                             Click="Button_Click_GenshinRole"
+                             Content="{x:Static resx:Resource.Button_GenshinRole}"
+                             ToolTip="打开原神角色界面"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_PlayGames" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="14"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="启动游戏" 
-                                           Text="{x:Static resx:Resource.Button_PlayGames}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                             Click="Button_Click_HonkaiImpact3"
+                             Content="{x:Static resx:Resource.Button_HonkaiImpact3}"
+                             ToolTip="打开崩坏三角色界面"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_GenshinRole" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="14"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="打开原神角色界面" 
-                                           Text="{x:Static resx:Resource.Button_GenshinRole}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_StarRail"
+                            Content="{x:Static resx:Resource.Button_StarRail}"
+                            ToolTip="打开崩坏星穹铁道角色界面"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_HonkaiImpact3" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="14"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="打开崩坏三角色界面"
-                                           Text="{x:Static resx:Resource.Button_HonkaiImpact3}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_MoveChest"
+                            Content="{x:Static resx:Resource.Button_MoveChest}"
+                            ToolTip="开始推箱子"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_StarRail" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="14"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="打开崩坏星穹铁道角色界面"
-                                           Text="{x:Static resx:Resource.Button_StarRail}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_Bing"
+                            Content="{x:Static resx:Resource.Button_Bing}"
+                            ToolTip="你猜猜Bing一下是干什么的"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_MoveChest" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="14"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="开始推箱子"
-                                           Text="{x:Static resx:Resource.Button_MoveChest}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_Updata"
+                            Content="{x:Static resx:Resource.Button_Updata}"
+                            ToolTip="字面意思"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_Bing" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="14"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="你猜猜Bing一下是干什么的"
-                                           Text="{x:Static resx:Resource.Button_Bing}"/>
-                            </Button>
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_Version"
+                            Content="{x:Static resx:Resource.Button_Version}"
+                            ToolTip="打开历史版本更新内容界面"/>
 
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_Updata" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="16"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="字面意思"
-                                           Text="{x:Static resx:Resource.Button_Updata}"/>
-                            </Button>
-
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_Version" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="18"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="打开历史版本更新内容界面"
-                                           Text="{x:Static resx:Resource.Button_Version}"/>
-                            </Button>
-
-                            <Button Width="70" Height="26" BorderBrush="Transparent" BorderThickness="0,0,0,0" 
-                                    Click="Button_Click_BuildJson" Focusable="False" IsTabStop="False">
-                                <TextBlock VerticalAlignment="Center" FontSize="17"
-                                           Foreground="#ff363232" Width="auto" 
-                                           ToolTip="输出一个没有什么用但又没有什么用的json文件"
-                                           Text="{x:Static resx:Resource.Button_BuildJson}"/>
-                            </Button>
-
-                        </ListBox>
-
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_BuildJson"
+                            Content="{x:Static resx:Resource.Button_BuildJson}"
+                            ToolTip="输出一个没有什么用但又没有什么用的json文件"/>
                     </StackPanel>
 
                 </DockPanel>
@@ -244,21 +197,21 @@
                     <DockPanel>
                         <StackPanel Height="400">
                             <DockPanel>
-                                <TextBox Width="400" Height="200" 
-                                         TextWrapping="Wrap" 
-                                         VerticalAlignment="Top"
-                                         AcceptsReturn="True" 
-                                         VerticalScrollBarVisibility="Visible" 
-                                         x:Name="ContentTextBox" 
-                                         TextChanged="ContentTextBox_TextChanged">
-
-                                </TextBox>
+                                <ui:TextBox 
+                                            MaxWidth="400" MaxHeight="200"
+                                            TextWrapping="Wrap" 
+                                            VerticalAlignment="Top"
+                                            AcceptsReturn="True" 
+                                            VerticalScrollBarVisibility="Visible" 
+                                            Foreground="Black"
+                                            x:Name="ContentTextBox" 
+                                            TextChanged="ContentTextBox_TextChanged"/>
                             </DockPanel>
                             <DockPanel>
-                                <TextBlock HorizontalAlignment="Right" >
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontSize="16">
                             更新地址：
                                 </TextBlock>
-                                <TextBox Name="Update_IP_address" Width="307" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged">
+                                <TextBox Name="Update_IP_address" Width="340" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black">
                                 </TextBox>
                             </DockPanel>
 
@@ -270,36 +223,36 @@
                                     </Style>
                                 </UniformGrid.Resources>
 
-                                <Button x:Name="playPauseButton" 
+                                <ui:Button x:Name="playPauseButton" Foreground="Black"
                                         Content="播放" 
                                         ToolTip="字面意思，播放"
                                         Click="Button_Click_MusicPlay_MusicPause"/>
-                                <Button Content="停止" 
+                                <ui:Button Content="停止" Foreground="Black"
                                         ToolTip="顾名思义，把整个停下来"
                                         Click="Button_Click_MusicStop"/>
-                                <Button Content="切歌" 
+                                <ui:Button Content="切歌" Foreground="Black"
                                         ToolTip="点快了报错"
                                         Click="Button_Click_MusicHandOff"/>
                             </UniformGrid>
 
                             <DockPanel>
-                                <TextBlock>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
                                     控制音量
                                 </TextBlock>
-                                <Slider x:Name="volumeSlider"
+                                <Slider x:Name="volumeSlider" VerticalAlignment="Center"
                                     Width="200"
                                     HorizontalAlignment="Left"
                                     Minimum="0" Maximum="1" Value="0.2"
                                     SmallChange="0.1" LargeChange="0.2"
                                     ValueChanged="volumeSlider_ValueChanged"
                                     ToolTip="音量调节"/>
-                                <TextBox Name="music_name" Width="124">
+                                <TextBox Name="music_name" Width="124" Foreground="Black">
                                     无
                                 </TextBox>
                             </DockPanel>
 
                             <DockPanel>
-                                <Slider x:Name="mediaPositionSlider" Minimum="0" Value="0"
+                                <Slider x:Name="mediaPositionSlider" Minimum="0" Value="0" VerticalAlignment="Center"
                                         IsEnabled="{Binding ElementName=mediaElement, Path=IsLoaded}" 
                                         AutoToolTipPlacement="TopLeft"
                                         TickFrequency="5"
@@ -309,32 +262,32 @@
 
                         </StackPanel>
 
-                        <DockPanel VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False">
-                            <Button Margin="0,0,0,0" Width="100" Height="18" 
+                        <DockPanel VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False" >
+                            <ui:Button Margin="0,0,0,0" Width="100" Height="28" Foreground="Black"
                                     DockPanel.Dock="Top"
                                     HorizontalAlignment="Left" VerticalAlignment="Top" 
                                     Click="Button_Click_ColourEgg">
                                     更多选项
-                            </Button>
+                            </ui:Button>
 
-                            <Button Margin="0,0,0,0" Width="100" Height="18" 
+                            <ui:Button Margin="0,0,0,0" Width="100" Height="28" Foreground="Black"
                                     DockPanel.Dock="Top"
                                     HorizontalAlignment="Left" VerticalAlignment="Top" 
                                     Click="Button_Click_RefreshWeather">
                                     天气刷新
-                            </Button>
+                            </ui:Button>
 
-                            <CheckBox DockPanel.Dock="Top" 
+                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
                                       Name="EnableCountingCheckBox" 
                                       Content="启用计数" 
                                       Checked="EnableCountingCheckBox_Checked" 
                                       Unchecked="EnableCountingCheckBox_Unchecked"/>
 
 
-                            <ListBox DockPanel.Dock="Top">
-                                <RadioButton Content="英文" Click="RadioButton_Click_English"/>
-                                <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese"/>
-                            </ListBox>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                                <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>
+                                <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese" Foreground="Black"/>
+                            </StackPanel>
 
                         </DockPanel>
 
@@ -402,16 +355,16 @@
             </DockPanel>
 
             <DockPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Name="beta_tabel">
-                <Label FontSize="20" 
+                <Label FontSize="20" Foreground="Black"
                        HorizontalAlignment="Right" 
                        VerticalAlignment="Bottom" 
                        Name="LaunchCount" 
                        Content=""/>
 
-                <Label FontSize="20"
+                <Label FontSize="20" Foreground="Black"
                        Name="Test_Label"
                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                       Content="{x:Static resx:Resource.Ts}"/>
+                       Content="{x:Static resx:Resource.Ts}" />
             </DockPanel>
 
         </Grid>

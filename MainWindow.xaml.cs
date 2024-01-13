@@ -220,7 +220,7 @@ namespace Software
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             其他窗口.WindowImage nextwindow = new();
             nextwindow.Show();
@@ -908,14 +908,10 @@ namespace Software
             mediaElement.Source = playmusicpath;
         }
 
-        private void listBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void Button_Click_PlayVideo(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Left || e.Key == Key.Right)
-            {
-                e.Handled = true;
-            }
+            其他窗口.WindowVideoPlayer nextwindow = new();
+            nextwindow.Show();
         }
-
-        
     }
 }

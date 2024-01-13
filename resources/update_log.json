@@ -6,6 +6,7 @@
       "version": "0.1.4.0",
       "updateTime": "",
       "updateContent": [
+        "添加了WPF-UI库,并对界面进行更新",
         "修复了config中不存在Culture的问题"
       ]
     },
