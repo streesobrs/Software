@@ -54,7 +54,7 @@ namespace Software
     <appSettings>
         <add key=""GamePath"" value=""""/>
         <add key=""TextContent"" value=""""/>
-        <add key=""UpdatePath"" value=""http://1.14.58.59/updata.xml""/>
+        <add key=""UpdatePath"" value=""https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml""/>
         <add key=""LaunchCount"" value=""0""/>
         <add key=""EnableCounting"" value=""false""/>
         <add key=""RetryCount"" value=""5""/>
@@ -79,7 +79,7 @@ namespace Software
                 // 检查每个需要的设置
                 CheckAndAddSetting(appSettings, "GamePath", "");
                 CheckAndAddSetting(appSettings, "TextContent", "");
-                CheckAndAddSetting(appSettings, "UpdatePath", "http://1.14.58.59/updata.xml");
+                CheckAndAddSetting(appSettings, "UpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml");
                 CheckAndAddSetting(appSettings, "LaunchCount", "0");
                 CheckAndAddSetting(appSettings, "EnableCounting", "false");
                 CheckAndAddSetting(appSettings, "RetryCount", "5");
