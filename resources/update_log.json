@@ -7,7 +7,8 @@
       "updateTime": "",
       "updateContent": [
         "添加了WPF-UI库,并对界面进行更新",
-        "修复了config中不存在Culture的问题"
+        "修复了config中不存在Culture的问题",
+        "修改了更新URL"
       ]
     },
     {
