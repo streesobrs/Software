@@ -18,6 +18,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -37,19 +38,42 @@ namespace Software
         private TextBox txtGamePath;
         private Weather weather;
 
+        private static readonly object ConfigLock = new object();
+
         public MainWindow()
         {
             InitializeComponent();
             ApplySavedCultureInfo();
 
-            // 检查配置文件是否存在
-            if (!File.Exists("Software.dll.config"))
+            lock (ConfigLock)
             {
-                // 如果不存在，创建一个新的配置文件
-                using (var stream = File.Create("Software.dll.config"))
+                // 获取文档文件夹的路径
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 添加子文件夹名称
+                string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                string folderPath = Path.Combine(docPath, subFolder);
+                // 检查子文件夹是否存在，如果不存在，则创建
+                if (!Directory.Exists(folderPath))
                 {
-                    // 写入默认的设置
-                    string defaultSettings = @"
+                    Directory.CreateDirectory(folderPath);
+                }
+                string configFilePath = Path.Combine(folderPath, "Software.config");
+
+                // 检查新的配置文件是否存在
+                if (!File.Exists(configFilePath))
+                {
+                    // 如果不存在，尝试读取旧的配置文件的内容
+                    string oldConfigFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Software.dll.config");
+                    string settings;
+                    if (File.Exists(oldConfigFilePath) && (settings = File.ReadAllText(oldConfigFilePath)).Trim() != "")
+                    {
+                        // 如果旧的配置文件存在且有内容，使用旧的配置文件的内容
+                        File.WriteAllText(configFilePath, settings);
+                    }
+                    else
+                    {
+                        // 否则，使用默认的设置
+                        settings = @"
 <configuration>
     <appSettings>
         <add key=""GamePath"" value=""""/>
@@ -66,14 +90,12 @@ namespace Software
         <add key=""Culture"" value=""zh-CN""/>
     </appSettings>
 </configuration>";
-                    byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
-                    stream.Write(data, 0, data.Length);
+                        File.WriteAllText(configFilePath, settings);
+                    }
                 }
-            }
-            else
-            {
+
                 // 如果存在，检查是否缺少某些设置，并添加缺少的设置
-                XDocument doc = XDocument.Load("Software.dll.config");
+                XDocument doc = XDocument.Load(configFilePath);
                 XElement appSettings = doc.Root.Element("appSettings");
 
                 // 检查每个需要的设置
@@ -90,9 +112,8 @@ namespace Software
                 CheckAndAddSetting(appSettings, "UpdateTimeColor", "Blue");
                 CheckAndAddSetting(appSettings, "Culture", "zh-CN");
                 // 保存修改后的配置文件
-                doc.Save("Software.dll.config");
+                doc.Save(configFilePath);
             }
-
 
             txtGamePath = new TextBox();
             weather = new Weather();
@@ -104,6 +125,7 @@ namespace Software
                 await weather.RefreshAsync();
             };
         }
+
 
         private void ApplySavedCultureInfo()
         {
@@ -128,51 +150,59 @@ namespace Software
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // 读取配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            // 获取TextContent的值
-            string contentTextBox = config.AppSettings.Settings["TextContent"].Value;
-            string updatePath = config.AppSettings.Settings["updatePath"].Value;
-            // 设置TextBox的文本
-            ContentTextBox.Text = contentTextBox;
-            Update_IP_address.Text = updatePath;
-
-
-            // 读取"EnableCounting"的值
-            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
-
-            // 设置CheckBox的状态
-            EnableCountingCheckBox.IsChecked = enableCounting;
-
-            // 如果启用计数，则执行计数逻辑
-            if (enableCounting)
+            lock (ConfigLock)
             {
-                // 读取并增加启动次数
-                int launchCount = int.Parse(ConfigurationManager.AppSettings["LaunchCount"]) + 1;
+                // 获取文档文件夹的路径
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 添加子文件夹名称
+                string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                string folderPath = Path.Combine(docPath, subFolder);
+                string configFilePath = Path.Combine(folderPath, "Software.config");
 
-                // 更新启动次数
-                UpdateEnableCounting(launchCount);
+                // 打开配置文件
+                var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
 
-                // 显示启动次数
-                LaunchCount.Content = $"软件已启动 {launchCount} 次";
+                // 获取TextContent的值
+                string contentTextBox = config.AppSettings.Settings["TextContent"].Value;
+                string updatePath = config.AppSettings.Settings["UpdatePath"].Value;
+                // 设置TextBox的文本
+                ContentTextBox.Text = contentTextBox;
+                Update_IP_address.Text = updatePath;
+
+                // 读取"EnableCounting"的值
+                bool enableCounting = bool.Parse(config.AppSettings.Settings["EnableCounting"].Value);
+
+                // 设置CheckBox的状态
+                EnableCountingCheckBox.IsChecked = enableCounting;
+
+                // 如果启用计数，则执行计数逻辑
+                if (enableCounting)
+                {
+                    // 读取并增加启动次数
+                    int launchCount = int.Parse(config.AppSettings.Settings["LaunchCount"].Value) + 1;
+
+                    // 更新启动次数
+                    UpdateEnableCounting(launchCount, config);
+
+                    // 显示启动次数
+                    LaunchCount.Content = $"软件已启动 {launchCount} 次";
+                }
             }
         }
 
-        private void UpdateEnableCounting(int launchCount)
+        private void UpdateEnableCounting(int launchCount, Configuration config)
         {
-            // 打开配置文件
-            Configuration config1 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
             // 更新启动次数
-            config1.AppSettings.Settings["LaunchCount"].Value = launchCount.ToString();
+            config.AppSettings.Settings["LaunchCount"].Value = launchCount.ToString();
 
             // 保存配置文件
-            config1.Save(ConfigurationSaveMode.Modified);
+            config.Save(ConfigurationSaveMode.Modified);
 
             // 刷新配置文件
             ConfigurationManager.RefreshSection("appSettings");
         }
+
 
         [StructLayout(LayoutKind.Sequential)]
         public struct SYSTEMTIME
@@ -251,34 +281,68 @@ namespace Software
 
         private void Button_Click_PlayGames(object sender, RoutedEventArgs e)
         {
-            string gamePath = ConfigurationManager.AppSettings["GamePath"];
-            if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
+            lock (ConfigLock)
             {
-                // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
-                var dialog = new OpenFileDialog();
-                dialog.ValidateNames = false;
-                dialog.CheckFileExists = true;
-                dialog.CheckPathExists = true;
-                dialog.FileName = "Select Game";
-                if (dialog.ShowDialog() == true)
+                try
                 {
-                    gamePath = dialog.FileName;
-                    UpdateGamePath(gamePath);  // 保存新的游戏路径
+                    // 获取文档文件夹的路径
+                    string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    // 添加子文件夹名称
+                    string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                    string folderPath = Path.Combine(docPath, subFolder);
+                    string configFilePath = Path.Combine(folderPath, "Software.config");
+
+                    // 打开配置文件
+                    var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                    Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                    string gamePath = ConfigurationManager.AppSettings["GamePath"];
+                    if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
+                    {
+                        // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
+                        var dialog = new OpenFileDialog();
+                        dialog.ValidateNames = false;
+                        dialog.CheckFileExists = true;
+                        dialog.CheckPathExists = true;
+                        dialog.FileName = "Select Game";
+                        if (dialog.ShowDialog() == true)
+                        {
+                            gamePath = dialog.FileName;
+                            UpdateGamePath(gamePath);  // 保存新的游戏路径
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
+                    {
+                        _ = System.Diagnostics.Process.Start(gamePath);
+                    }
                 }
-            }
-            if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
-            {
-                _ = System.Diagnostics.Process.Start(gamePath);
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
-
         private void UpdateGamePath(string newPath)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["GamePath"].Value = newPath;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            lock (ConfigLock)
+            {
+                // 获取文档文件夹的路径
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 添加子文件夹名称
+                string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                string folderPath = Path.Combine(docPath, subFolder);
+                string configFilePath = Path.Combine(folderPath, "Software.config");
+
+                // 打开配置文件
+                var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                config.AppSettings.Settings["GamePath"].Value = newPath;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+
         }
 
         private void Button_Click_GenshinRole(object sender, RoutedEventArgs e)
@@ -459,19 +523,23 @@ namespace Software
                 Content = new StackPanel()
             };
 
+            var converter = new System.Windows.Media.BrushConverter();
+            var brush = (Brush)converter.ConvertFromString("#FFB1D0F3");
+            dialog.Background = brush;
+
             string logFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
             var logButton = new Button
             {
                 Content = "打开log文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
             };
             logButton.Click += (sender, e) =>
             {
                 Process.Start("explorer.exe", logFolder);
                 dialog.Close();
-            }; 
+            };
 
             string resourcesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources");
             var resourcesButton = new Button
@@ -479,7 +547,8 @@ namespace Software
                 Content = "打开resources文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Black
             };
             resourcesButton.Click += (sender, e) =>
             {
@@ -493,7 +562,8 @@ namespace Software
                 Content = "打开music文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Black
             };
             musicButton.Click += (sender, e) =>
             {
@@ -506,7 +576,8 @@ namespace Software
                 Content = "同步系统时间",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Black
             };
             syncButton.Click += (sender, e) =>
             {
@@ -545,7 +616,8 @@ namespace Software
                 Content = "删除多个文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Black
             };
             deleteFoldersButton.Click += (sender, e) =>
             {
@@ -606,7 +678,8 @@ namespace Software
                 Content = "保存路径",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Black
             };
 
             savePathButton.Click += Button_Click_SavePath;
@@ -684,24 +757,49 @@ namespace Software
 
         private void ContentTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // 获取TextBox的文本
-            string text = ContentTextBox.Text;
+            lock (ConfigLock)
+            {
+                // 获取TextBox的文本
+                string text = ContentTextBox.Text;
+                // 获取文档文件夹的路径
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 添加子文件夹名称
+                string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                string folderPath = Path.Combine(docPath, subFolder);
+                string configFilePath = Path.Combine(folderPath, "Software.config");
 
-            // 保存到配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["TextContent"].Value = text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+                // 打开配置文件
+                var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                config.AppSettings.Settings["TextContent"].Value = text;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
         }
 
         private void Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string text = Update_IP_address.Text;
-            // 保存到配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["UpdatePath"].Value = text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            lock (ConfigLock)
+            {
+                string text = Update_IP_address.Text;
+                // 获取文档文件夹的路径
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 添加子文件夹名称
+                string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                string folderPath = Path.Combine(docPath, subFolder);
+                string configFilePath = Path.Combine(folderPath, "Software.config");
+
+                // 打开配置文件
+                var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                config.AppSettings.Settings["UpdatePath"].Value = text;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+
+
         }
 
         private void EnableCountingCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -716,12 +814,33 @@ namespace Software
             this.LaunchCount.Visibility = Visibility.Hidden;
         }
 
+
         private void UpdateEnableCounting(bool enableCounting)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            lock (ConfigLock)
+            {
+                try
+                {
+                    // 获取文档文件夹的路径
+                    string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    // 添加子文件夹名称
+                    string subFolder = "NibaSoftConfigDepot";
+                    string folderPath = Path.Combine(docPath, subFolder);
+                    string configFilePath = Path.Combine(folderPath, "Software.config");
+
+                    // 打开配置文件
+                    var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                    Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                    config.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
+                    config.Save(ConfigurationSaveMode.Modified);
+                    ConfigurationManager.RefreshSection("appSettings");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
@@ -736,10 +855,24 @@ namespace Software
 
         private void SaveCultureInfo(string cultureName)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["Culture"].Value = cultureName;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            lock (ConfigLock)
+            {
+                // 获取文档文件夹的路径
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 添加子文件夹名称
+                string subFolder = "NibaSoftConfigDepot"; // 子文件夹名称
+                string folderPath = Path.Combine(docPath, subFolder);
+                string configFilePath = Path.Combine(folderPath, "Software.config");
+
+                // 打开配置文件
+                var configFileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFilePath };
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                config.AppSettings.Settings["Culture"].Value = cultureName;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+
         }
 
         // 获取Music文件夹中的所有音乐文件路径

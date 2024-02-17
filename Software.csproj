@@ -51,9 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="resources\fonts\qweather-icons.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="resources\image\apple-red.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -99,9 +96,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="resources\fonts\华康少女文字W5-P.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="resources\image\apple-green.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
