@@ -18,6 +18,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -451,6 +452,7 @@ namespace Software
                 Width = 400,
                 Height = 300,
                 Title = "请选择要打开的文件夹目录",
+                Background = (Brush)new BrushConverter().ConvertFromString("#CADFF6"),
                 ShowInTaskbar = false,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
                 ResizeMode = ResizeMode.NoResize,
@@ -465,6 +467,7 @@ namespace Software
                 Content = "打开log文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             logButton.Click += (sender, e) =>
@@ -479,6 +482,7 @@ namespace Software
                 Content = "打开resources文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             resourcesButton.Click += (sender, e) =>
@@ -493,6 +497,7 @@ namespace Software
                 Content = "打开music文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             musicButton.Click += (sender, e) =>
@@ -506,6 +511,7 @@ namespace Software
                 Content = "同步系统时间",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             syncButton.Click += (sender, e) =>
@@ -545,6 +551,7 @@ namespace Software
                 Content = "删除多个文件夹",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             deleteFoldersButton.Click += (sender, e) =>
@@ -595,6 +602,7 @@ namespace Software
                 Content = "选择文件",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 
@@ -606,6 +614,7 @@ namespace Software
                 Content = "保存路径",
                 Padding = new Thickness(5),
                 Margin = new Thickness(5),
+                Foreground = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 

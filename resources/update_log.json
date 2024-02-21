@@ -4,7 +4,7 @@
   "updates": [
     {
       "version": "0.1.4.0",
-      "updateTime": "",
+      "updateTime": "2024/02/22",
       "updateContent": [
         "添加了WPF-UI库,并对界面进行更新",
         "修复了config中不存在Culture的问题",

@@ -35,9 +35,7 @@
   <ItemGroup>
     <None Remove="Delete_file.bat" />
     <None Remove="MainWindow.xaml.cs~RF10164d2.TMP" />
-    <None Remove="resources\fonts\qweather-icons.ttf" />
     <None Remove="resources\fonts\SmileySans-Oblique.ttf" />
-    <None Remove="resources\fonts\华康少女文字W5-P.ttf" />
     <None Remove="resources\image\apple-green.png" />
     <None Remove="resources\image\apple-red.png" />
     <None Remove="resources\image\cxk.png" />
@@ -51,9 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="resources\fonts\qweather-icons.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="resources\image\apple-red.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -99,9 +94,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="resources\fonts\华康少女文字W5-P.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="resources\image\apple-green.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
