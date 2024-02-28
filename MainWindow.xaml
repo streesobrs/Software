@@ -115,7 +115,7 @@
         </Grid>
 
         <!--下面的栏-->
-        <Grid Grid.Row="1" Background="#FFB1D0F3" Focusable="False">
+        <Grid Grid.Row="1" Background="#B1D0F3"  Focusable="False">
 
             <DockPanel LastChildFill="True">
                 <!--左侧的栏-->

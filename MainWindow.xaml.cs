@@ -156,7 +156,7 @@ namespace Software
                 UpdateEnableCounting(launchCount);
 
                 // 显示启动次数
-                LaunchCount.Content = $"软件已启动 {launchCount} 次";
+                LaunchCount.Content = $"软件已启动 {launchCount} 次 ";
             }
         }
 
