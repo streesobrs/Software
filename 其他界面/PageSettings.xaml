@@ -7,27 +7,18 @@
       xmlns:resx="clr-namespace:Software.Properties" 
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="PageSettings">
+      Title="PageSettings" Loaded="Page_Loaded">
 
-    <Grid>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid>
+    <Grid Background="Snow">
+        <StackPanel>
             
-        </Grid>
-
-        <Grid>
-            
-        </Grid>
+            <TextBlock Text="是否开启启动计数" FontSize="24"/>
+            <CheckBox DockPanel.Dock="Top" Foreground="Black"
+          Name="EnableCountingCheckBox" 
+          Content="启用计数" 
+          Checked="EnableCountingCheckBox_Checked" 
+          Unchecked="EnableCountingCheckBox_Unchecked"/>
+        </StackPanel>
         
     </Grid>
 </Page>

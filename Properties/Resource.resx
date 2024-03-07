@@ -156,4 +156,7 @@
   <data name="Button_MoveChest" xml:space="preserve">
     <value>MoveChest</value>
   </data>
+  <data name="Button_Settings" xml:space="preserve">
+    <value>Setting</value>
+  </data>
 </root>

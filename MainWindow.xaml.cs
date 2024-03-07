@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Software.ViewModels;
+using Software.其他界面;
 using System;
 using System.Configuration;
 using System.Diagnostics;
@@ -33,6 +34,7 @@ namespace Software
         Frame frameVersion = new Frame() { Content = new 其他界面.PageVersion() };
         Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
         Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
+        Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
 
         private Window dialog;
         private TextBox txtGamePath;
@@ -139,40 +141,8 @@ namespace Software
             ContentTextBox.Text = contentTextBox;
             Update_IP_address.Text = updatePath;
 
-
-            // 读取"EnableCounting"的值
-            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
-
-            // 设置CheckBox的状态
-            EnableCountingCheckBox.IsChecked = enableCounting;
-
-            // 如果启用计数，则执行计数逻辑
-            if (enableCounting)
-            {
-                // 读取并增加启动次数
-                int launchCount = int.Parse(ConfigurationManager.AppSettings["LaunchCount"]) + 1;
-
-                // 更新启动次数
-                UpdateEnableCounting(launchCount);
-
-                // 显示启动次数
-                LaunchCount.Content = $"软件已启动 {launchCount} 次 ";
-            }
-        }
-
-        private void UpdateEnableCounting(int launchCount)
-        {
-            // 打开配置文件
-            Configuration config1 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            // 更新启动次数
-            config1.AppSettings.Settings["LaunchCount"].Value = launchCount.ToString();
-
-            // 保存配置文件
-            config1.Save(ConfigurationSaveMode.Modified);
-
-            // 刷新配置文件
-            ConfigurationManager.RefreshSection("appSettings");
+            PageSettings pageSettings = new PageSettings();
+            pageSettings.HandleLaunchCount();
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -921,6 +891,11 @@ namespace Software
         {
             其他窗口.WindowVideoPlayer nextwindow = new();
             nextwindow.Show();
+        }
+
+        private void Button_Click_Settings(object sender, RoutedEventArgs e)
+        {
+            contentcon.Content = frameSettings;
         }
     }
 }

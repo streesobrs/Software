@@ -183,6 +183,11 @@
                             Click="Button_Click_BuildJson"
                             Content="{x:Static resx:Resource.Button_BuildJson}"
                             ToolTip="输出一个没有什么用但又没有什么用的json文件"/>
+
+                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Click="Button_Click_Settings"
+                            Content="{x:Static resx:Resource.Button_Settings}"
+                            ToolTip="设置部分功能"/>
                     </StackPanel>
 
                 </DockPanel>
@@ -274,15 +279,8 @@
                                     DockPanel.Dock="Top"
                                     HorizontalAlignment="Left" VerticalAlignment="Top" 
                                     Click="Button_Click_RefreshWeather">
-                                    天气刷新
+                                天气刷新
                             </ui:Button>
-
-                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
-                                      Name="EnableCountingCheckBox" 
-                                      Content="启用计数" 
-                                      Checked="EnableCountingCheckBox_Checked" 
-                                      Unchecked="EnableCountingCheckBox_Unchecked"/>
-
 
                             <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
                                 <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>

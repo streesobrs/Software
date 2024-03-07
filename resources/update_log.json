@@ -3,6 +3,14 @@
   "version": "0.1.4.0",
   "updates": [
     {
+      "version": "0.1.5.0",
+      "updateTime": "",
+      "updateContent": [
+        "添加了设置选项",
+        "修复了「版本内容」页面下不存在update_log.json时只出现色块不全的问题"
+      ]
+    },
+    {
       "version": "0.1.4.0",
       "updateTime": "2024/02/22",
       "updateContent": [

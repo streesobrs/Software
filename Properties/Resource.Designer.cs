@@ -142,6 +142,15 @@ namespace Software.Properties {
         }
         
         /// <summary>
+        ///   查找类似 Setting 的本地化字符串。
+        /// </summary>
+        public static string Button_Settings {
+            get {
+                return ResourceManager.GetString("Button_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 StarRail 的本地化字符串。
         /// </summary>
         public static string Button_StarRail {

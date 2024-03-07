@@ -156,4 +156,7 @@
   <data name="Button_MoveChest" xml:space="preserve">
     <value>推箱子</value>
   </data>
+  <data name="Button_Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
 </root>
