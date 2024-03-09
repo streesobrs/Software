@@ -15,6 +15,22 @@ namespace Software.其他界面
             InitializeComponent();
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 读取配置文件
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            // 读取"EnableCounting"的值
+            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
+            //读取“updatePath”的值
+            string updatePath = config.AppSettings.Settings["updatePath"].Value;
+
+            // 设置CheckBox的状态
+            EnableCountingCheckBox.IsChecked = enableCounting;
+            // 设置TextBox的内容
+            Update_IP_address.Text = updatePath;
+        }
+
         public void HandleLaunchCount()
         {
             // 读取"EnableCounting"的值
@@ -75,16 +91,14 @@ namespace Software.其他界面
             mainWindow.LaunchCount.Visibility = Visibility.Hidden;
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // 读取配置文件
+            string text = Update_IP_address.Text;
+            // 保存到配置文件
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            // 读取"EnableCounting"的值
-            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
-
-            // 设置CheckBox的状态
-            EnableCountingCheckBox.IsChecked = enableCounting;
+            config.AppSettings.Settings["UpdatePath"].Value = text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
         }
     }
 }

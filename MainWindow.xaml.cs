@@ -136,10 +136,8 @@ namespace Software
 
             // 获取TextContent的值
             string contentTextBox = config.AppSettings.Settings["TextContent"].Value;
-            string updatePath = config.AppSettings.Settings["updatePath"].Value;
             // 设置TextBox的文本
             ContentTextBox.Text = contentTextBox;
-            Update_IP_address.Text = updatePath;
 
             PageSettings pageSettings = new PageSettings();
             pageSettings.HandleLaunchCount();
@@ -293,8 +291,11 @@ namespace Software
 
             try
             {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                string updatePath = config.AppSettings.Settings["updatePath"].Value;
+
                 // 获取更新服务器的IP地址
-                var UpdateIP = this.Update_IP_address.Text;
+                var UpdateIP = updatePath;
                 // 获取当前正在执行的程序集
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 // 获取版本信息
@@ -669,16 +670,6 @@ namespace Software
             // 保存到配置文件
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["TextContent"].Value = text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-
-        private void Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            string text = Update_IP_address.Text;
-            // 保存到配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["UpdatePath"].Value = text;
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
         }

@@ -7,18 +7,30 @@
       xmlns:resx="clr-namespace:Software.Properties" 
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+      FontFamily="../resources/Fonts/#得意黑"
       Title="PageSettings" Loaded="Page_Loaded">
 
-    <Grid Background="Snow">
+    <Grid Background="#B1D0F3">
         <StackPanel>
+            <DockPanel>
             
-            <TextBlock Text="是否开启启动计数" FontSize="24"/>
+            <TextBlock Text="是否开启启动计数" FontSize="21"/>
             <CheckBox DockPanel.Dock="Top" Foreground="Black"
           Name="EnableCountingCheckBox" 
           Content="启用计数" 
           Checked="EnableCountingCheckBox_Checked" 
           Unchecked="EnableCountingCheckBox_Unchecked"/>
+        </DockPanel>
+
+        <DockPanel>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontSize="16">
+                            更新地址：
+            </TextBlock>
+            <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black">
+            </TextBox>
+        </DockPanel>
         </StackPanel>
         
+
     </Grid>
 </Page>

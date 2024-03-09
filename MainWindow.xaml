@@ -124,67 +124,67 @@
                     <StackPanel>
 
                         <!--左边菜单的选项-->
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_Home"
                             Content="{x:Static resx:Resource.Button_Home}"
                             ToolTip="没用的按钮……"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_GenshinMap"
                             Content="{x:Static resx:Resource.Button_GenshinMap}"
                             ToolTip="打开地图界面"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_SelectUP"
                             Content="{x:Static resx:Resource.Button_SelectUP}"
                             ToolTip="打开查询界面"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_PlayGames"
                             Content="{x:Static resx:Resource.Button_PlayGames}"
                             ToolTip="启动游戏"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                              Click="Button_Click_GenshinRole"
                              Content="{x:Static resx:Resource.Button_GenshinRole}"
                              ToolTip="打开原神角色界面"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                              Click="Button_Click_HonkaiImpact3"
                              Content="{x:Static resx:Resource.Button_HonkaiImpact3}"
                              ToolTip="打开崩坏三角色界面"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_StarRail"
                             Content="{x:Static resx:Resource.Button_StarRail}"
                             ToolTip="打开崩坏星穹铁道角色界面"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_MoveChest"
                             Content="{x:Static resx:Resource.Button_MoveChest}"
                             ToolTip="开始推箱子"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_Bing"
                             Content="{x:Static resx:Resource.Button_Bing}"
                             ToolTip="你猜猜Bing一下是干什么的"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_Updata"
                             Content="{x:Static resx:Resource.Button_Updata}"
                             ToolTip="字面意思"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_Version"
                             Content="{x:Static resx:Resource.Button_Version}"
                             ToolTip="打开历史版本更新内容界面"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_BuildJson"
                             Content="{x:Static resx:Resource.Button_BuildJson}"
                             ToolTip="输出一个没有什么用但又没有什么用的json文件"/>
 
-                        <ui:Button Width="90" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                        <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Click="Button_Click_Settings"
                             Content="{x:Static resx:Resource.Button_Settings}"
                             ToolTip="设置部分功能"/>
@@ -212,14 +212,7 @@
                                             x:Name="ContentTextBox" 
                                             TextChanged="ContentTextBox_TextChanged"/>
                             </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontSize="16">
-                            更新地址：
-                                </TextBlock>
-                                <TextBox Name="Update_IP_address" Width="340" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black">
-                                </TextBox>
-                            </DockPanel>
-
+                            
                             <UniformGrid Rows="1" Columns="3">
                                 <UniformGrid.Resources>
                                     <Style TargetType="{x:Type Button}">
