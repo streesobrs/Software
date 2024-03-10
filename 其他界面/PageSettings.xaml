@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:Software.其他界面"
       xmlns:resx="clr-namespace:Software.Properties" 
       mc:Ignorable="d" 
@@ -10,8 +11,8 @@
       FontFamily="../resources/Fonts/#得意黑"
       Title="PageSettings" Loaded="Page_Loaded">
 
-    <Grid Background="#B1D0F3">
-        <StackPanel>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#B1D0F3" Margin="0,0">
+        <StackPanel >
             <DockPanel>
             
             <TextBlock Text="是否开启启动计数" FontSize="21"/>

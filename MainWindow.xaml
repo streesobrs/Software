@@ -29,12 +29,7 @@
         <!--上面的栏-->
         <Grid Grid.Row="0" Background="#116ECC">
 
-            <MediaElement Name="mediaElement"
-              LoadedBehavior="Manual" 
-              UnloadedBehavior="Manual"
-              Volume="{Binding ElementName=volumeSlider, Path=Value}"
-              MediaOpened="MediaElement_MediaOpened" 
-              IsMuted="{Binding ElementName=bgm, Path=IsChecked}"/>
+            
 
             <StackPanel HorizontalAlignment="Left" Height="50" Margin="0,0" 
                         VerticalAlignment="Top" Width="50" Grid.Column="1">
@@ -192,12 +187,10 @@
 
                 </DockPanel>
 
-                <Frame x:Name="contentcon" NavigationUIVisibility="Hidden">
-                    
-                </Frame>
+                <Frame x:Name="contentcon" NavigationUIVisibility="Hidden" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0"/>
 
                 <!--右边大点的栏-->
-                <StackPanel>
+                <!--<StackPanel>
 
                     <DockPanel>
                         <StackPanel Height="400">
@@ -284,7 +277,7 @@
 
                         <StackPanel Width="auto" Height="Auto">
                             <StackPanel Margin="0,10,0,0">
-                                <!-- 省份和城市 -->
+                                --><!-- 省份和城市 --><!--
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="省份：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Province}" FontSize="18" x:Name="Data_Province" Margin="5,0,0,0"/>
@@ -293,19 +286,19 @@
                                     <TextBlock Text="{Binding Data_City}" FontSize="18" x:Name="Data_City" Margin="5,0,0,0"/>
                                 </StackPanel>
 
-                                <!-- 行政编码 -->
+                                --><!-- 行政编码 --><!--
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <TextBlock Text="行政编码：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Adcode}" FontSize="18" x:Name="Data_Adcode" Margin="5,0,0,0"/>
                                 </StackPanel>
 
-                                <!-- 天气状况 -->
+                                --><!-- 天气状况 --><!--
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <TextBlock Text="天气状况：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Weather}" FontSize="18" x:Name="Data_Weather" Margin="5,0,0,0"/>
                                 </StackPanel>
 
-                                <!-- 当前温度和相对湿度 -->
+                                --><!-- 当前温度和相对湿度 --><!--
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <TextBlock Text="当前温度：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Temperature}" FontSize="18" x:Name="Data_Temperature" Margin="5,0,0,0" />
@@ -316,7 +309,7 @@
                                     <TextBlock Text="%" FontSize="18" Margin="5,0,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
 
-                                <!-- 当前风向和风力 -->
+                                --><!-- 当前风向和风力 --><!--
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <TextBlock Text="当前风向：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Winddirection}" FontSize="18" x:Name="Data_Winddirection" Margin="5,0,0,0"/>
@@ -325,13 +318,13 @@
                                     <TextBlock Text="{Binding Data_Windpower}" FontSize="18" x:Name="Data_Windpower" Margin="5,0,0,0"/>
                                 </StackPanel>
 
-                                <!-- 数据更新时间 -->
+                                --><!-- 数据更新时间 --><!--
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <TextBlock Text="数据更新时间：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Reporttime}" FontSize="18"/>
                                 </StackPanel>
                                 
-                                <!-- 数据刷新时间 -->
+                                --><!-- 数据刷新时间 --><!--
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                     <TextBlock Text="数据刷新时间：" FontSize="16" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Data_Refreshtime}" FontSize="18"/>
@@ -341,7 +334,7 @@
 
                     </DockPanel>
 
-                </StackPanel>
+                </StackPanel>-->
 
             </DockPanel>
 
