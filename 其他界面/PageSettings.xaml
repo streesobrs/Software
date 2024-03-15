@@ -11,44 +11,57 @@
       FontFamily="../resources/Fonts/#得意黑"
       Title="PageSettings" Loaded="Page_Loaded">
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#B1D0F3" Margin="0,0">
-        <StackPanel >
-            <DockPanel>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#B1D0F3" Margin="5">
+        <ScrollViewer>
+            <StackPanel Margin="1,1,1,1">
+                <DockPanel Margin="5">
 
-                <TextBlock Text="是否开启启动计数" FontSize="21"/>
-                <CheckBox DockPanel.Dock="Top" Foreground="Black"
-          Name="EnableCountingCheckBox" 
-          Content="启用计数" 
-          Checked="EnableCountingCheckBox_Checked" 
-          Unchecked="EnableCountingCheckBox_Unchecked"/>
-            </DockPanel>
+                    <TextBlock Text="是否开启启动计数  " FontSize="24" Foreground="Black"/>
+                    <CheckBox DockPanel.Dock="Top" Foreground="Black"
+                          Name="EnableCountingCheckBox" 
+                          Content="启用计数" 
+                          Checked="EnableCountingCheckBox_Checked" 
+                          Unchecked="EnableCountingCheckBox_Unchecked"/>
+                </DockPanel>
 
-            <DockPanel>
-                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="16">
+                <DockPanel Margin="2">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
                  软件更新地址：
-                </TextBlock>
-                <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black"/>
+                    </TextBlock>
+                    <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
 
-            </DockPanel>
-            <DockPanel>
-                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="16">
+                </DockPanel>
+                <DockPanel Margin="2">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
                 日志更新地址：
-                </TextBlock>
-                <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black"/>
-            </DockPanel>
-
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                    <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>
-                    <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese" Foreground="Black"/>
-                </StackPanel>
-            </DockPanel>
-
-            <StackPanel>
-                <ui:Button Foreground="Black" Click="Button_Click_Open">打开软件根目录</ui:Button>
+                    </TextBlock>
+                    <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                </DockPanel>
                 
+                
+
+                <DockPanel Margin="2">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                        <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>
+                        <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese" Foreground="Black"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <StackPanel Margin="2">
+                    <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"
+                               Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5">打开软件根目录</ui:Button>
+                    <ui:Button Foreground="Black" Name="Open_Log_Folder"
+                               Click="Button_Click_Open_Log_Folder" Margin="0,5">打开Log文件夹</ui:Button>
+                    <ui:Button Foreground="Black" Name="Open_Resources_Folder"
+                               Click="Button_Click_Open_Resources_Folder" Margin="0,5">打开resources文件夹</ui:Button>
+                    <ui:Button Foreground="Black" Name="Open_Music_Folder"
+                               Click="Button_Click_Open_Music_Folder" Margin="0,5">打开music文件夹</ui:Button>
+                    <ui:Button Foreground="Black" Name="Delete_Folder"
+                               Click="Button_Click_Delete_Folder" Margin="0,5">删除文件夹</ui:Button>
+                </StackPanel>
+
             </StackPanel>
-            
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
+
 </Page>
