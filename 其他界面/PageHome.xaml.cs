@@ -443,24 +443,6 @@ namespace Software.其他界面
             ConfigurationManager.RefreshSection("appSettings");
         }
 
-        private void RadioButton_Click_English(object sender, RoutedEventArgs e)
-        {
-            SaveCultureInfo("en-US");
-        }
-
-        private void RadioButton_Click_Chinese(object sender, RoutedEventArgs e)
-        {
-            SaveCultureInfo("zh-CN");
-        }
-
-        private void SaveCultureInfo(string cultureName)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["Culture"].Value = cultureName;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-
         // 获取Music文件夹中的所有音乐文件路径
         string[] musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
         bool isPlaying = false; // 标记当前媒体文件是否正在播放

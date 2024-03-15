@@ -95,12 +95,6 @@
                         Click="Button_Click_RefreshWeather">
                         天气刷新
                     </ui:Button>
-
-                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                        <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>
-                        <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese" Foreground="Black"/>
-                    </StackPanel>
-
                 </DockPanel>
 
                 <StackPanel Width="auto" Height="Auto">

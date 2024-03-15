@@ -24,11 +24,13 @@ namespace Software.其他界面
             bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
             //读取“updatePath”的值
             string updatePath = config.AppSettings.Settings["updatePath"].Value;
+            string updateLogPath = config.AppSettings.Settings["UpdateLogUrl"].Value;
 
             // 设置CheckBox的状态
             EnableCountingCheckBox.IsChecked = enableCounting;
             // 设置TextBox的内容
             Update_IP_address.Text = updatePath;
+            Update_Log_IP_address.Text = updateLogPath;
         }
 
         public void HandleLaunchCount()
@@ -99,6 +101,38 @@ namespace Software.其他界面
             config.AppSettings.Settings["UpdatePath"].Value = text;
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void Update_Log_IP_address_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string text = Update_Log_IP_address.Text;
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["UpdateLogUrl"].Value = text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void RadioButton_Click_English(object sender, RoutedEventArgs e)
+        {
+            SaveCultureInfo("en-US");
+        }
+
+        private void RadioButton_Click_Chinese(object sender, RoutedEventArgs e)
+        {
+            SaveCultureInfo("zh-CN");
+        }
+
+        private void SaveCultureInfo(string cultureName)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["Culture"].Value = cultureName;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void Button_Click_Open(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
