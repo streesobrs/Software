@@ -1,33 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
+using Software.ViewModels;
+using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using Software;
-using Software.ViewModels;
-using AutoUpdaterDotNET;
-using Microsoft.Win32;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Xml.Linq;
 using Path = System.IO.Path;
 
 namespace Software.其他界面
@@ -58,15 +41,14 @@ namespace Software.其他界面
 
         MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
 
-        public void HandleContentTextBox()
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             // 获取TextContent的值
             string contentTextBox = ConfigurationManager.AppSettings["TextContent"];
             // 设置TextBox的文本
             ContentTextBox.Text = contentTextBox;
         }
-
-
 
         private void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
         {
@@ -502,6 +484,7 @@ namespace Software.其他界面
         {
             mediaElement.Volume = volumeSlider.Value;
         }
+
 
     }
 }

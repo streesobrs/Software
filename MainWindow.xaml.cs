@@ -1,8 +1,6 @@
 ﻿using AutoUpdaterDotNET;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Software.ViewModels;
 using Software.其他界面;
 using System;
 using System.Configuration;
@@ -10,7 +8,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -19,9 +16,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Navigation;
-using System.Windows.Threading;
 using System.Xml.Linq;
 
 namespace Software
@@ -37,7 +32,7 @@ namespace Software
         Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
         Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
 
-        
+
 
         public MainWindow()
         {
@@ -127,9 +122,6 @@ namespace Software
 
             PageSettings pageSettings = new PageSettings();
             pageSettings.HandleLaunchCount();
-
-            PageHome pageHome = new PageHome();
-            pageHome.HandleContentTextBox();
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -148,7 +140,7 @@ namespace Software
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetSystemTime(ref SYSTEMTIME lpSystemTime);
 
-        
+
 
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -296,7 +288,13 @@ namespace Software
         private void Button_Click_Version(object sender, RoutedEventArgs e)
         {
             contentcon.Content = frameVersion;
-            this.beta_tabel.Visibility = Visibility.Hidden;
+            beta_tabel.Visibility = Visibility.Hidden;
+        }
+
+        private void Button_Click_Settings(object sender, RoutedEventArgs e)
+        {
+            contentcon.Content = frameSettings;
+            beta_tabel.Visibility = Visibility.Hidden;
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
@@ -314,7 +312,7 @@ namespace Software
             nextwindow.Show();
         }
 
-        
+
 
         // 获取Music文件夹中的所有音乐文件路径
         string[] musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
@@ -330,7 +328,7 @@ namespace Software
             //mediaElement.Play();
         }
 
-        
+
 
         private void Button_Click_BuildJson(object sender, RoutedEventArgs e)
         {
@@ -438,9 +436,5 @@ namespace Software
             nextwindow.Show();
         }
 
-        private void Button_Click_Settings(object sender, RoutedEventArgs e)
-        {
-            contentcon.Content = frameSettings;
-        }
     }
 }
