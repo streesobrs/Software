@@ -328,8 +328,6 @@ namespace Software
             //mediaElement.Play();
         }
 
-
-
         private void Button_Click_BuildJson(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;

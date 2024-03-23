@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using Software;
 
 namespace Software.其他界面
 {
@@ -13,9 +15,27 @@ namespace Software.其他界面
     /// </summary>
     public partial class PageSettings : Page
     {
+        MainWindow mainWindow;
+        PageHome pageHome;
+
         public PageSettings()
         {
             InitializeComponent();
+            Loaded += PageSettings_Loaded;
+        }
+
+        private void PageSettings_Loaded(object sender, RoutedEventArgs e)
+        {
+            mainWindow = (MainWindow)Application.Current.MainWindow;
+            if (mainWindow == null)
+            {
+                throw new Exception("mainWindow is null");
+            }
+            pageHome = (PageHome)mainWindow.FindName("PageHome");
+            if (pageHome == null)
+            {
+                throw new Exception("pageHome is null");
+            }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -172,7 +192,7 @@ namespace Software.其他界面
 
         private void Button_Click_Open_Root_Directory_Folder(object sender, RoutedEventArgs e)
         {
-            
+
             Process.Start("explorer.exe", rootDirectoryFolder);
         }
 
@@ -219,5 +239,145 @@ namespace Software.其他界面
                 MessageBox.Show("所有文件夹删除成功", "删除文件夹提示");
             }
         }
+
+        private async void Button_Click_BuildJson(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            PageHome pageHome = (PageHome)mainWindow.FindName("PageHome");
+
+            // 检查 mainWindow 和 pageHome 是否为 null
+            if (mainWindow == null || pageHome == null)
+            {
+                // 如果 mainWindow 或 pageHome 为 null，则显示错误消息并返回
+                MessageBox.Show("mainWindow or pageHome is null");
+                return;
+            }
+
+            // 获取应用程序的名称和版本
+            string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+            string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            // 获取当前的日期和时间
+            string outputDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            // 获取操作系统的版本和计算机的名称
+            string osVersion = Environment.OSVersion.Version.ToString();
+            string computerName = Environment.MachineName;
+
+            // 获取 pageHome.ContentTextBox 的文本
+            string contentText = pageHome.ContentTextBox.Text;
+
+            // 获取音乐的名称
+            var musicName = pageHome.music_name.Text;
+            if (pageHome.mediaElement.Source != null)
+            {
+                string musicFilePath = pageHome.mediaElement.Source.LocalPath;
+                if (!string.IsNullOrEmpty(musicFilePath))
+                {
+                    musicName = System.IO.Path.GetFileName(musicFilePath);
+                }
+            }
+
+            // 获取音乐的路径
+            Uri playmusicpath = pageHome.mediaElement.Source;
+
+            // 如果 pageHome.mediaElement.Source 为 null，则设置为默认的音乐路径
+            Uri defaultMusicPath = new Uri(AppDomain.CurrentDomain.BaseDirectory + "resources/sound/music/music_001.mp3");
+            if (pageHome.mediaElement == null || pageHome.mediaElement.Source == null)
+            {
+                pageHome.mediaElement.Source = defaultMusicPath;
+            }
+            Uri musicPath = pageHome.mediaElement.Source;
+
+            // 获取当前线程的文化信息
+            var language = Thread.CurrentThread.CurrentCulture;
+
+            // 如果 pageHome.ContentTextBox 的文本为空，则设置为默认的文本
+            if (string.IsNullOrEmpty(pageHome.ContentTextBox.Text))
+            {
+                pageHome.ContentTextBox.Text = "你什么也没输入";
+            };
+
+            // 从文件中读取数据
+            string result;
+            using (StreamReader file = File.OpenText("resources\\weather.json"))
+            {
+                result = await file.ReadToEndAsync();
+            }
+
+            // 解析数据
+            var jsonObject = JObject.Parse(result);
+            var lives = jsonObject["lives"].First;
+
+            // 检查 lives，lives["province"] 和 lives["city"] 是否为 null
+            if (lives == null || lives["province"] == null || lives["city"] == null /* add other checks as needed */)
+            {
+                // 如果 lives，lives["province"] 或 lives["city"] 为 null，则显示错误消息并返回
+                Console.WriteLine("Error: Some required data is missing from the JSON file.");
+                MessageBox.Show("无法从JSON文件中获取所有需要的数据。请检查文件内容是否正确。");
+                return;
+            }
+
+            // 创建一个新的 JSON 对象
+            var json = new
+            {
+                Name = appName,
+                ComputerName = computerName,
+                Windows = osVersion,
+                Language = language,
+                CityWeather = new
+                {
+                    Province = lives["province"].ToString(),
+                    City = lives["city"].ToString(),
+                    Adcode = lives["adcode"].ToString(),
+                    Weather = lives["weather"].ToString(),
+                    Temperature = lives["temperature"].ToString(),
+                    Winddirection = lives["winddirection"].ToString(),
+                    Windpower = lives["windpower"].ToString(),
+                    Humidity = lives["humidity"].ToString()
+                },
+                Detail = new
+                {
+                    Time = outputDate,
+                    Version = appVersion,
+                    MemoryUsage = $"{(Process.GetCurrentProcess().WorkingSet64 / 1024f) / 1024f}MB",
+                    MusicName = musicName,
+                    MusicPath = musicPath.ToString(),
+                    Content = pageHome.ContentTextBox.Text
+                }
+            };
+
+            // 将 JSON 对象序列化为字符串
+            string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
+
+            // 检查是否需要创建 log 文件夹
+            string logFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+            if (!Directory.Exists(logFolderPath))
+            {
+                Directory.CreateDirectory(logFolderPath);
+            }
+
+            // 构造文件名
+            string date = DateTime.Now.ToString("yyyyMMdd");
+            string folderPath = "./log/";
+            string fileName = $"SoftwareMessage_v{appVersion}_{date}.json";
+
+            // 如果文件已存在，则在后面加上数字
+            int count = 1;
+            while (File.Exists(Path.Combine(folderPath, fileName)))
+            {
+                fileName = $"SoftwareMessage_v{appVersion}_{date}_{count}.json";
+                count++;
+            }
+
+            // 将字符串写入到日志文件中
+            string path = Path.Combine(folderPath, fileName);
+            File.WriteAllText(path, jsonString);
+
+            // 恢复 pageHome.ContentTextBox 的文本和 pageHome.mediaElement 的源
+            pageHome.ContentTextBox.Text = contentText;
+            pageHome.mediaElement.Source = playmusicpath;
+        }
+
     }
 }
