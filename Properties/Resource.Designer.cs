@@ -70,15 +70,6 @@ namespace Software.Properties {
         }
         
         /// <summary>
-        ///   查找类似 BuildJson 的本地化字符串。
-        /// </summary>
-        public static string Button_BuildJson {
-            get {
-                return ResourceManager.GetString("Button_BuildJson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 GenshinMap 的本地化字符串。
         /// </summary>
         public static string Button_GenshinMap {

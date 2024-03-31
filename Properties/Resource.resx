@@ -147,9 +147,6 @@
   <data name="Button_Version" xml:space="preserve">
     <value>Version</value>
   </data>
-  <data name="Button_BuildJson" xml:space="preserve">
-    <value>BuildJson</value>
-  </data>
   <data name="Button_StarRail" xml:space="preserve">
     <value>StarRail</value>
   </data>

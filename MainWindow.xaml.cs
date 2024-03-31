@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -38,6 +39,19 @@ namespace Software
         {
             InitializeComponent();
             ApplySavedCultureInfo();
+
+            // 在窗口加载完成后检查是否以管理员权限运行
+            this.Loaded += (s, e) =>
+            {
+                if (IsRunningAsAdministrator())
+                {
+                    this.Title = "MainWindow (Administrator)";
+                }
+                else
+                {
+                    this.Title = "MainWindow";
+                }
+            };
 
             contentcon.Content = frameHome;
 
@@ -92,6 +106,14 @@ namespace Software
                 doc.Save("Software.dll.config");
             }
 
+        }
+
+        public bool IsRunningAsAdministrator()
+        {
+            var wi = WindowsIdentity.GetCurrent();
+            var wp = new WindowsPrincipal(wi);
+
+            return wp.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         private void ApplySavedCultureInfo()
@@ -315,7 +337,7 @@ namespace Software
 
 
         // 获取Music文件夹中的所有音乐文件路径
-        string[] musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
+        //string[] musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
 
         private void MediaElement_Loaded(object sender, RoutedEventArgs e)
         {
@@ -328,105 +350,105 @@ namespace Software
             //mediaElement.Play();
         }
 
-        private void Button_Click_BuildJson(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            PageHome pageHome = (PageHome)mainWindow.FindName("PageHome");
+        //private void Button_Click_BuildJson(object sender, RoutedEventArgs e)
+        //{
+        //    MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+        //    PageHome pageHome = (PageHome)mainWindow.FindName("PageHome");
 
-            string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;//获取软件名称
-            string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();//获取软件版本号
-            string outputDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");//获取输出时间
-            string osVersion = Environment.OSVersion.Version.ToString();//获取操作系统
-            string computerName = Environment.MachineName;//获取系统用户名
-            string contentText = pageHome.ContentTextBox.Text;//获取白框框里的内容
+        //    string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;//获取软件名称
+        //    string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();//获取软件版本号
+        //    string outputDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");//获取输出时间
+        //    string osVersion = Environment.OSVersion.Version.ToString();//获取操作系统
+        //    string computerName = Environment.MachineName;//获取系统用户名
+        //    string contentText = pageHome.ContentTextBox.Text;//获取白框框里的内容
 
-            var musicName = pageHome.music_name.Text;
-            if (pageHome.mediaElement.Source != null)
-            {
-                string musicFilePath = pageHome.mediaElement.Source.LocalPath;
-                if (!string.IsNullOrEmpty(musicFilePath))
-                {
-                    musicName = System.IO.Path.GetFileName(musicFilePath);
-                }
-            }
+        //    var musicName = pageHome.music_name.Text;
+        //    if (pageHome.mediaElement.Source != null)
+        //    {
+        //        string musicFilePath = pageHome.mediaElement.Source.LocalPath;
+        //        if (!string.IsNullOrEmpty(musicFilePath))
+        //        {
+        //            musicName = System.IO.Path.GetFileName(musicFilePath);
+        //        }
+        //    }
 
-            Uri playmusicpath = pageHome.mediaElement.Source;
+        //    Uri playmusicpath = pageHome.mediaElement.Source;
 
-            Uri defaultMusicPath = new Uri(AppDomain.CurrentDomain.BaseDirectory + "resources/sound/music/music_001.mp3");
+        //    Uri defaultMusicPath = new Uri(AppDomain.CurrentDomain.BaseDirectory + "resources/sound/music/music_001.mp3");
 
-            if (pageHome.mediaElement == null || pageHome.mediaElement.Source == null)
-            {
-                pageHome.mediaElement.Source = defaultMusicPath;
-            }
+        //    if (pageHome.mediaElement == null || pageHome.mediaElement.Source == null)
+        //    {
+        //        pageHome.mediaElement.Source = defaultMusicPath;
+        //    }
 
-            Uri musicPath = pageHome.mediaElement.Source;
+        //    Uri musicPath = pageHome.mediaElement.Source;
 
-            var language = Thread.CurrentThread.CurrentCulture;//获取当前语言
+        //    var language = Thread.CurrentThread.CurrentCulture;//获取当前语言
 
-            if (string.IsNullOrEmpty(pageHome.ContentTextBox.Text))
-            {
-                pageHome.ContentTextBox.Text = "你什么也没输入";
-            };
+        //    if (string.IsNullOrEmpty(pageHome.ContentTextBox.Text))
+        //    {
+        //        pageHome.ContentTextBox.Text = "你什么也没输入";
+        //    };
 
-            var json = new
-            {
-                Name = appName,//软件名称
-                ComputerName = computerName,//系统用户名
-                Windows = osVersion,//系统版本号
-                Language = language,//语言
-                CityWeather = new
-                {
-                    Province = pageHome.Data_Province.Text,
-                    City = pageHome.Data_City.Text,
-                    Adcode = pageHome.Data_Adcode.Text,
-                    Weather = pageHome.Data_Weather.Text,
-                    Temperature = pageHome.Data_Temperature.Text,
-                    Winddirection = pageHome.Data_Winddirection.Text,
-                    Windpower = pageHome.Data_Windpower.Text,
-                    Humidity = pageHome.Data_Humidity.Text
-                },
-                Detail = new
-                {
-                    Time = outputDate,//时间
-                    Version = appVersion,//软件版本号
-                    MemoryUsage = $"{(Process.GetCurrentProcess().WorkingSet64 / 1024f) / 1024f}MB", //软件内存占用，单位是MB
-                    MusicName = musicName,
-                    MusicPath = musicPath.ToString(),
-                    Content = pageHome.ContentTextBox.Text//白框框里的内容
-                }
-            };
+        //    var json = new
+        //    {
+        //        Name = appName,//软件名称
+        //        ComputerName = computerName,//系统用户名
+        //        Windows = osVersion,//系统版本号
+        //        Language = language,//语言
+        //        CityWeather = new
+        //        {
+        //            Province = pageHome.Data_Province.Text,
+        //            City = pageHome.Data_City.Text,
+        //            Adcode = pageHome.Data_Adcode.Text,
+        //            Weather = pageHome.Data_Weather.Text,
+        //            Temperature = pageHome.Data_Temperature.Text,
+        //            Winddirection = pageHome.Data_Winddirection.Text,
+        //            Windpower = pageHome.Data_Windpower.Text,
+        //            Humidity = pageHome.Data_Humidity.Text
+        //        },
+        //        Detail = new
+        //        {
+        //            Time = outputDate,//时间
+        //            Version = appVersion,//软件版本号
+        //            MemoryUsage = $"{(Process.GetCurrentProcess().WorkingSet64 / 1024f) / 1024f}MB", //软件内存占用，单位是MB
+        //            MusicName = musicName,
+        //            MusicPath = musicPath.ToString(),
+        //            Content = pageHome.ContentTextBox.Text//白框框里的内容
+        //        }
+        //    };
 
-            //序列化为 JSON 字符串
-            string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
+        //    //序列化为 JSON 字符串
+        //    string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
 
-            //判断是否需要创建log文件夹
-            string logFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
-            if (!Directory.Exists(logFolderPath))
-            {
-                Directory.CreateDirectory(logFolderPath);
-            }
+        //    //判断是否需要创建log文件夹
+        //    string logFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+        //    if (!Directory.Exists(logFolderPath))
+        //    {
+        //        Directory.CreateDirectory(logFolderPath);
+        //    }
 
-            //构造文件名
-            string date = DateTime.Now.ToString("yyyyMMdd");
-            string folderPath = "./log/";
-            string fileName = $"SoftwareMessage_v{appVersion}_{date}.json";
+        //    //构造文件名
+        //    string date = DateTime.Now.ToString("yyyyMMdd");
+        //    string folderPath = "./log/";
+        //    string fileName = $"SoftwareMessage_v{appVersion}_{date}.json";
 
-            //如果文件已存在，则在后面加上数字
-            int count = 1;
-            while (File.Exists(Path.Combine(folderPath, fileName)))
-            {
-                fileName = $"SoftwareMessage_v{appVersion}_{date}_{count}.json";
-                count++;
-            }
+        //    //如果文件已存在，则在后面加上数字
+        //    int count = 1;
+        //    while (File.Exists(Path.Combine(folderPath, fileName)))
+        //    {
+        //        fileName = $"SoftwareMessage_v{appVersion}_{date}_{count}.json";
+        //        count++;
+        //    }
 
-            //写入到日志文件中
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log", fileName);
-            File.WriteAllText(path, jsonString);
+        //    //写入到日志文件中
+        //    string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log", fileName);
+        //    File.WriteAllText(path, jsonString);
 
-            pageHome.ContentTextBox.Text = contentText;
+        //    pageHome.ContentTextBox.Text = contentText;
 
-            pageHome.mediaElement.Source = playmusicpath;
-        }
+        //    pageHome.mediaElement.Source = playmusicpath;
+        //}
 
         private void Button_Click_PlayVideo(object sender, RoutedEventArgs e)
         {

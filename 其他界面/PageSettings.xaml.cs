@@ -21,21 +21,6 @@ namespace Software.其他界面
         public PageSettings()
         {
             InitializeComponent();
-            Loaded += PageSettings_Loaded;
-        }
-
-        private void PageSettings_Loaded(object sender, RoutedEventArgs e)
-        {
-            mainWindow = (MainWindow)Application.Current.MainWindow;
-            if (mainWindow == null)
-            {
-                throw new Exception("mainWindow is null");
-            }
-            pageHome = (PageHome)mainWindow.FindName("PageHome");
-            if (pageHome == null)
-            {
-                throw new Exception("pageHome is null");
-            }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -56,6 +41,7 @@ namespace Software.其他界面
             Update_Log_IP_address.Text = updateLogPath;
 
             //设置按钮的ToolTip
+            BuildJson.ToolTip = publishJson;
             Open_Root_Directory_Folder.ToolTip = rootDirectoryFolder;
             Open_Log_Folder.ToolTip = logFolder;
             Open_Resources_Folder.ToolTip = resourcesFolder;
@@ -184,6 +170,8 @@ namespace Software.其他界面
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tr"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zh-TW"),
         };
+        //添加ToolTip
+        string publishJson = "此功能未迁移完成 使用需谨慎";
         //添加打开文件夹
         string rootDirectoryFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
         string logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
@@ -242,8 +230,6 @@ namespace Software.其他界面
 
         private async void Button_Click_BuildJson(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            PageHome pageHome = (PageHome)mainWindow.FindName("PageHome");
 
             // 检查 mainWindow 和 pageHome 是否为 null
             if (mainWindow == null || pageHome == null)
@@ -379,5 +365,43 @@ namespace Software.其他界面
             pageHome.mediaElement.Source = playmusicpath;
         }
 
+        private void Button_Click_Reboot_Software(object sender, RoutedEventArgs e)
+        {
+            // 获取当前应用程序的路径
+            string appPath = Process.GetCurrentProcess().MainModule.FileName;
+
+            // 创建一个新的进程来启动新的应用程序实例
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = appPath,
+                UseShellExecute = true
+            };
+
+            // 启动新的进程
+            Process.Start(psi);
+
+            // 关闭当前的应用程序
+            Application.Current.Shutdown();
+        }
+
+        private void Button_Click_Root_Reboot_Software(object sender, RoutedEventArgs e)
+        {
+            // 获取当前应用程序的路径
+            string appPath = Process.GetCurrentProcess().MainModule.FileName;
+
+            // 创建一个新的进程来启动新的应用程序实例
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = appPath,
+                UseShellExecute = true,
+                Verb = "runas"  // 运行新的进程时请求管理员权限
+            };
+
+            // 启动新的进程
+            Process.Start(psi);
+
+            // 关闭当前的应用程序
+            Application.Current.Shutdown();
+        }
     }
 }

@@ -60,6 +60,10 @@
                                Click="Button_Click_Open_Music_Folder" Margin="0,5">打开music文件夹</ui:Button>
                     <ui:Button Foreground="Black" Name="Delete_Folder"
                                Click="Button_Click_Delete_Folder" Margin="0,5">删除文件夹</ui:Button>
+                    <ui:Button Foreground="Black" Name="Reboot_Software"
+                               Click="Button_Click_Reboot_Software" Margin="0,5">重启软件</ui:Button>
+                    <ui:Button Foreground="Black" Name="Root_Reboot_Software"
+                               Click="Button_Click_Root_Reboot_Software" Margin="0,5">管理员重启软件</ui:Button>
                 </StackPanel>
 
             </StackPanel>
