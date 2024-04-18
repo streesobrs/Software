@@ -231,14 +231,6 @@ namespace Software.其他界面
         private async void Button_Click_BuildJson(object sender, RoutedEventArgs e)
         {
 
-            // 检查 mainWindow 和 pageHome 是否为 null
-            if (mainWindow == null || pageHome == null)
-            {
-                // 如果 mainWindow 或 pageHome 为 null，则显示错误消息并返回
-                MessageBox.Show("mainWindow or pageHome is null");
-                return;
-            }
-
             // 获取应用程序的名称和版本
             string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
             string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -249,40 +241,38 @@ namespace Software.其他界面
             // 获取操作系统的版本和计算机的名称
             string osVersion = Environment.OSVersion.Version.ToString();
             string computerName = Environment.MachineName;
-
-            // 获取 pageHome.ContentTextBox 的文本
-            string contentText = pageHome.ContentTextBox.Text;
-
-            // 获取音乐的名称
-            var musicName = pageHome.music_name.Text;
-            if (pageHome.mediaElement.Source != null)
-            {
-                string musicFilePath = pageHome.mediaElement.Source.LocalPath;
-                if (!string.IsNullOrEmpty(musicFilePath))
-                {
-                    musicName = System.IO.Path.GetFileName(musicFilePath);
-                }
-            }
-
-            // 获取音乐的路径
-            Uri playmusicpath = pageHome.mediaElement.Source;
-
-            // 如果 pageHome.mediaElement.Source 为 null，则设置为默认的音乐路径
-            Uri defaultMusicPath = new Uri(AppDomain.CurrentDomain.BaseDirectory + "resources/sound/music/music_001.mp3");
-            if (pageHome.mediaElement == null || pageHome.mediaElement.Source == null)
-            {
-                pageHome.mediaElement.Source = defaultMusicPath;
-            }
-            Uri musicPath = pageHome.mediaElement.Source;
-
+            
             // 获取当前线程的文化信息
             var language = Thread.CurrentThread.CurrentCulture;
 
-            // 如果 pageHome.ContentTextBox 的文本为空，则设置为默认的文本
-            if (string.IsNullOrEmpty(pageHome.ContentTextBox.Text))
-            {
-                pageHome.ContentTextBox.Text = "你什么也没输入";
-            };
+            //// 获取 pageHome.ContentTextBox 的文本
+            //string contentText = pageHome.ContentTextBox.Text;
+
+            //// 获取音乐的名称
+            //var musicName = pageHome.music_name.Text;
+            //if (pageHome.mediaElement.Source != null)
+            //{
+            //    string musicFilePath = pageHome.mediaElement.Source.LocalPath;
+            //    if (!string.IsNullOrEmpty(musicFilePath))
+            //    {
+            //        musicName = System.IO.Path.GetFileName(musicFilePath);
+            //    }
+            //}
+
+            //// 获取音乐的路径
+            //Uri playmusicpath = pageHome.mediaElement.Source;
+            //// 如果 pageHome.mediaElement.Source 为 null，则设置为默认的音乐路径
+            //Uri defaultMusicPath = new Uri(AppDomain.CurrentDomain.BaseDirectory + "resources/sound/music/music_001.mp3");
+            //if (pageHome.mediaElement == null || pageHome.mediaElement.Source == null)
+            //{
+            //    pageHome.mediaElement.Source = defaultMusicPath;
+            //}
+            //Uri musicPath = pageHome.mediaElement.Source;
+            //// 如果 pageHome.ContentTextBox 的文本为空，则设置为默认的文本
+            //if (string.IsNullOrEmpty(pageHome.ContentTextBox.Text))
+            //{
+            //    pageHome.ContentTextBox.Text = "你什么也没输入";
+            //};
 
             // 从文件中读取数据
             string result;
@@ -327,9 +317,9 @@ namespace Software.其他界面
                     Time = outputDate,
                     Version = appVersion,
                     MemoryUsage = $"{(Process.GetCurrentProcess().WorkingSet64 / 1024f) / 1024f}MB",
-                    MusicName = musicName,
-                    MusicPath = musicPath.ToString(),
-                    Content = pageHome.ContentTextBox.Text
+                    //MusicName = musicName,
+                    //MusicPath = musicPath.ToString(),
+                    //Content = pageHome.ContentTextBox.Text
                 }
             };
 
@@ -361,8 +351,8 @@ namespace Software.其他界面
             File.WriteAllText(path, jsonString);
 
             // 恢复 pageHome.ContentTextBox 的文本和 pageHome.mediaElement 的源
-            pageHome.ContentTextBox.Text = contentText;
-            pageHome.mediaElement.Source = playmusicpath;
+            //pageHome.ContentTextBox.Text = contentText;
+            //pageHome.mediaElement.Source = playmusicpath;
         }
 
         private void Button_Click_Reboot_Software(object sender, RoutedEventArgs e)

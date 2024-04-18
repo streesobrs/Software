@@ -6,7 +6,9 @@
       "version": "0.1.6.0",
       "updateTime": "",
       "updateContent": [
-        "修复了update_log中的日期错误"
+        "修改了部分显示方式",
+        "修复了update_log中的日期错误",
+        "临时修复了输出Json"
       ]
     },
     {

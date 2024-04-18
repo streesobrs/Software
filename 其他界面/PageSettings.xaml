@@ -49,7 +49,7 @@
 
                 <StackPanel Margin="2">
                     <ui:Button Foreground="Black" Name="BuildJson"
-                               Click="Button_Click_BuildJson" Margin="0,5">生成Json数据</ui:Button>
+                               Click="Button_Click_BuildJson" Margin="0,5">输出Json</ui:Button>
                     <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"
                                Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5">打开软件根目录</ui:Button>
                     <ui:Button Foreground="Black" Name="Open_Log_Folder"

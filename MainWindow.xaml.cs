@@ -28,6 +28,7 @@ namespace Software
     public partial class MainWindow : Window
     {
         Frame frameHome = new Frame() { Content = new 其他界面.PageHome() };
+        Frame frameMap = new Frame() { Content = new 其他界面.PageGenshinMap() };
         Frame frameVersion = new Frame() { Content = new 其他界面.PageVersion() };
         Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
         Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
@@ -173,14 +174,14 @@ namespace Software
         private void Button_Click_Home(object sender, RoutedEventArgs e)
         {
             contentcon.Content = frameHome;
-
             this.beta_tabel.Visibility = Visibility.Visible;
         }
 
         private void Button_Click_GenshinMap(object sender, RoutedEventArgs e)
         {
-            其他窗口.WindowGenshinMap nextwindow = new();
-            nextwindow.Show();
+            contentcon.Content = frameMap;
+            //其他窗口.WindowGenshinMap nextwindow = new();
+            //nextwindow.Show();
         }
 
         private void Button_Click_SelectUP(object sender, RoutedEventArgs e)
@@ -250,8 +251,8 @@ namespace Software
         private void Button_Click_Bing(object sender, RoutedEventArgs e)
         {
             contentcon.Content = frameBing;
-            其他窗口.WindowBing nextwindow = new();
-            nextwindow.Show();
+            //其他窗口.WindowBing nextwindow = new();
+            //nextwindow.Show();
         }
 
         private async void Button_Click_Updata(object sender, RoutedEventArgs e)
