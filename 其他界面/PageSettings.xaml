@@ -26,19 +26,24 @@
 
                 <DockPanel Margin="2">
                     <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
-                 软件更新地址：
+                        软件更新地址：
                     </TextBlock>
                     <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
 
                 </DockPanel>
                 <DockPanel Margin="2">
                     <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
-                日志更新地址：
+                        日志更新地址：
                     </TextBlock>
                     <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                 </DockPanel>
-                
-                
+                <DockPanel Margin="2">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
+                        游戏启动路径：
+                    </TextBlock>
+                    <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                </DockPanel>
+
 
                 <DockPanel Margin="2">
                     <StackPanel DockPanel.Dock="Top" Orientation="Vertical">

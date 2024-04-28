@@ -15,8 +15,8 @@ namespace Software.其他界面
     /// </summary>
     public partial class PageSettings : Page
     {
-        MainWindow mainWindow;
-        PageHome pageHome;
+        //MainWindow mainWindow;
+        //PageHome pageHome;
 
         public PageSettings()
         {
@@ -30,15 +30,17 @@ namespace Software.其他界面
 
             // 读取"EnableCounting"的值
             bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
-            //读取“updatePath”的值
+            //读取值
             string updatePath = config.AppSettings.Settings["updatePath"].Value;
             string updateLogPath = config.AppSettings.Settings["UpdateLogUrl"].Value;
+            string currentPath = config.AppSettings.Settings["GamePath"].Value;
 
             // 设置CheckBox的状态
             EnableCountingCheckBox.IsChecked = enableCounting;
             // 设置TextBox的内容
             Update_IP_address.Text = updatePath;
             Update_Log_IP_address.Text = updateLogPath;
+            Text_GamePath.Text = currentPath;
 
             //设置按钮的ToolTip
             BuildJson.ToolTip = publishJson;
@@ -127,6 +129,15 @@ namespace Software.其他界面
             ConfigurationManager.RefreshSection("appSettings");
         }
 
+        private void Text_GamePath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string text = Text_GamePath.Text;
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["GamePath"].Value = text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("aappSettings");
+        }
+
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
         {
             SaveCultureInfo("en-US");
@@ -170,6 +181,7 @@ namespace Software.其他界面
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tr"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zh-TW"),
         };
+        
         //添加ToolTip
         string publishJson = "此功能未迁移完成 使用需谨慎";
         //添加打开文件夹
@@ -245,6 +257,7 @@ namespace Software.其他界面
             // 获取当前线程的文化信息
             var language = Thread.CurrentThread.CurrentCulture;
 
+            string contentTextBox = ConfigurationManager.AppSettings["TextContent"];
             //// 获取 pageHome.ContentTextBox 的文本
             //string contentText = pageHome.ContentTextBox.Text;
 
@@ -319,7 +332,7 @@ namespace Software.其他界面
                     MemoryUsage = $"{(Process.GetCurrentProcess().WorkingSet64 / 1024f) / 1024f}MB",
                     //MusicName = musicName,
                     //MusicPath = musicPath.ToString(),
-                    //Content = pageHome.ContentTextBox.Text
+                    Content = contentTextBox
                 }
             };
 
@@ -393,5 +406,7 @@ namespace Software.其他界面
             // 关闭当前的应用程序
             Application.Current.Shutdown();
         }
+
+        
     }
 }
