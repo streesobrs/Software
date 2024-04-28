@@ -40,9 +40,13 @@ namespace Software.其他界面
         }
 
         MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+        // 获取Music文件夹中的所有音乐文件路径
+        string[] musicFiles;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
+
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             // 获取TextContent的值
             string contentTextBox = ConfigurationManager.AppSettings["TextContent"];
@@ -424,10 +428,9 @@ namespace Software.其他界面
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
         }
-
-        // 获取Music文件夹中的所有音乐文件路径
-        string[] musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
-        bool isPlaying = false; // 标记当前媒体文件是否正在播放
+        
+        // 标记当前媒体文件是否正在播放
+        bool isPlaying = false; 
 
         private void Button_Click_MusicPlay_MusicPause(object sender, RoutedEventArgs e)
         {
@@ -480,11 +483,16 @@ namespace Software.其他界面
             this.music_name.Text = musicName;
         }
 
+        private void Button_Click_RefreshMusicPath(object sender, RoutedEventArgs e)
+        {
+            musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
+        }
+
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             mediaElement.Volume = volumeSlider.Value;
         }
 
-
+        
     }
 }
