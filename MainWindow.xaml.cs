@@ -33,7 +33,7 @@ namespace Software
         Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
         Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
         Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
-
+        Frame frameImage = new Frame() { Content = new 其他界面.PageImage() };
 
 
         public MainWindow()
@@ -162,14 +162,6 @@ namespace Software
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetSystemTime(ref SYSTEMTIME lpSystemTime);
-
-
-
-        private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            其他窗口.WindowImage nextwindow = new();
-            nextwindow.Show();
-        }
 
         private void Button_Click_Home(object sender, RoutedEventArgs e)
         {
@@ -457,5 +449,10 @@ namespace Software
             nextwindow.Show();
         }
 
+        private void Button_Click_Image(object sender, RoutedEventArgs e)
+        {
+            contentcon.Content = frameImage;
+            this.beta_tabel.Visibility = Visibility.Hidden;
+        }
     }
 }

@@ -1,15 +1,15 @@
-﻿<Page x:Class="Software.其他界面.PageBing"
+﻿<Page x:Class="Software.其他界面.PageImage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Software.其他界面"
       mc:Ignorable="d" 
-      xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="PageBing">
-    <DockPanel>
-        <wv2:WebView2 Name = "webView"
-                      Source = "https://bing.com/"/>
-    </DockPanel>
+      Title="PageImage">
+
+    <Grid>
+        <Image Stretch="Uniform"
+           Source="https://i.pixiv.re/img-original/img/2016/11/27/23/50/27/60140856_p0.jpg"/>
+    </Grid>
 </Page>

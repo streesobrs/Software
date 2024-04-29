@@ -4,26 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Web.WebView2.Core;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Software.其他窗口
+namespace Software.其他界面
 {
     /// <summary>
-    /// WindowBing.xaml 的交互逻辑
+    /// PageImage.xaml 的交互逻辑
     /// </summary>
-    public partial class WindowBing : Window
+    public partial class PageImage : Page
     {
-        public WindowBing()
+        public PageImage()
         {
             InitializeComponent();
         }
-
     }
 }

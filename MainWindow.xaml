@@ -35,7 +35,7 @@
                     <Ellipse.Fill>
                         <VisualBrush>
                             <VisualBrush.Visual>
-                                <Image Source ="resources/image/cxk.png" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
+                                <Image Source="resources/image/cxk.png"/>
                             </VisualBrush.Visual>
                         </VisualBrush>
                     </Ellipse.Fill>
@@ -100,7 +100,7 @@
 
             <DockPanel Grid.Column="2" LastChildFill="False">
 
-                <ui:Button DockPanel.Dock="Right" Background="Transparent" VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9" Content="关于"/>
+                <ui:Button DockPanel.Dock="Right" Background="Transparent" VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9" Content="关于" Click="Button_Click_Image"/>
                 <ui:Button DockPanel.Dock="Right" Background="Transparent" VerticalAlignment="Center" Margin="10,0" FontSize="19" Foreground="#EFE0EEF9" Content="别点" Click="Button_Click_PlayVideo"/>
 
             </DockPanel>
