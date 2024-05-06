@@ -43,7 +43,14 @@
                     </TextBlock>
                     <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                 </DockPanel>
-
+                <DockPanel Margin="2">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18" 
+                               ToolTip="填写结构化地址信息:省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写">
+                        输入地址信息：
+                    </TextBlock>
+                    <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
+                    <ui:Button Foreground="Black" Background="#D8E8F9" Click="Button_Click_City_Address">确定</ui:Button>
+                </DockPanel>
 
                 <DockPanel Margin="2">
                     <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
@@ -54,21 +61,21 @@
 
                 <StackPanel Margin="2">
                     <ui:Button Foreground="Black" Name="BuildJson"
-                               Click="Button_Click_BuildJson" Margin="0,5">输出Json</ui:Button>
+                               Click="Button_Click_BuildJson" Margin="0,5" Background="#D8E8F9">输出Json</ui:Button>
                     <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"
-                               Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5">打开软件根目录</ui:Button>
+                               Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5" Background="#D8E8F9">打开软件根目录</ui:Button>
                     <ui:Button Foreground="Black" Name="Open_Log_Folder"
-                               Click="Button_Click_Open_Log_Folder" Margin="0,5">打开Log文件夹</ui:Button>
+                               Click="Button_Click_Open_Log_Folder" Margin="0,5" Background="#D8E8F9">打开Log文件夹</ui:Button>
                     <ui:Button Foreground="Black" Name="Open_Resources_Folder"
-                               Click="Button_Click_Open_Resources_Folder" Margin="0,5">打开resources文件夹</ui:Button>
+                               Click="Button_Click_Open_Resources_Folder" Margin="0,5" Background="#D8E8F9">打开resources文件夹</ui:Button>
                     <ui:Button Foreground="Black" Name="Open_Music_Folder"
-                               Click="Button_Click_Open_Music_Folder" Margin="0,5">打开music文件夹</ui:Button>
+                               Click="Button_Click_Open_Music_Folder" Margin="0,5" Background="#D8E8F9">打开music文件夹</ui:Button>
                     <ui:Button Foreground="Black" Name="Delete_Folder"
-                               Click="Button_Click_Delete_Folder" Margin="0,5">删除文件夹</ui:Button>
+                               Click="Button_Click_Delete_Folder" Margin="0,5" Background="#D8E8F9">删除文件夹</ui:Button>
                     <ui:Button Foreground="Black" Name="Reboot_Software"
-                               Click="Button_Click_Reboot_Software" Margin="0,5">重启软件</ui:Button>
+                               Click="Button_Click_Reboot_Software" Margin="0,5" Background="#D8E8F9">重启软件</ui:Button>
                     <ui:Button Foreground="Black" Name="Root_Reboot_Software"
-                               Click="Button_Click_Root_Reboot_Software" Margin="0,5">管理员重启软件</ui:Button>
+                               Click="Button_Click_Root_Reboot_Software" Margin="0,5" Background="#D8E8F9">管理员重启软件</ui:Button>
                 </StackPanel>
 
             </StackPanel>

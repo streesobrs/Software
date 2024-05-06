@@ -4,6 +4,8 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,6 +50,45 @@ namespace Software.其他界面
             Open_Log_Folder.ToolTip = logFolder;
             Open_Resources_Folder.ToolTip = resourcesFolder;
             Open_Music_Folder.ToolTip = musicFolder;
+        }
+
+        public void RebootSoftware()
+        {
+            // 获取当前应用程序的路径
+            string appPath = Process.GetCurrentProcess().MainModule.FileName;
+
+            // 创建一个新的进程来启动新的应用程序实例
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = appPath,
+                UseShellExecute = true
+            };
+
+            // 启动新的进程
+            Process.Start(psi);
+
+            // 关闭当前的应用程序
+            Application.Current.Shutdown();
+        }
+
+        public void RootRebootSoftware()
+        {
+            // 获取当前应用程序的路径
+            string appPath = Process.GetCurrentProcess().MainModule.FileName;
+
+            // 创建一个新的进程来启动新的应用程序实例
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = appPath,
+                UseShellExecute = true,
+                Verb = "runas"  // 运行新的进程时请求管理员权限
+            };
+
+            // 启动新的进程
+            Process.Start(psi);
+
+            // 关闭当前的应用程序
+            Application.Current.Shutdown();
         }
 
         public void HandleLaunchCount()
@@ -370,43 +411,60 @@ namespace Software.其他界面
 
         private void Button_Click_Reboot_Software(object sender, RoutedEventArgs e)
         {
-            // 获取当前应用程序的路径
-            string appPath = Process.GetCurrentProcess().MainModule.FileName;
-
-            // 创建一个新的进程来启动新的应用程序实例
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = appPath,
-                UseShellExecute = true
-            };
-
-            // 启动新的进程
-            Process.Start(psi);
-
-            // 关闭当前的应用程序
-            Application.Current.Shutdown();
+            RebootSoftware();
         }
 
         private void Button_Click_Root_Reboot_Software(object sender, RoutedEventArgs e)
         {
-            // 获取当前应用程序的路径
-            string appPath = Process.GetCurrentProcess().MainModule.FileName;
-
-            // 创建一个新的进程来启动新的应用程序实例
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = appPath,
-                UseShellExecute = true,
-                Verb = "runas"  // 运行新的进程时请求管理员权限
-            };
-
-            // 启动新的进程
-            Process.Start(psi);
-
-            // 关闭当前的应用程序
-            Application.Current.Shutdown();
+            RootRebootSoftware();
         }
 
-        
+        private async void Button_Click_City_Address(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string address = Text_CityAddress.Text;
+
+                var client = new HttpClient();
+                var request = new HttpRequestMessage();
+                request.RequestUri = new Uri($"https://restapi.amap.com/v3/geocode/geo?address={address}&output=JSON&key=71d6333d58f635ab3136a8955cec1e8c");
+                request.Method = HttpMethod.Get;
+                Debug.WriteLine($"{address}");
+                var response = await client.SendAsync(request);
+                string json = await response.Content.ReadAsStringAsync();
+
+                JObject obj = JObject.Parse(json);
+                Debug.WriteLine($"{json}");
+                JArray geocodes = (JArray)obj["geocodes"];
+
+                if (geocodes.Count > 0)
+                {
+                    JObject geocode = (JObject)geocodes[0];
+                    string adcode = (string)geocode["adcode"];
+                    Debug.WriteLine($"adcode: {adcode}");
+
+                    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                    config.AppSettings.Settings["adcode"].Value = adcode;
+                    config.Save(ConfigurationSaveMode.Modified);
+                    ConfigurationManager.RefreshSection("appSettings");
+
+                    MessageBoxResult result = MessageBox.Show("修改成功，需重启后生效。\n是否重启？", "成功", MessageBoxButton.YesNo);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        RebootSoftware();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("未找到对应的adcode，请检查地址是否正确。", "错误", MessageBoxButton.OK);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                MessageBox.Show($"发生错误：{ex.Message}", "错误", MessageBoxButton.OK);
+            }
+        }
+
     }
 }

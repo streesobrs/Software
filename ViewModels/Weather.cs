@@ -167,16 +167,19 @@ namespace Software.ViewModels
                 var jsonResult = JObject.Parse(result);
                 if (jsonResult["city"] is JArray cityArray && cityArray.Count == 0)
                 {
-                    return "500000";
+                    MessageBox.Show("没有成功获取到信息，推荐去设置页面搜索");
+                    return "";
                 }
                 return jsonResult["adcode"].ToString();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"错误代码为：{ex.Message}" + "\n默认返回了个值");
-                return "500000";
+                return "";
             }
         }
+
+
 
         public async Task DownloadDataAsync(string city, string filePath)
         {
