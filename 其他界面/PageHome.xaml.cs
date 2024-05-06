@@ -2,11 +2,13 @@
 using Newtonsoft.Json.Linq;
 using Software.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -31,6 +33,9 @@ namespace Software.其他界面
             txtGamePath = new TextBox();
             weather = new Weather();
             this.DataContext = weather;
+
+            this.AllowDrop = true;
+            this.Drop += Page_Drop;
 
             Loaded += async (_, __) =>
             {
@@ -493,6 +498,102 @@ namespace Software.其他界面
             mediaElement.Volume = volumeSlider.Value;
         }
 
-        
+        private void Page_Drop(object sender, DragEventArgs e)
+        {
+            Debug.WriteLine("Drop event triggered.");
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (var file in files)
+                {
+                    string md5 = ComputeMD5(file);
+                    string sha1 = ComputeSHA1(file);
+                    string sha256 = ComputeSHA256(file);
+                    string sha384 = ComputeSHA384(file);
+                    string sha512 = ComputeSHA512(file);
+                    //Debug.WriteLine($"File: {file}, MD5: {md5}, SHA1: {sha1}");
+
+                    // 创建并显示自定义对话框
+                    var dialog = new Window
+                    {
+                        Width = 400,
+                        Height = 300,
+                        Title = "MD5/SHA1/SHA256/SHA384/SHA512值",
+                        Background = (Brush)new BrushConverter().ConvertFromString("#CADFF6"),
+                        ShowInTaskbar = false,
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                        ResizeMode = ResizeMode.NoResize,
+                        WindowStyle = WindowStyle.SingleBorderWindow,
+                        Owner = Application.Current.MainWindow,
+                        Content = new PageHashDialog(file, md5, sha1,sha256,sha384,sha512)
+                    };
+                    Debug.WriteLine("Showing dialog.");
+                    bool? result = dialog.ShowDialog();
+                    Debug.WriteLine("Dialog closed.");
+                }
+            }
+        }
+
+        private string ComputeMD5(string filename)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
+        private string ComputeSHA1(string filename)
+        {
+            using (var sha1 = SHA1.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = sha1.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
+        private string ComputeSHA256(string filename)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = sha256.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
+        private string ComputeSHA384(string filename)
+        {
+            using (var sha384 = SHA384.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = sha384.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
+        private string ComputeSHA512(string filename)
+        {
+            using (var sha512 = SHA512.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = sha512.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
+
     }
 }

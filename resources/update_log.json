@@ -3,6 +3,13 @@
   "version": "0.1.6.0",
   "updates": [
     {
+      "version": "0.1.7.0",
+      "updateTime": "",
+      "updateContent": [
+        "添加了获取文件的MD5/SHA1/SHA256/SHA384/SHA512值的功能"
+      ]
+    },
+    {
       "version": "0.1.6.0",
       "updateTime": "2024/04/30",
       "updateContent": [

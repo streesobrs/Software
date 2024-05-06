@@ -10,7 +10,7 @@
       FontFamily="../resources/Fonts/#得意黑"
       Title="PageHome" Loaded="Page_Loaded">
 
-    <Grid>
+    <Grid AllowDrop="True" Drop="Page_Drop">
         <StackPanel>
 
             <DockPanel>
@@ -81,7 +81,6 @@
                             TickPlacement="BottomRight"
                             ValueChanged="MediaPositionSlider_ValueChanged"/>
                     </DockPanel>
-
                 </StackPanel>
 
                 <DockPanel VerticalAlignment="Top" HorizontalAlignment="Left" LastChildFill="False" >
