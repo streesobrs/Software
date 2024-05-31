@@ -52,6 +52,7 @@ namespace Software
                 {
                     this.Title = "MainWindow";
                 }
+                Debug.WriteLine("加载完成");
             };
 
             contentcon.Content = frameHome;
@@ -184,24 +185,31 @@ namespace Software
 
         private void Button_Click_PlayGames(object sender, RoutedEventArgs e)
         {
-            string gamePath = ConfigurationManager.AppSettings["GamePath"];
-            if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
+            try
             {
-                // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
-                var dialog = new OpenFileDialog();
-                dialog.ValidateNames = false;
-                dialog.CheckFileExists = true;
-                dialog.CheckPathExists = true;
-                dialog.FileName = "Select Game";
-                if (dialog.ShowDialog() == true)
+                string gamePath = ConfigurationManager.AppSettings["GamePath"];
+                if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
                 {
-                    gamePath = dialog.FileName;
-                    UpdateGamePath(gamePath);  // 保存新的游戏路径
+                    // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
+                    var dialog = new OpenFileDialog();
+                    dialog.ValidateNames = false;
+                    dialog.CheckFileExists = true;
+                    dialog.CheckPathExists = true;
+                    dialog.FileName = "Select Game";
+                    if (dialog.ShowDialog() == true)
+                    {
+                        gamePath = dialog.FileName;
+                        UpdateGamePath(gamePath);  // 保存新的游戏路径
+                    }
+                }
+                if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
+                {
+                    _ = System.Diagnostics.Process.Start(gamePath);
                 }
             }
-            if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
+            catch (Exception ex)
             {
-                _ = System.Diagnostics.Process.Start(gamePath);
+                MessageBox.Show(ex.Message);
             }
         }
 
