@@ -32,6 +32,7 @@ namespace Software.其他界面
 
             // 读取"EnableCounting"的值
             bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
+            bool enableAutoUpdate = bool.Parse(ConfigurationManager.AppSettings["EnableAutoUpdate"]);
             //读取值
             string updatePath = config.AppSettings.Settings["updatePath"].Value;
             string updateLogPath = config.AppSettings.Settings["UpdateLogUrl"].Value;
@@ -39,6 +40,7 @@ namespace Software.其他界面
 
             // 设置CheckBox的状态
             EnableCountingCheckBox.IsChecked = enableCounting;
+            EnableAutoUpdateCheckBox.IsChecked = enableAutoUpdate;
             // 设置TextBox的内容
             Update_IP_address.Text = updatePath;
             Update_Log_IP_address.Text = updateLogPath;
@@ -149,6 +151,24 @@ namespace Software.其他界面
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             UpdateEnableCounting(false);
             mainWindow.LaunchCount.Visibility = Visibility.Hidden;
+        }
+
+        private void UpdateAutoUpdateCounting(bool enableAutoUpdate)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["EnableAutoUpdate"].Value = enableAutoUpdate.ToString();
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void EnableAutoUpdateCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateAutoUpdateCounting(true);
+        }
+
+        private void EnableAutoUpdateCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateAutoUpdateCounting(false);
         }
 
         private void Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
@@ -472,5 +492,6 @@ namespace Software.其他界面
             }
         }
 
+        
     }
 }

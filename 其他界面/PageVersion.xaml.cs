@@ -202,47 +202,51 @@ namespace Software.其他界面
                     return;
                 }
 
-                // 根据 JsonVersion 的值来处理 updates
+                // 默认处理最新版本的 updates
+                foreach (Update update in root.updates)
+                {
+                    // 检查 update 和 update.updateContent 是否为 null
+                    if (update == null || update.updateContent == null)
+                    {
+                        continue;
+                    }
+
+                    Paragraph paragraph = new Paragraph();
+
+                    // 创建并添加版本信息
+                    Run versionRun = new Run($"版本：{update.version}\n");
+                    versionRun.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(versionColor);
+                    paragraph.Inlines.Add(versionRun);
+
+                    // 创建并添加更新时间信息
+                    Run updateTimeRun = new Run($"·更新时间：{update.updateTime}\n");
+                    updateTimeRun.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(updateTimeColor);
+                    paragraph.Inlines.Add(updateTimeRun);
+
+                    // 创建并添加更新内容标签
+                    Run updateContentLabel = new Run("更新内容:\n");
+                    paragraph.Inlines.Add(updateContentLabel);
+
+                    // 添加更新内容
+                    foreach (string content in update.updateContent)
+                    {
+                        paragraph.Inlines.Add(new Run("- " + content + "\n"));
+                    }
+                    // 将段落添加到历史文档
+                    historyDocument.Blocks.Add(paragraph);
+                }
+
+                // 特定版本的处理逻辑
                 if (root.jsonVersion == "1.0.0")
                 {
-                    // 处理版本为 "1.0.0" 的 updates
-                    foreach (Update update in root.updates)
-                    {
-                        // 检查 update 和 update.updateContent 是否为 null
-                        if (update == null || update.updateContent == null)
-                        {
-                            continue;
-                        }
-
-                        Paragraph paragraph = new Paragraph();
-
-                        // 创建并添加版本信息
-                        Run versionRun = new Run($"版本：{update.version}\n");
-                        versionRun.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(versionColor);  // 设置版本颜色为versionColor里的颜色
-                        paragraph.Inlines.Add(versionRun);
-
-                        // 创建并添加更新时间信息
-                        Run updateTimeRun = new Run($"·更新时间：{update.updateTime}\n");
-                        updateTimeRun.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(updateTimeColor);  // 设置版本颜色为updateTimeColor里的颜色
-                        paragraph.Inlines.Add(updateTimeRun);
-
-                        // 创建并添加更新内容标签
-                        Run updateContentLabel = new Run("更新内容:\n");
-                        paragraph.Inlines.Add(updateContentLabel);
-
-                        // 添加更新内容
-                        foreach (string content in update.updateContent)
-                        {
-                            paragraph.Inlines.Add(new Run("- " + content + "\n"));
-                        }
-                        // 将段落添加到历史文档
-                        historyDocument.Blocks.Add(paragraph);
-                    }
+                    // 处理版本为 "1.0.0" 的特定逻辑
                 }
                 else if (root.jsonVersion == "1.0.1")
                 {
-                    // 处理其他版本的 updates
+                    // 处理版本为 "1.0.1" 的特定逻辑
                 }
+                // 可以继续添加其他已知版本的处理逻辑
+
             }
             catch (Exception ex)
             {

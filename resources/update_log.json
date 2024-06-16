@@ -3,8 +3,17 @@
   "version": "0.1.7.0",
   "updates": [
     {
-      "version": "0.1.7.0",
+      "version": "0.1.8.0",
       "updateTime": "",
+      "updateContent": [
+        "更新了依赖",
+        "添加了自动更新功能，默认为启用",
+        "修复了更新日志错误的兼容方式"
+      ]
+    },
+    {
+      "version": "0.1.7.0",
+      "updateTime": "2024/05/31",
       "updateContent": [
         "添加了获取文件的MD5/SHA1/SHA256/SHA384/SHA512值的功能",
         "添加了通过在设置页面输入城市获取天气信息的功能",

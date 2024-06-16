@@ -83,14 +83,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.0.4" />
-    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.4" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="AngleSharp" Version="1.1.2" />
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2535.41" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
-    <PackageReference Include="WPF-UI" Version="2.1.0" />
+    <PackageReference Include="WPF-UI" Version="3.0.4" />
   </ItemGroup>
 
   <ItemGroup>

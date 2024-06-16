@@ -79,6 +79,7 @@ namespace Software
         <add key=""VersionColor"" value=""Red""/>
 		<add key=""UpdateTimeColor"" value=""Blue""/>
         <add key=""Culture"" value=""zh-CN""/>
+        <add key=""AutoUpdate"" value=""true""/>
     </appSettings>
 </configuration>";
                     byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
@@ -104,6 +105,7 @@ namespace Software
                 CheckAndAddSetting(appSettings, "VersionColor", "Red");
                 CheckAndAddSetting(appSettings, "UpdateTimeColor", "Blue");
                 CheckAndAddSetting(appSettings, "Culture", "zh-CN");
+                CheckAndAddSetting(appSettings, "AutoUpdate", "true");
                 // 保存修改后的配置文件
                 doc.Save("Software.dll.config");
             }
@@ -143,6 +145,13 @@ namespace Software
         {
             // 读取配置文件
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            bool dd_enableAutoUpdate = bool.Parse(ConfigurationManager.AppSettings["EnableAutoUpdate"]);
+            string dd_updatePath = config.AppSettings.Settings["updatePath"].Value;
+            if (dd_enableAutoUpdate)
+            {
+                AutoUpdater.Start($"{dd_updatePath}");
+            }
 
             PageSettings pageSettings = new PageSettings();
             pageSettings.HandleLaunchCount();

@@ -15,13 +15,21 @@
         <ScrollViewer>
             <StackPanel Margin="1,1,1,1">
                 <DockPanel Margin="5">
-
-                    <TextBlock Text="是否开启启动计数  " FontSize="24" Foreground="Black"/>
+                    <TextBlock Text="启动计数" FontSize="24" Foreground="Black"/>
                     <CheckBox DockPanel.Dock="Top" Foreground="Black"
-                          Name="EnableCountingCheckBox" 
-                          Content="启用计数" 
-                          Checked="EnableCountingCheckBox_Checked" 
-                          Unchecked="EnableCountingCheckBox_Unchecked"/>
+                        Name="EnableCountingCheckBox" 
+                        Content="" 
+                        Checked="EnableCountingCheckBox_Checked" 
+                        Unchecked="EnableCountingCheckBox_Unchecked"/>
+                </DockPanel>
+
+                <DockPanel Margin="5">
+                    <TextBlock Text="自动更新" FontSize="24" Foreground="Black"/>
+                    <CheckBox DockPanel.Dock="Top" Foreground="Black"
+                        Name="EnableAutoUpdateCheckBox" 
+                        Content="" 
+                        Checked="EnableAutoUpdateCheckBox_Checked" 
+                        Unchecked="EnableAutoUpdateCheckBox_Unchecked"/>
                 </DockPanel>
 
                 <DockPanel Margin="2">
@@ -76,6 +84,9 @@
                                Click="Button_Click_Reboot_Software" Margin="0,5" Background="#D8E8F9">重启软件</ui:Button>
                     <ui:Button Foreground="Black" Name="Root_Reboot_Software"
                                Click="Button_Click_Root_Reboot_Software" Margin="0,5" Background="#D8E8F9">管理员重启软件</ui:Button>
+                </StackPanel>
+                <StackPanel>
+                    
                 </StackPanel>
 
             </StackPanel>
