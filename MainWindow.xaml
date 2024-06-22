@@ -41,62 +41,6 @@
                     </Ellipse.Fill>
                 </Ellipse>
             </StackPanel>
-            <!-- 音量按钮 -->
-            <ToggleButton x:Name="bgm"
-                      Margin="160,10"
-                      HorizontalAlignment="Right"
-                      VerticalAlignment="Top"
-                      Panel.ZIndex="1"
-                      FocusVisualStyle="{x:Null}"
-                      Foreground="#9FFF"
-                      IsChecked="True"
-                      Cursor="Hand">
-                <ToggleButton.Effect>
-                    <BlurEffect Radius="1" />
-                </ToggleButton.Effect>
-                <ToggleButton.Template>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Ellipse Width="25"
-                                 Height="25"
-                                 Stroke="{TemplateBinding Foreground}"
-                                 StrokeThickness="2" />
-                            <TextBlock HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Text="&#xEC4F;"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   FontFamily="Segoe MDL2 Assets"
-                                   RenderTransformOrigin="0.5,0.5"
-                                   Foreground="{TemplateBinding Foreground}">
-                                <TextBlock.RenderTransform>
-                                    <RotateTransform Angle="-15" />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
-                            <TextBlock x:Name="block"
-                                   Margin="0,0,4,5"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Bottom"
-                                   Visibility="Hidden"
-                                   Text="&#xF140;"
-                                   FontWeight="SemiBold"
-                                   FontSize="10"
-                                   Foreground="LightCoral"
-                                   FontFamily="Segoe MDL2 Assets"
-                                   RenderTransformOrigin="0.5,0.5">
-                                <TextBlock.RenderTransform>
-                                    <ScaleTransform ScaleX="-1" />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="block" Property="Visibility" Value="Visible" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </ToggleButton.Template>
-            </ToggleButton>
 
             <DockPanel Grid.Column="2" LastChildFill="False">
 
