@@ -486,6 +486,9 @@ namespace Software.其他界面
             mediaElement.Play();
             var musicName = System.IO.Path.GetFileName(mediaElement.Source.LocalPath);
             this.music_name.Text = musicName;
+            playPauseButton.Content = "暂停";
+            playPauseButton.ToolTip = "字面意思，暂停";
+            isPlaying = true;
         }
 
         private void Button_Click_RefreshMusicPath(object sender, RoutedEventArgs e)

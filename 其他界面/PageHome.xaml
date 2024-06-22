@@ -14,7 +14,7 @@
         <StackPanel>
 
             <DockPanel>
-                <StackPanel Height="400">
+                <StackPanel Height="400" Width="400">
                     <DockPanel>
                         <MediaElement Name="mediaElement"
                             LoadedBehavior="Manual" 
@@ -22,7 +22,7 @@
                             Volume="{Binding ElementName=volumeSlider, Path=Value}"
                             MediaOpened="MediaElement_MediaOpened" 
                             IsMuted="{Binding ElementName=bgm, Path=IsChecked}"/>
-                        
+
                         <ui:TextBox 
                                 MaxWidth="400" MaxHeight="200"
                                 TextWrapping="Wrap" 
@@ -57,21 +57,64 @@
                             Click="Button_Click_RefreshMusicPath"/>
                     </UniformGrid>
 
-                    <DockPanel>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-                        控制音量
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <!-- 左边 -->
+                            <ColumnDefinition Width="*" />
+                            <!-- 中间 -->
+                            <ColumnDefinition Width="Auto" MaxWidth="180" />
+                            <!-- 右边 -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 音量控制文本 -->
+                        <TextBlock Grid.Column="0" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            控制音量
                         </TextBlock>
-                        <Slider x:Name="volumeSlider" VerticalAlignment="Center"
-                        Width="200"
-                        HorizontalAlignment="Left"
-                        Minimum="0" Maximum="1" Value="0.2"
-                        SmallChange="0.1" LargeChange="0.2"
-                        ValueChanged="volumeSlider_ValueChanged"
-                        ToolTip="音量调节"/>
-                        <TextBox Name="music_name" Width="124" Foreground="Black">
+
+                        <!-- 中间的两个 TextBox -->
+                        <!-- 音量滑块 -->
+                        <Slider x:Name="volumeSlider" Grid.Column="1" Margin="5,0,45,0" Width="Auto" VerticalAlignment="Center" Minimum="0" Maximum="1" Value="0.2">
+                            <Slider.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Text="{Binding Value, ElementName=volumeSlider, StringFormat=F2}" />
+                                </ToolTip>
+                            </Slider.ToolTip>
+                        </Slider>
+
+                        <!-- 背景音乐开关按钮 -->
+                        <ToggleButton x:Name="bgm" Grid.Column="1" Margin="10" Grid.Row="1" Width="Auto" HorizontalAlignment="Right" VerticalAlignment="Center" Panel.ZIndex="1" FocusVisualStyle="{x:Null}" Foreground="#9FFF" IsChecked="True" Cursor="Hand" ToolTip="背景音乐开关">
+                            <ToggleButton.Effect>
+                                <BlurEffect Radius="1" />
+                            </ToggleButton.Effect>
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Grid>
+                                        <Ellipse Width="25" Height="25" Stroke="{TemplateBinding Foreground}" StrokeThickness="2" />
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="" FontSize="16" FontWeight="SemiBold" FontFamily="Segoe MDL2 Assets" RenderTransformOrigin="0.5,0.5" Foreground="{TemplateBinding Foreground}">
+                                            <TextBlock.RenderTransform>
+                                                <RotateTransform Angle="-15" />
+                                            </TextBlock.RenderTransform>
+                                        </TextBlock>
+                                        <TextBlock x:Name="block" Margin="0,0,4,5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="Hidden" Text="" FontWeight="SemiBold" FontSize="10" Foreground="LightCoral" FontFamily="Segoe MDL2 Assets" RenderTransformOrigin="0.5,0.5">
+                                            <TextBlock.RenderTransform>
+                                                <ScaleTransform ScaleX="-1" />
+                                            </TextBlock.RenderTransform>
+                                        </TextBlock>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="block" Property="Visibility" Value="Visible" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <!-- 音乐名称文本框 -->
+                        <TextBox Name="music_name" Grid.Column="2" MaxWidth="180" MinWidth="40" HorizontalAlignment="Right" Margin="5" Foreground="Black">
                             无
                         </TextBox>
-                    </DockPanel>
+                    </Grid>
 
                     <DockPanel>
                         <Slider x:Name="mediaPositionSlider" Minimum="0" Value="0" VerticalAlignment="Center"
