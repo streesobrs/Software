@@ -56,60 +56,6 @@ namespace Software
             };
 
             contentcon.Content = frameHome;
-
-            // 检查配置文件是否存在
-            if (!File.Exists("Software.dll.config"))
-            {
-                // 如果不存在，创建一个新的配置文件
-                using (var stream = File.Create("Software.dll.config"))
-                {
-                    // 写入默认的设置
-                    string defaultSettings = @"
-<configuration>
-    <appSettings>
-        <add key=""GamePath"" value=""""/>
-        <add key=""TextContent"" value=""""/>
-        <add key=""UpdatePath"" value=""https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml""/>
-        <add key=""LaunchCount"" value=""0""/>
-        <add key=""EnableCounting"" value=""false""/>
-        <add key=""RetryCount"" value=""5""/>
-        <add key=""RetryDelay"" value=""10""/>
-        <add key=""adcode"" value=""""/>
-        <add key=""UpdateLogUrl"" value=""https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json"" />
-        <add key=""VersionColor"" value=""Red""/>
-		<add key=""UpdateTimeColor"" value=""Blue""/>
-        <add key=""Culture"" value=""zh-CN""/>
-        <add key=""AutoUpdate"" value=""true""/>
-    </appSettings>
-</configuration>";
-                    byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
-                    stream.Write(data, 0, data.Length);
-                }
-            }
-            else
-            {
-                // 如果存在，检查是否缺少某些设置，并添加缺少的设置
-                XDocument doc = XDocument.Load("Software.dll.config");
-                XElement appSettings = doc.Root.Element("appSettings");
-
-                // 检查每个需要的设置
-                CheckAndAddSetting(appSettings, "GamePath", "");
-                CheckAndAddSetting(appSettings, "TextContent", "");
-                CheckAndAddSetting(appSettings, "UpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml");
-                CheckAndAddSetting(appSettings, "LaunchCount", "0");
-                CheckAndAddSetting(appSettings, "EnableCounting", "false");
-                CheckAndAddSetting(appSettings, "RetryCount", "5");
-                CheckAndAddSetting(appSettings, "RetryDelay", "10");
-                CheckAndAddSetting(appSettings, "adcode", "");
-                CheckAndAddSetting(appSettings, "UpdateLogUrl", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json");
-                CheckAndAddSetting(appSettings, "VersionColor", "Red");
-                CheckAndAddSetting(appSettings, "UpdateTimeColor", "Blue");
-                CheckAndAddSetting(appSettings, "Culture", "zh-CN");
-                CheckAndAddSetting(appSettings, "AutoUpdate", "true");
-                // 保存修改后的配置文件
-                doc.Save("Software.dll.config");
-            }
-
         }
 
         public bool IsRunningAsAdministrator()
@@ -130,31 +76,34 @@ namespace Software
             }
         }
 
-        // 检查一个设置是否存在，如果不存在，就添加这个设置
-        void CheckAndAddSetting(XElement appSettings, string key, string value)
-        {
-            XElement setting = appSettings.Elements("add").FirstOrDefault(e => e.Attribute("key").Value == key);
-            if (setting == null)
-            {
-                // 如果设置不存在，添加这个设置
-                appSettings.Add(new XElement("add", new XAttribute("key", key), new XAttribute("value", value)));
-            }
-        }
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // 读取配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            bool dd_enableAutoUpdate = bool.Parse(ConfigurationManager.AppSettings["EnableAutoUpdate"]);
-            string dd_updatePath = config.AppSettings.Settings["updatePath"].Value;
-            if (dd_enableAutoUpdate)
+            try
             {
-                AutoUpdater.Start($"{dd_updatePath}");
-            }
+                // 读取配置文件
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            PageSettings pageSettings = new PageSettings();
-            pageSettings.HandleLaunchCount();
+                // 检查 "EnableAutoUpdate" 配置项的值是否为 null
+                string enableAutoUpdateValue = ConfigurationManager.AppSettings["EnableAutoUpdate"];
+                bool dd_enableAutoUpdate = enableAutoUpdateValue != null ? bool.Parse(enableAutoUpdateValue) : true;
+
+                string dd_updatePath = config.AppSettings.Settings["updatePath"].Value;
+                if (dd_enableAutoUpdate)
+                {
+                    AutoUpdater.Start($"{dd_updatePath}");
+                }
+
+                PageSettings pageSettings = new PageSettings();
+                pageSettings.HandleLaunchCount();
+            }
+            catch (Exception ex)
+            {
+                // 将异常信息写入日志
+                File.WriteAllText("error.log", ex.ToString());
+
+                // 显示一个错误消息
+                MessageBox.Show("应用程序在启动时遇到了一个错误。请查看 error.log 文件以获取更多信息。");
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]

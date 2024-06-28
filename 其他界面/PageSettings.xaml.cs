@@ -96,7 +96,8 @@ namespace Software.其他界面
         public void HandleLaunchCount()
         {
             // 读取"EnableCounting"的值
-            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
+            string enableCountingValue = ConfigurationManager.AppSettings["EnableCounting"];
+            bool enableCounting = enableCountingValue != null ? bool.Parse(enableCountingValue) : false;
 
             // 设置CheckBox的状态
             EnableCountingCheckBox.IsChecked = enableCounting;
