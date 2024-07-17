@@ -65,59 +65,70 @@
                         <StackPanel Width="100">
                             <!--左边菜单的选项-->
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_Home"
-                Content="{x:Static resx:Resource.Button_Home}"
-                ToolTip="没用的按钮……"/>
+                            Name="Button_Home"
+                            Click="Button_Click_Home"
+                            Content="{x:Static resx:Resource.Button_Home}"
+                            ToolTip="没用的按钮……"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_GenshinMap"
-                Content="{x:Static resx:Resource.Button_GenshinMap}"
-                ToolTip="打开地图界面"/>
+                            Name="Button_GenshinMap"
+                            Click="Button_Click_GenshinMap"
+                            Content="{x:Static resx:Resource.Button_GenshinMap}"
+                            ToolTip="打开地图界面"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_SelectUP"
-                Content="{x:Static resx:Resource.Button_SelectUP}"
-                ToolTip="打开查询界面"/>
+                            Name="Button_SelectUP"
+                            Click="Button_Click_SelectUP"
+                            Content="{x:Static resx:Resource.Button_SelectUP}"
+                            ToolTip="打开查询界面"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_PlayGames"
-                Content="{x:Static resx:Resource.Button_PlayGames}"
-                ToolTip="启动游戏"/>
+                            Name="Button_PlayGames"
+                            Click="Button_Click_PlayGames"
+                            Content="{x:Static resx:Resource.Button_PlayGames}"
+                            ToolTip="启动游戏"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                 Click="Button_Click_GenshinRole"
-                 Content="{x:Static resx:Resource.Button_GenshinRole}"
-                 ToolTip="打开原神角色界面"/>
+                            Name="Button_GenshinRole"
+                            Click="Button_Click_GenshinRole"
+                            Content="{x:Static resx:Resource.Button_GenshinRole}"
+                            ToolTip="打开原神角色界面"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                 Click="Button_Click_HonkaiImpact3"
-                 Content="{x:Static resx:Resource.Button_HonkaiImpact3}"
-                 ToolTip="打开崩坏三角色界面"/>
+                            Name="Button_HonkaiImpact3"
+                            Click="Button_Click_HonkaiImpact3"
+                            Content="{x:Static resx:Resource.Button_HonkaiImpact3}"
+                            ToolTip="打开崩坏三角色界面"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_StarRail"
-                Content="{x:Static resx:Resource.Button_StarRail}"
-                ToolTip="打开崩坏星穹铁道角色界面"/>
+                            Name="Button_StarRail"
+                            Click="Button_Click_StarRail"
+                            Content="{x:Static resx:Resource.Button_StarRail}"
+                            ToolTip="打开崩坏星穹铁道角色界面"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_MoveChest"
-                Content="{x:Static resx:Resource.Button_MoveChest}"
-                ToolTip="开始推箱子"/>
+                            Name="Button_MoveChest"
+                            Click="Button_Click_MoveChest"
+                            Content="{x:Static resx:Resource.Button_MoveChest}"
+                            ToolTip="开始推箱子"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_Bing"
-                Content="{x:Static resx:Resource.Button_Bing}"
-                ToolTip="你猜猜Bing一下是干什么的"/>
+                            Name="Button_Bing"
+                            Click="Button_Click_Bing"
+                            Content="{x:Static resx:Resource.Button_Bing}"
+                            ToolTip="你猜猜Bing一下是干什么的"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_Updata"
-                Content="{x:Static resx:Resource.Button_Updata}"
-                ToolTip="字面意思"/>
+                            Name="Button_Updata"
+                            Click="Button_Click_Updata"
+                            Content="{x:Static resx:Resource.Button_Updata}"
+                            ToolTip="字面意思"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
-                Click="Button_Click_Version"
-                Content="{x:Static resx:Resource.Button_Version}"
-                ToolTip="打开历史版本更新内容界面"/>
+                            Name="Button_Version"
+                            Click="Button_Click_Version"
+                            Content="{x:Static resx:Resource.Button_Version}"
+                            ToolTip="打开历史版本更新内容界面"/>
 
                         </StackPanel>
                     </ScrollViewer>

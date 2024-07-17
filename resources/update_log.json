@@ -3,6 +3,14 @@
   "version": "0.1.8.0",
   "updates": [
     {
+      "version": "0.1.9.0",
+      "updateTime": "",
+      "updateContent": [
+        "添加了对左侧选项栏项目的可隐藏",
+        "修改了设置界面的排版"
+      ]
+    },
+    {
       "version": "0.1.8.0",
       "updateTime": "2024/06/30",
       "updateContent": [
