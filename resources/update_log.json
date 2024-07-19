@@ -3,6 +3,14 @@
   "version": "0.1.8.0",
   "updates": [
     {
+      "version": "0.1.9.0",
+      "updateTime": "",
+      "updateContent": [
+        "修改了获取文件的计算线程",
+        "修复了获取文件MD5/SHA1/SHA256/SHA384/SHA512值的窗口关掉后再次显示的问题"
+      ]
+    },
+    {
       "version": "0.1.8.0",
       "updateTime": "2024/06/30",
       "updateContent": [

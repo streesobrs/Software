@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -354,7 +356,7 @@ namespace Software.其他界面
             dialog.Content = stackPanel;
 
             // 打开提示框
-            dialog.ShowDialog();
+            dialog.Show();
         }
 
         private void UpdateGamePath(string newPath)
@@ -501,23 +503,60 @@ namespace Software.其他界面
             mediaElement.Volume = volumeSlider.Value;
         }
 
-        private void Page_Drop(object sender, DragEventArgs e)
+        private async Task<string> ComputeHashAsync(string filename, Func<HashAlgorithm> createHashAlgorithm)
+        {
+            using (var stream = File.OpenRead(filename))
+            {
+                var hash = await Task.Run(() =>
+                {
+                    using (var hashAlgorithm = createHashAlgorithm())
+                    {
+                        return hashAlgorithm.ComputeHash(stream);
+                    }
+                });
+
+                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            }
+        }
+
+        private async Task<string> ComputeMD5Async(string filename)
+        {
+            return await ComputeHashAsync(filename, () => MD5.Create());
+        }
+
+        private async Task<string> ComputeSHA1Async(string filename)
+        {
+            return await ComputeHashAsync(filename, () => SHA1.Create());
+        }
+
+        private async Task<string> ComputeSHA256Async(string filename)
+        {
+            return await ComputeHashAsync(filename, () => SHA256.Create());
+        }
+
+        private async Task<string> ComputeSHA384Async(string filename)
+        {
+            return await ComputeHashAsync(filename, () => SHA384.Create());
+        }
+
+        private async Task<string> ComputeSHA512Async(string filename)
+        {
+            return await ComputeHashAsync(filename, () => SHA512.Create());
+        }
+
+        private async void Page_Drop(object sender, DragEventArgs e)
         {
             Debug.WriteLine("Drop event triggered.");
 
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                foreach (var file in files)
-                {
-                    string md5 = ComputeMD5(file);
-                    string sha1 = ComputeSHA1(file);
-                    string sha256 = ComputeSHA256(file);
-                    string sha384 = ComputeSHA384(file);
-                    string sha512 = ComputeSHA512(file);
-                    //Debug.WriteLine($"File: {file}, MD5: {md5}, SHA1: {sha1}");
 
-                    // 创建并显示自定义对话框
+                var existingDialog = Application.Current.Windows.OfType<Window>()
+                    .FirstOrDefault(w => w.Title == "MD5/SHA1/SHA256/SHA384/SHA512值");
+
+                if (existingDialog == null)
+                {
                     var dialog = new Window
                     {
                         Width = 400,
@@ -529,71 +568,25 @@ namespace Software.其他界面
                         ResizeMode = ResizeMode.NoResize,
                         WindowStyle = WindowStyle.SingleBorderWindow,
                         Owner = Application.Current.MainWindow,
-                        Content = new PageHashDialog(file, md5, sha1,sha256,sha384,sha512)
+                        Topmost = false
                     };
-                    Debug.WriteLine("Showing dialog.");
-                    bool? result = dialog.ShowDialog();
-                    Debug.WriteLine("Dialog closed.");
-                }
-            }
-        }
 
-        private string ComputeMD5(string filename)
-        {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
-        }
+                    foreach (var file in files)
+                    {
+                        string md5 = await ComputeMD5Async(file);
+                        string sha1 = await ComputeSHA1Async(file);
+                        string sha256 = await ComputeSHA256Async(file);
+                        string sha384 = await ComputeSHA384Async(file);
+                        string sha512 = await ComputeSHA512Async(file);
 
-        private string ComputeSHA1(string filename)
-        {
-            using (var sha1 = SHA1.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    var hash = sha1.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                        dialog.Content = new PageHashDialog(file, md5, sha1, sha256, sha384, sha512);
+                        Debug.WriteLine("Showing dialog.");
+                        dialog.Show();
+                    }
                 }
-            }
-        }
-
-        private string ComputeSHA256(string filename)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                using (var stream = File.OpenRead(filename))
+                else
                 {
-                    var hash = sha256.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
-        }
-
-        private string ComputeSHA384(string filename)
-        {
-            using (var sha384 = SHA384.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    var hash = sha384.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
-        }
-
-        private string ComputeSHA512(string filename)
-        {
-            using (var sha512 = SHA512.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    var hash = sha512.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    Debug.WriteLine("Dialog already open.");
                 }
             }
         }
