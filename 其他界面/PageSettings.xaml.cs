@@ -9,6 +9,10 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using Wpf.Ui.Controls;
+using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
+using MessageBoxResult = System.Windows.MessageBoxResult;
 
 namespace Software.其他界面
 {
@@ -52,6 +56,64 @@ namespace Software.其他界面
             Open_Log_Folder.ToolTip = logFolder;
             Open_Resources_Folder.ToolTip = resourcesFolder;
             Open_Music_Folder.ToolTip = musicFolder;
+
+            LoadSettings();
+
+        }
+
+        private void LoadSettings()
+        {
+            // 禁用事件
+            ToggleSwitch_Button_GenshinMap_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_GenshinMap_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_SelectUP_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_SelectUP_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_PlayGames_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_PlayGames_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_GenshinRole_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_GenshinRole_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_HonkaiImpact3_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_HonkaiImpact3_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_StarRail_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_StarRail_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_MoveChest_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_MoveChest_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_Bing_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_Bing_Display.Unchecked -= ToggleSwitch_Unchecked;
+
+            try
+            {
+                ToggleSwitch_Button_GenshinMap_Display.IsChecked = (bool)Properties.Settings.Default["Button_GenshinMap_Display"];
+                ToggleSwitch_Button_SelectUP_Display.IsChecked = (bool)Properties.Settings.Default["Button_SelectUP_Display"];
+                ToggleSwitch_Button_PlayGames_Display.IsChecked = (bool)Properties.Settings.Default["Button_PlayGames_Display"];
+                ToggleSwitch_Button_GenshinRole_Display.IsChecked = (bool)Properties.Settings.Default["Button_GenshinRole_Display"];
+                ToggleSwitch_Button_HonkaiImpact3_Display.IsChecked = (bool)Properties.Settings.Default["Button_HonkaiImpact3_Display"];
+                ToggleSwitch_Button_StarRail_Display.IsChecked = (bool)Properties.Settings.Default["Button_StarRail_Display"];
+                ToggleSwitch_Button_MoveChest_Display.IsChecked = (bool)Properties.Settings.Default["Button_MoveChest_Display"];
+                ToggleSwitch_Button_Bing_Display.IsChecked = (bool)Properties.Settings.Default["Button_Bing_Display"];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("读取设置时发生错误: " + ex.Message);
+            }
+
+            // 启用事件
+            ToggleSwitch_Button_GenshinMap_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_GenshinMap_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_SelectUP_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_SelectUP_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_PlayGames_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_PlayGames_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_GenshinRole_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_GenshinRole_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_HonkaiImpact3_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_HonkaiImpact3_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_StarRail_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_StarRail_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_MoveChest_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_MoveChest_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_Bing_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_Bing_Display.Unchecked += ToggleSwitch_Unchecked;
         }
 
         public void RebootSoftware()
@@ -493,6 +555,104 @@ namespace Software.其他界面
             }
         }
 
-        
+        private void ToggleSwitch_Checked(object sender, RoutedEventArgs e)
+        {
+            var toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                string name = toggleSwitch.Name;
+                MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+                switch (name)
+                {
+                    case "ToggleSwitch_Button_GenshinMap_Display":
+                        mainWindow.Button_GenshinMap.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_SelectUP_Display":
+                        mainWindow.Button_SelectUP.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_PlayGames_Display":
+                        mainWindow.Button_PlayGames.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_GenshinRole_Display":
+                        mainWindow.Button_GenshinRole.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_HonkaiImpact3_Display":
+                        mainWindow.Button_HonkaiImpact3.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_StarRail_Display":
+                        mainWindow.Button_StarRail.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_MoveChest_Display":
+                        mainWindow.Button_MoveChest.Visibility = Visibility.Visible;
+                        break;
+                    case "ToggleSwitch_Button_Bing_Display":
+                        mainWindow.Button_Bing.Visibility = Visibility.Visible;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            SaveSettings(); // 在每次切换时保存设置
+        }
+
+        private void ToggleSwitch_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                string name = toggleSwitch.Name;
+                MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+                switch (name)
+                {
+                    case "ToggleSwitch_Button_GenshinMap_Display":
+                        mainWindow.Button_GenshinMap.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_SelectUP_Display":
+                        mainWindow.Button_SelectUP.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_PlayGames_Display":
+                        mainWindow.Button_PlayGames.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_GenshinRole_Display":
+                        mainWindow.Button_GenshinRole.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_HonkaiImpact3_Display":
+                        mainWindow.Button_HonkaiImpact3.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_StarRail_Display":
+                        mainWindow.Button_StarRail.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_MoveChest_Display":
+                        mainWindow.Button_MoveChest.Visibility = Visibility.Collapsed;
+                        break;
+                    case "ToggleSwitch_Button_Bing_Display":
+                        mainWindow.Button_Bing.Visibility = Visibility.Collapsed;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            SaveSettings(); // 在每次切换时保存设置
+        }
+
+        public void SaveSettings()
+        {
+            try
+            {
+                Properties.Settings.Default["Button_GenshinMap_Display"] = ToggleSwitch_Button_GenshinMap_Display.IsChecked;
+                Properties.Settings.Default["Button_SelectUP_Display"] = ToggleSwitch_Button_SelectUP_Display.IsChecked;
+                Properties.Settings.Default["Button_PlayGames_Display"] = ToggleSwitch_Button_PlayGames_Display.IsChecked;
+                Properties.Settings.Default["Button_GenshinRole_Display"] = ToggleSwitch_Button_GenshinRole_Display.IsChecked;
+                Properties.Settings.Default["Button_HonkaiImpact3_Display"] = ToggleSwitch_Button_HonkaiImpact3_Display.IsChecked;
+                Properties.Settings.Default["Button_StarRail_Display"] = ToggleSwitch_Button_StarRail_Display.IsChecked;
+                Properties.Settings.Default["Button_MoveChest_Display"] = ToggleSwitch_Button_MoveChest_Display.IsChecked;
+                Properties.Settings.Default["Button_Bing_Display"] = ToggleSwitch_Button_Bing_Display.IsChecked;
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("保存设置时发生错误: " + ex.Message);
+            }
+        }
     }
 }

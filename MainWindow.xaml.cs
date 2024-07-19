@@ -5,6 +5,7 @@ using Software.其他界面;
 using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -35,6 +36,7 @@ namespace Software
         Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
         Frame frameImage = new Frame() { Content = new 其他界面.PageImage() };
 
+        private 其他界面.PageSettings pageSettings;
 
         public MainWindow()
         {
@@ -54,8 +56,35 @@ namespace Software
                 }
                 Debug.WriteLine("加载完成");
             };
+            
+            pageSettings = new 其他界面.PageSettings(); // 创建PageSettings的实例
+            LoadSettings(); // 在窗口加载时读取设置
 
             contentcon.Content = frameHome;
+        }
+
+        private void LoadSettings()
+        {
+            try
+            {
+                SetButtonVisibility(Button_GenshinMap, "Button_GenshinMap_Display");
+                SetButtonVisibility(Button_SelectUP, "Button_SelectUP_Display");
+                SetButtonVisibility(Button_PlayGames, "Button_PlayGames_Display");
+                SetButtonVisibility(Button_GenshinRole, "Button_GenshinRole_Display");
+                SetButtonVisibility(Button_HonkaiImpact3, "Button_HonkaiImpact3_Display");
+                SetButtonVisibility(Button_StarRail, "Button_StarRail_Display");
+                SetButtonVisibility(Button_MoveChest, "Button_MoveChest_Display");
+                SetButtonVisibility(Button_Bing, "Button_Bing_Display");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("读取设置时发生错误: " + ex.Message);
+            }
+        }
+
+        private void SetButtonVisibility(Button button, string settingName)
+        {
+            button.Visibility = (bool)Properties.Settings.Default[settingName] ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public bool IsRunningAsAdministrator()
@@ -93,7 +122,7 @@ namespace Software
                     AutoUpdater.Start($"{dd_updatePath}");
                 }
 
-                PageSettings pageSettings = new PageSettings();
+                其他界面.PageSettings pageSettings = new 其他界面.PageSettings();
                 pageSettings.HandleLaunchCount();
             }
             catch (Exception ex)

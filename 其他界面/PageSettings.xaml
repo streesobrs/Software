@@ -60,7 +60,7 @@
                     <ui:Button Foreground="Black" Background="#D8E8F9" Click="Button_Click_City_Address">确定</ui:Button>
                 </DockPanel>
 
-                <DockPanel Margin="2">
+                <DockPanel Margin="2" Visibility="Collapsed">
                     <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
                         <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>
                         <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese" Foreground="Black"/>
@@ -68,25 +68,65 @@
                 </DockPanel>
 
                 <StackPanel Margin="2">
-                    <ui:Button Foreground="Black" Name="BuildJson"
-                               Click="Button_Click_BuildJson" Margin="0,5" Background="#D8E8F9">输出Json</ui:Button>
-                    <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"
-                               Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5" Background="#D8E8F9">打开软件根目录</ui:Button>
-                    <ui:Button Foreground="Black" Name="Open_Log_Folder"
-                               Click="Button_Click_Open_Log_Folder" Margin="0,5" Background="#D8E8F9">打开Log文件夹</ui:Button>
-                    <ui:Button Foreground="Black" Name="Open_Resources_Folder"
-                               Click="Button_Click_Open_Resources_Folder" Margin="0,5" Background="#D8E8F9">打开resources文件夹</ui:Button>
-                    <ui:Button Foreground="Black" Name="Open_Music_Folder"
-                               Click="Button_Click_Open_Music_Folder" Margin="0,5" Background="#D8E8F9">打开music文件夹</ui:Button>
-                    <ui:Button Foreground="Black" Name="Delete_Folder"
-                               Click="Button_Click_Delete_Folder" Margin="0,5" Background="#D8E8F9">删除文件夹</ui:Button>
-                    <ui:Button Foreground="Black" Name="Reboot_Software"
-                               Click="Button_Click_Reboot_Software" Margin="0,5" Background="#D8E8F9">重启软件</ui:Button>
-                    <ui:Button Foreground="Black" Name="Root_Reboot_Software"
-                               Click="Button_Click_Root_Reboot_Software" Margin="0,5" Background="#D8E8F9">管理员重启软件</ui:Button>
+                    <Expander Header="更多选项" Foreground="Black" Background="#D8E8F9">
+                        <StackPanel>
+                            <ui:Button Foreground="Black" Name="BuildJson"
+                       Click="Button_Click_BuildJson" Margin="0,5" Background="#D8E8F9">输出Json</ui:Button>
+                            <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"
+                       Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5" Background="#D8E8F9">打开软件根目录</ui:Button>
+                            <ui:Button Foreground="Black" Name="Open_Log_Folder"
+                       Click="Button_Click_Open_Log_Folder" Margin="0,5" Background="#D8E8F9">打开Log文件夹</ui:Button>
+                            <ui:Button Foreground="Black" Name="Open_Resources_Folder"
+                       Click="Button_Click_Open_Resources_Folder" Margin="0,5" Background="#D8E8F9">打开resources文件夹</ui:Button>
+                            <ui:Button Foreground="Black" Name="Open_Music_Folder"
+                       Click="Button_Click_Open_Music_Folder" Margin="0,5" Background="#D8E8F9">打开music文件夹</ui:Button>
+                            <ui:Button Foreground="Black" Name="Delete_Folder"
+                       Click="Button_Click_Delete_Folder" Margin="0,5" Background="#D8E8F9">删除文件夹</ui:Button>
+                            <ui:Button Foreground="Black" Name="Reboot_Software"
+                       Click="Button_Click_Reboot_Software" Margin="0,5" Background="#D8E8F9">重启软件</ui:Button>
+                            <ui:Button Foreground="Black" Name="Root_Reboot_Software"
+                       Click="Button_Click_Root_Reboot_Software" Margin="0,5" Background="#D8E8F9">管理员重启软件</ui:Button>
+                        </StackPanel>
+                    </Expander>
                 </StackPanel>
-                <StackPanel>
-                    
+
+                <StackPanel Margin="2">
+                    <Expander Header="隐藏开关" Foreground="Black" Background="#D8E8F9">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">地图</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinMap_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">查询</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_SelectUP_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">游戏</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_PlayGames_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">原神角色</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinRole_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">崩坏三角色</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_HonkaiImpact3_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">崩坏星穹铁道角色</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StarRail_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">推箱子</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MoveChest_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">Bing</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Expander>
                 </StackPanel>
 
             </StackPanel>
