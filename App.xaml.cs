@@ -6,6 +6,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,6 +23,11 @@ namespace Software
         {
             try
             {
+                base.OnStartup(e);
+
+                SettingsMigrator migrator = new SettingsMigrator();
+                migrator.MigrateSettings();
+
                 // 检查配置文件是否存在
                 if (!File.Exists("Software.dll.config"))
                 {
@@ -91,6 +97,8 @@ namespace Software
                     return;
                 }
 
+
+
             }
             catch (Exception ex)
             {
@@ -117,5 +125,45 @@ namespace Software
                 appSettings.Add(new XElement("add", new XAttribute("key", key), new XAttribute("value", value)));
             }
         }
+
+        public class SettingsMigrator
+        {
+            public void MigrateSettings()
+            {
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                var settingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Software");
+                var softwareDirectories = Directory.GetDirectories(settingsDirectory);
+
+                // 选择名称以“Software_Url_”开头的文件夹
+                var softwareUrlDirectory = softwareDirectories.FirstOrDefault(dir => Path.GetFileName(dir).StartsWith("Software_Url_"));
+
+                if (softwareUrlDirectory == null)
+                {
+                    throw new Exception("未找到名称以“Software_Url_”开头的文件夹");
+                }
+
+                var currentVersionDirectory = Path.Combine(softwareUrlDirectory, currentVersion);
+
+                if (!Directory.Exists(currentVersionDirectory))
+                {
+                    Directory.CreateDirectory(currentVersionDirectory);
+                }
+
+                foreach (var directory in Directory.GetDirectories(softwareUrlDirectory))
+                {
+                    var directoryName = Path.GetFileName(directory);
+                    if (directoryName != currentVersion)
+                    {
+                        foreach (var file in Directory.GetFiles(directory))
+                        {
+                            var fileName = Path.GetFileName(file);
+                            File.Copy(file, Path.Combine(currentVersionDirectory, fileName), true);
+                        }
+                        Directory.Delete(directory, true);
+                    }
+                }
+            }
+        }
+
     }
 }
