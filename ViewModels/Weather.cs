@@ -245,29 +245,5 @@ namespace Software.ViewModels
             Data_Refreshtime = jsonObject["Refreshtime"].ToString();
         }
 
-        //public async Task LoadDataAsync(string filePath)
-        //{
-        //    // 从文件中读取数据
-        //    string result;
-        //    using (StreamReader file = File.OpenText(filePath))
-        //    {
-        //        result = await file.ReadToEndAsync();
-        //    }
-
-        //    // 解析数据并更新UI
-        //    var lives = JObject.Parse(result)["lives"];
-        //    foreach (var item in lives)
-        //    {
-        //        Data_Province = item["province"].ToString();
-        //        Data_City = item["city"].ToString();
-        //        Data_Adcode = item["adcode"].ToString();
-        //        Data_Weather = item["weather"].ToString();
-        //        Data_Temperature = item["temperature"].ToString();
-        //        Data_Winddirection = item["winddirection"].ToString();
-        //        Data_Windpower = item["windpower"].ToString();
-        //        Data_Humidity = item["humidity"].ToString();
-        //        Data_Reporttime = item["reporttime"].ToString();
-        //    }
-        //}
     }
 }

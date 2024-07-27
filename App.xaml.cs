@@ -132,34 +132,46 @@ namespace Software
             {
                 var currentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 var settingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Software");
-                var softwareDirectories = Directory.GetDirectories(settingsDirectory);
 
-                // 选择名称以“Software_Url_”开头的文件夹
-                var softwareUrlDirectory = softwareDirectories.FirstOrDefault(dir => Path.GetFileName(dir).StartsWith("Software_Url_"));
-
-                if (softwareUrlDirectory == null)
+                // 检查是否存在“Software”文件夹，如果不存在，则跳过后续代码
+                if (!Directory.Exists(settingsDirectory))
                 {
-                    throw new Exception("未找到名称以“Software_Url_”开头的文件夹");
+                    Console.WriteLine("未找到“Software”文件夹。");
+                    return;
                 }
 
-                var currentVersionDirectory = Path.Combine(softwareUrlDirectory, currentVersion);
+                // 获取以“Software_Url_”开头的文件夹
+                var softwareUrlDirectories = Directory.GetDirectories(settingsDirectory)
+                    .Where(dir => Path.GetFileName(dir).StartsWith("Software_Url_"));
 
-                if (!Directory.Exists(currentVersionDirectory))
+                // 如果没有找到以“Software_Url_”开头的文件夹，则跳过后续代码
+                if (!softwareUrlDirectories.Any())
                 {
-                    Directory.CreateDirectory(currentVersionDirectory);
+                    Console.WriteLine("未找到名称以“Software_Url_”开头的文件夹。");
+                    return;
                 }
 
-                foreach (var directory in Directory.GetDirectories(softwareUrlDirectory))
+                foreach (var softwareUrlDirectory in softwareUrlDirectories)
                 {
-                    var directoryName = Path.GetFileName(directory);
-                    if (directoryName != currentVersion)
+                    var currentVersionDirectory = Path.Combine(softwareUrlDirectory, currentVersion);
+
+                    if (!Directory.Exists(currentVersionDirectory))
                     {
-                        foreach (var file in Directory.GetFiles(directory))
+                        Directory.CreateDirectory(currentVersionDirectory);
+                    }
+
+                    foreach (var directory in Directory.GetDirectories(softwareUrlDirectory))
+                    {
+                        var directoryName = Path.GetFileName(directory);
+                        if (directoryName != currentVersion)
                         {
-                            var fileName = Path.GetFileName(file);
-                            File.Copy(file, Path.Combine(currentVersionDirectory, fileName), true);
+                            foreach (var file in Directory.GetFiles(directory))
+                            {
+                                var fileName = Path.GetFileName(file);
+                                File.Copy(file, Path.Combine(currentVersionDirectory, fileName), true);
+                            }
+                            Directory.Delete(directory, true);
                         }
-                        Directory.Delete(directory, true);
                     }
                 }
             }
