@@ -1,6 +1,7 @@
 ﻿using AutoUpdaterDotNET;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Software.ViewModels;
 using Software.其他界面;
 using System;
 using System.Configuration;

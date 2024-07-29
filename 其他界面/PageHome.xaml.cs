@@ -28,9 +28,17 @@ namespace Software.其他界面
         private TextBox txtGamePath;
         private Weather weather;
 
+        private MusicPlayer musicPlayer;
+
+        public static PageHome Instance { get; private set; }
+
         public PageHome()
         {
             InitializeComponent();
+            Instance = this;
+
+            // 创建 MusicPlayer 实例，并将控件的引用传递给它
+            musicPlayer = new MusicPlayer(mediaElement, music_name, playPauseButton, volumeSlider, bgm);
 
             txtGamePath = new TextBox();
             weather = new Weather();
@@ -46,14 +54,8 @@ namespace Software.其他界面
             };
         }
 
-        MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-        // 获取Music文件夹中的所有音乐文件路径
-        string[] musicFiles;
-
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
-
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             // 获取TextContent的值
             string contentTextBox = ConfigurationManager.AppSettings["TextContent"];
@@ -414,88 +416,25 @@ namespace Software.其他界面
             }
         }
 
-
-
-        private void EnableCountingCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            UpdateEnableCounting(true);
-            mainWindow.LaunchCount.Visibility = Visibility.Visible;
-        }
-
-        private void EnableCountingCheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            UpdateEnableCounting(false);
-            mainWindow.LaunchCount.Visibility = Visibility.Hidden;
-        }
-
-        private void UpdateEnableCounting(bool enableCounting)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-        
-        // 标记当前媒体文件是否正在播放
-        bool isPlaying = false; 
-
         private void Button_Click_MusicPlay_MusicPause(object sender, RoutedEventArgs e)
         {
-            if (null == mediaElement.Source)
-            {
-                // 随机选择一个音乐文件路径
-                Random random = new Random();
-                string selectedMusicFile = musicFiles[random.Next(musicFiles.Length)];
-                // 设置播放路径
-                mediaElement.Source = new Uri(selectedMusicFile);
-                // 把歌名丢进文本框
-                var musicName = System.IO.Path.GetFileName(mediaElement.Source.LocalPath);
-                this.music_name.Text = musicName;
-            }
-            if (isPlaying) // 如果正在播放，则暂停媒体文件
-            {
-                mediaElement.Pause();
-                playPauseButton.Content = "播放";
-                playPauseButton.ToolTip = "字面意思，播放";
-                isPlaying = false;
-            }
-            else // 如果没有播放，则开始播放媒体文件
-            {
-                mediaElement.Play();
-                playPauseButton.Content = "暂停";
-                playPauseButton.ToolTip = "字面意思，暂停";
-                isPlaying = true;
-            }
+            musicPlayer.PlayPause();
         }
 
         private void Button_Click_MusicStop(object sender, RoutedEventArgs e)
         {
-            mediaElement.Stop();
-            playPauseButton.Content = "播放";
-            playPauseButton.ToolTip = "字面意思，播放";
-            isPlaying = false;
+            musicPlayer.Stop();
         }
 
         private void Button_Click_MusicHandOff(object sender, RoutedEventArgs e)
         {
 
-            // 随机选择一个音乐文件路径
-            Random random = new Random();
-            string selectedMusicFile = musicFiles[random.Next(musicFiles.Length)];
-
-            // 设置MediaElement控件的Source属性为所选音乐文件路径
-            mediaElement.Source = new Uri(selectedMusicFile);
-            mediaElement.Play();
-            var musicName = System.IO.Path.GetFileName(mediaElement.Source.LocalPath);
-            this.music_name.Text = musicName;
-            playPauseButton.Content = "暂停";
-            playPauseButton.ToolTip = "字面意思，暂停";
-            isPlaying = true;
+            musicPlayer.PlayRandomMusic();
         }
 
         private void Button_Click_RefreshMusicPath(object sender, RoutedEventArgs e)
         {
-            musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
+            musicPlayer.RefreshMusicFiles();
         }
 
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Software.ViewModels;
 using System;
 using System.Configuration;
 using System.Diagnostics;
@@ -22,11 +23,12 @@ namespace Software.其他界面
     public partial class PageSettings : Page
     {
         //MainWindow mainWindow;
-        //PageHome pageHome;
+        private ViewModels.MusicPlayer musicPlayer;
 
         public PageSettings()
         {
             InitializeComponent();
+            musicPlayer = new ViewModels.MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton, PageHome.Instance.volumeSlider, PageHome.Instance.bgm);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -382,35 +384,25 @@ namespace Software.其他界面
                 // 获取当前线程的文化信息
                 var language = Thread.CurrentThread.CurrentCulture;
 
+                // 确保musicPlayer已初始化
+                if (musicPlayer == null)
+                {
+                    MessageBox.Show("音乐播放器未初始化");
+                    return;
+                }
+
+                //获取音乐名称和音乐路径
+                if (musicPlayer == null)
+                {
+                    MessageBox.Show("第一次用记得先点播放音乐");
+                }
+                string musicName = musicPlayer.GetCurrentMusicName();
+                string musicPath = musicPlayer.GetCurrentMusicPath();
+                Uri musicUri = new Uri(musicPath);
+                string musicUrl = musicUri.AbsoluteUri;
+
+                //获取文本
                 string contentTextBox = ConfigurationManager.AppSettings["TextContent"];
-                //// 获取 pageHome.ContentTextBox 的文本
-                //string contentText = pageHome.ContentTextBox.Text;
-
-                //// 获取音乐的名称
-                //var musicName = pageHome.music_name.Text;
-                //if (pageHome.mediaElement.Source != null)
-                //{
-                //    string musicFilePath = pageHome.mediaElement.Source.LocalPath;
-                //    if (!string.IsNullOrEmpty(musicFilePath))
-                //    {
-                //        musicName = System.IO.Path.GetFileName(musicFilePath);
-                //    }
-                //}
-
-                //// 获取音乐的路径
-                //Uri playmusicpath = pageHome.mediaElement.Source;
-                //// 如果 pageHome.mediaElement.Source 为 null，则设置为默认的音乐路径
-                //Uri defaultMusicPath = new Uri(AppDomain.CurrentDomain.BaseDirectory + "resources/sound/music/music_001.mp3");
-                //if (pageHome.mediaElement == null || pageHome.mediaElement.Source == null)
-                //{
-                //    pageHome.mediaElement.Source = defaultMusicPath;
-                //}
-                //Uri musicPath = pageHome.mediaElement.Source;
-                //// 如果 pageHome.ContentTextBox 的文本为空，则设置为默认的文本
-                //if (string.IsNullOrEmpty(pageHome.ContentTextBox.Text))
-                //{
-                //    pageHome.ContentTextBox.Text = "你什么也没输入";
-                //};
 
                 // 从文件中读取数据
                 string result;
@@ -450,19 +442,28 @@ namespace Software.其他界面
                         Windpower = lives["windpower"].ToString(),
                         Humidity = lives["humidity"].ToString()
                     },
+                    Music = string.IsNullOrEmpty(musicName) || string.IsNullOrEmpty(musicPath) ? null : new
+                    {
+                        MusicName = musicName,
+                        MusicPath = musicPath,
+                        MusicUrl = musicUrl
+                    },
                     Detail = new
                     {
                         Time = outputDate,
                         Version = appVersion,
                         MemoryUsage = $"{(Process.GetCurrentProcess().WorkingSet64 / 1024f) / 1024f}MB",
-                        //MusicName = musicName,
-                        //MusicPath = musicPath.ToString(),
                         Content = contentTextBox
                     }
                 };
 
+                Debug.WriteLine(json);
+
                 // 将 JSON 对象序列化为字符串
-                string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
+                string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
 
                 // 检查是否需要创建 log 文件夹
                 string logFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
@@ -487,14 +488,10 @@ namespace Software.其他界面
                 // 将字符串写入到日志文件中
                 string path = Path.Combine(folderPath, fileName);
                 File.WriteAllText(path, jsonString);
-
-                // 恢复 pageHome.ContentTextBox 的文本和 pageHome.mediaElement 的源
-                //pageHome.ContentTextBox.Text = contentText;
-                //pageHome.mediaElement.Source = playmusicpath;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show($"发生错误: {ex.Message}");
             }
         }
 
