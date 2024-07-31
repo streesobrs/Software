@@ -27,7 +27,6 @@ namespace Software.其他界面
     /// </summary>
     public partial class PageHome : Page
     {
-        private Window dialog;
         private TextBox txtGamePath;
         private Weather weather;
         private ToggleSwitch playModeToggleSwitch;
