@@ -28,7 +28,8 @@ namespace Software.其他界面
         public PageSettings()
         {
             InitializeComponent();
-            musicPlayer = new ViewModels.MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton, PageHome.Instance.volumeSlider, PageHome.Instance.bgm);
+            musicPlayer = new MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton);
+
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
