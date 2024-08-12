@@ -70,6 +70,8 @@
                 <StackPanel Margin="2">
                     <Expander Header="更多选项" Foreground="Black" Background="#D8E8F9">
                         <StackPanel>
+                            <ui:Button Foreground="Black" Name="Open_LogDashboard"
+                        Click="Button_Click_Open_LogDashboard" Margin="0,5" Background="#D8E8F9">打开日志面板</ui:Button>
                             <ui:Button Foreground="Black" Name="BuildJson"
                        Click="Button_Click_BuildJson" Margin="0,5" Background="#D8E8F9">输出Json</ui:Button>
                             <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"

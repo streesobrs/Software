@@ -9,8 +9,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using LogDashboard;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 using System.Windows;
 using System.Xml.Linq;
+using Software.Models;
 
 namespace Software
 {
@@ -24,6 +30,28 @@ namespace Software
             try
             {
                 base.OnStartup(e);
+
+                #region Serilog配置
+                string logOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} || {Level} || {SourceContext:l} || {Message} || {Exception} ||end {NewLine}";
+                Log.Logger = new LoggerConfiguration()
+                  .MinimumLevel.Override("Default", LogEventLevel.Information)
+                  .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+                  .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                  .Enrich.FromLogContext()
+                  .WriteTo.File($"{AppContext.BaseDirectory}logs/log.log", rollingInterval: RollingInterval.Day, outputTemplate: logOutputTemplate)
+                  .CreateLogger();
+
+                #endregion
+
+                #region 启动ASP.NET Core主机
+                var host = Host.CreateDefaultBuilder(e.Args)
+                    .UseSerilog()
+                    .ConfigureWebHostDefaults(webBuilder => {
+                        webBuilder.UseStartup<Startup>();
+                    }).Build();
+
+                host.RunAsync();
+                #endregion
 
                 SettingsMigrator migrator = new SettingsMigrator();
                 migrator.MigrateSettings();
@@ -104,6 +132,7 @@ namespace Software
             {
                 // 将异常信息写入日志
                 File.WriteAllText("error.log", ex.ToString());
+                Log.Logger.Error(ex.ToString());
 
                 // 显示一个错误消息
                 MessageBox.Show("应用程序在启动时遇到了一个错误。请查看 error.log 文件以获取更多信息。");
@@ -111,7 +140,7 @@ namespace Software
                 // 关闭应用程序
                 this.Shutdown();
             }
-            
+
             base.OnStartup(e);
         }
 

@@ -652,5 +652,19 @@ namespace Software.其他界面
                 MessageBox.Show("保存设置时发生错误: " + ex.Message);
             }
         }
+
+        private void Button_Click_Open_LogDashboard(object sender, RoutedEventArgs e)
+        {
+            OpenUrl("http://localhost:5000/logdashboard");
+        }
+
+        private void OpenUrl(string url)
+        {
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+        }
     }
 }

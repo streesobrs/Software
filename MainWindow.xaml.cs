@@ -1,11 +1,12 @@
 ﻿using AutoUpdaterDotNET;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Serilog;
+using System.Diagnostics;
 using Software.ViewModels;
 using Software.其他界面;
 using System;
 using System.Configuration;
-using System.Diagnostics;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
@@ -39,9 +40,26 @@ namespace Software
 
         private 其他界面.PageSettings pageSettings;
 
+        private ILogger logger;
+
+        public ILogger MyLoger
+        {
+            get
+            {
+                if (logger == null)
+                {
+                    logger = Log.ForContext<MainWindow>();
+                }
+                return logger;
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
+
+            MyLoger.Information("WPF窗体中记录的日志");
+
             ApplySavedCultureInfo();
 
             // 在窗口加载完成后检查是否以管理员权限运行
@@ -154,12 +172,14 @@ namespace Software
 
         private void Button_Click_Home(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameHome;
             this.beta_tabel.Visibility = Visibility.Visible;
         }
 
         private void Button_Click_GenshinMap(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameMap;
             //其他窗口.WindowGenshinMap nextwindow = new();
             //nextwindow.Show();
@@ -167,12 +187,14 @@ namespace Software
 
         private void Button_Click_SelectUP(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowInquirySystem nextwindow = new();
             nextwindow.Show();
         }
 
         private void Button_Click_PlayGames(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             try
             {
                 string gamePath = ConfigurationManager.AppSettings["GamePath"];
@@ -197,6 +219,7 @@ namespace Software
             }
             catch (Exception ex)
             {
+                MyLoger.Error(ex, "An error occurred while performing an operation.");
                 MessageBox.Show(ex.Message);
             }
         }
@@ -211,24 +234,28 @@ namespace Software
 
         private void Button_Click_GenshinRole(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowGenshinRole nextwindow = new();
             nextwindow.Show();
         }
 
         private void Button_Click_HonkaiImpact3(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowHonkaiImpact3 nextwindow = new();
             nextwindow.Show();
         }
 
         private void Button_Click_StarRail(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowStarRail nextwindow = new();
             nextwindow.Show();
         }
 
         private void Button_Click_MoveChest(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowMoveChest nextwindow = new();
             nextwindow.Show();
             //PageMoveChest page = new PageMoveChest(); // 创建PageMoveChest实例
@@ -238,6 +265,7 @@ namespace Software
 
         private void Button_Click_Bing(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameBing;
             //其他窗口.WindowBing nextwindow = new();
             //nextwindow.Show();
@@ -245,6 +273,7 @@ namespace Software
 
         private async void Button_Click_Updata(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             // 初始化一个空的字符串变量
             string versionString = string.Empty;
 
@@ -291,6 +320,7 @@ namespace Software
             catch (Exception ex)
             {
                 // 在这里处理异常，例如显示错误消息
+                MyLoger.Error(ex, "An error occurred while performing an operation.");
                 MessageBox.Show($"更新检查失败：{ex.Message}");
             }
 
@@ -298,18 +328,21 @@ namespace Software
 
         private void Button_Click_Version(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameVersion;
             beta_tabel.Visibility = Visibility.Hidden;
         }
 
         private void Button_Click_Settings(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameSettings;
             beta_tabel.Visibility = Visibility.Hidden;
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             NavigationWindow window = new()
             {
                 Source = new Uri("其他界面/PageDetails.xaml", UriKind.Relative)
@@ -319,32 +352,21 @@ namespace Software
 
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowVideoPlayer nextwindow = new();
             nextwindow.Show();
         }
 
-        // 获取Music文件夹中的所有音乐文件路径
-        //string[] musicFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "resources\\sound\\music");
-
-        private void MediaElement_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 随机选择一个音乐文件路径
-            //Random random = new Random();
-            //string selectedMusicFile = musicFiles[random.Next(musicFiles.Length)];
-
-            // 设置MediaElement控件的Source属性为所选音乐文件路径
-            //mediaElement.Source = new Uri(selectedMusicFile);
-            //mediaElement.Play();
-        }
-
         private void Button_Click_PlayVideo(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             其他窗口.WindowVideoPlayer nextwindow = new();
             nextwindow.Show();
         }
 
         private void Button_Click_Image(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameImage;
             this.beta_tabel.Visibility = Visibility.Hidden;
         }
