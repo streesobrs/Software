@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using Software.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -31,10 +32,23 @@ namespace Software.其他界面
         private Weather weather;
         private ToggleSwitch playModeToggleSwitch;
 
-
         private MusicPlayer musicPlayer;
 
         public static PageHome Instance { get; private set; }
+
+        private ILogger logger;
+
+        public ILogger MyLoger
+        {
+            get
+            {
+                if (logger == null)
+                {
+                    logger = Log.ForContext<PageHome>();
+                }
+                return logger;
+            }
+        }
 
         public PageHome()
         {
@@ -56,6 +70,8 @@ namespace Software.其他界面
                 await weather.LoadAsync();
                 await weather.RefreshAsync();
             };
+
+            MyLoger.Information("PageHome初始化完成");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

@@ -40,7 +40,6 @@ namespace Software
                   .Enrich.FromLogContext()
                   .WriteTo.File($"{AppContext.BaseDirectory}logs/log.log", rollingInterval: RollingInterval.Day, outputTemplate: logOutputTemplate)
                   .CreateLogger();
-
                 #endregion
 
                 #region 启动ASP.NET Core主机
@@ -121,12 +120,10 @@ namespace Software
                 if (runningProcess != null)
                 {
                     MessageBox.Show("应用程序已经在运行中。");
+                    Log.Logger.Warning("应用程序已经在运行中。");
                     this.Shutdown();
                     return;
                 }
-
-
-
             }
             catch (Exception ex)
             {
@@ -165,7 +162,7 @@ namespace Software
                 // 检查是否存在“Software”文件夹，如果不存在，则跳过后续代码
                 if (!Directory.Exists(settingsDirectory))
                 {
-                    Console.WriteLine("未找到“Software”文件夹。");
+                    Log.Logger.Warning("未找到“Software”文件夹。");
                     return;
                 }
 
@@ -176,7 +173,7 @@ namespace Software
                 // 如果没有找到以“Software_Url_”开头的文件夹，则跳过后续代码
                 if (!softwareUrlDirectories.Any())
                 {
-                    Console.WriteLine("未找到名称以“Software_Url_”开头的文件夹。");
+                    Log.Logger.Warning("未找到名称以“Software_Url_”开头的文件夹。");
                     return;
                 }
 

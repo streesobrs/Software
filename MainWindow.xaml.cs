@@ -37,6 +37,7 @@ namespace Software
         Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
         Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
         Frame frameImage = new Frame() { Content = new 其他界面.PageImage() };
+        Frame frameLog = new Frame() { Content = new 其他界面.PageLog() };
 
         private 其他界面.PageSettings pageSettings;
 
@@ -58,8 +59,6 @@ namespace Software
         {
             InitializeComponent();
 
-            MyLoger.Information("WPF窗体中记录的日志");
-
             ApplySavedCultureInfo();
 
             // 在窗口加载完成后检查是否以管理员权限运行
@@ -73,7 +72,7 @@ namespace Software
                 {
                     this.Title = "MainWindow";
                 }
-                Debug.WriteLine("加载完成");
+                MyLoger.Information("MainWindow加载完成");
             };
             
             pageSettings = new 其他界面.PageSettings(); // 创建PageSettings的实例
@@ -97,6 +96,7 @@ namespace Software
             }
             catch (Exception ex)
             {
+                MyLoger.Error("读取设置时发生错误:{error}", ex.ToString());
                 MessageBox.Show("读取设置时发生错误: " + ex.Message);
             }
         }
@@ -148,7 +148,7 @@ namespace Software
             {
                 // 将异常信息写入日志
                 File.WriteAllText("error.log", ex.ToString());
-
+                MyLoger.Warning("应用程序在启动时遇到了一个错误。请查看 error.log 文件以获取更多信息。");
                 // 显示一个错误消息
                 MessageBox.Show("应用程序在启动时遇到了一个错误。请查看 error.log 文件以获取更多信息。");
             }
@@ -181,6 +181,7 @@ namespace Software
         {
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameMap;
+            beta_tabel.Visibility = Visibility.Hidden;
             //其他窗口.WindowGenshinMap nextwindow = new();
             //nextwindow.Show();
         }
@@ -267,6 +268,7 @@ namespace Software
         {
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameBing;
+            beta_tabel.Visibility = Visibility.Hidden;
             //其他窗口.WindowBing nextwindow = new();
             //nextwindow.Show();
         }

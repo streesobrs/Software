@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using Software.ViewModels;
 using System;
 using System.Configuration;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Wpf.Ui.Controls;
+using Button = Wpf.Ui.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 using MessageBoxButton = System.Windows.MessageBoxButton;
 using MessageBoxResult = System.Windows.MessageBoxResult;
@@ -22,14 +24,30 @@ namespace Software.其他界面
     /// </summary>
     public partial class PageSettings : Page
     {
-        //MainWindow mainWindow;
+        private MainWindow mainWindow;
+
         private ViewModels.MusicPlayer musicPlayer;
+
+        private ILogger logger;
+
+        public ILogger MyLoger
+        {
+            get
+            {
+                if (logger == null)
+                {
+                    logger = Log.ForContext<PageSettings>();
+                }
+                return logger;
+            }
+        }
 
         public PageSettings()
         {
             InitializeComponent();
             musicPlayer = new MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton);
 
+            MyLoger.Information("PageSettings初始化完成");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -97,6 +115,7 @@ namespace Software.其他界面
             }
             catch (Exception ex)
             {
+                MyLoger.Warning("读取设置时发生错误: {warning}", ex.ToString());
                 MessageBox.Show("读取设置时发生错误: " + ex.Message);
             }
 
@@ -207,6 +226,7 @@ namespace Software.其他界面
 
         private void EnableCountingCheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             UpdateEnableCounting(true);
             mainWindow.LaunchCount.Visibility = Visibility.Visible;
@@ -214,6 +234,7 @@ namespace Software.其他界面
 
         private void EnableCountingCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             UpdateEnableCounting(false);
             mainWindow.LaunchCount.Visibility = Visibility.Hidden;
@@ -267,11 +288,13 @@ namespace Software.其他界面
 
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             SaveCultureInfo("en-US");
         }
 
         private void RadioButton_Click_Chinese(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             SaveCultureInfo("zh-CN");
         }
 
@@ -310,7 +333,7 @@ namespace Software.其他界面
         };
         
         //添加ToolTip
-        string publishJson = "此功能迁移中 会横跨多个版本 使用需谨慎";
+        string publishJson = "此功能迁移完成";
         //添加打开文件夹
         string rootDirectoryFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
         string logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
@@ -319,27 +342,31 @@ namespace Software.其他界面
 
         private void Button_Click_Open_Root_Directory_Folder(object sender, RoutedEventArgs e)
         {
-
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             Process.Start("explorer.exe", rootDirectoryFolder);
         }
 
         private void Button_Click_Open_Log_Folder(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             Process.Start("explorer.exe", logFolder);
         }
 
         private void Button_Click_Open_Resources_Folder(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             Process.Start("explorer.exe", resourcesFolder);
         }
 
         private void Button_Click_Open_Music_Folder(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             Process.Start("explorer.exe", musicFolder);
         }
 
         private void Button_Click_Delete_Folder(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             bool hasError = false;
 
             foreach (string folderPath in folderPaths)
@@ -352,23 +379,27 @@ namespace Software.其他界面
                     }
                     catch (Exception ex)
                     {
+                        MyLoger.Error("删除文件夹 {folderPath} 时发生错误: {error}", folderPath, ex.ToString());
                         MessageBox.Show($"删除文件夹{folderPath}失败：{ex.Message}", "删除文件夹错误");
                         hasError = true;
                     }
                 }
                 else
                 {
+                    MyLoger.Error("根目录下没有名为“{folderPath}”的文件夹/你删过了", folderPath);
                     MessageBox.Show($"根目录下没有名为“{Path.GetFileName(folderPath)}”的文件夹/你删过了", "删除文件夹提示");
                 }
             }
             if (!hasError)
             {
+                MyLoger.Information("所有文件夹删除成功");
                 MessageBox.Show("所有文件夹删除成功", "删除文件夹提示");
             }
         }
 
         private async void Button_Click_BuildJson(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             try
             {
                 // 获取应用程序的名称和版本
@@ -388,6 +419,7 @@ namespace Software.其他界面
                 // 确保musicPlayer已初始化
                 if (musicPlayer == null)
                 {
+                    MyLoger.Warning("音乐播放器未初始化");
                     MessageBox.Show("音乐播放器未初始化");
                     return;
                 }
@@ -420,7 +452,7 @@ namespace Software.其他界面
                 if (lives == null || lives["province"] == null || lives["city"] == null /* add other checks as needed */)
                 {
                     // 如果 lives，lives["province"] 或 lives["city"] 为 null，则显示错误消息并返回
-                    Console.WriteLine("Error: Some required data is missing from the JSON file.");
+                    MyLoger.Error("无法从JSON文件中获取所有需要的数据。请检查文件内容是否正确。");
                     MessageBox.Show("无法从JSON文件中获取所有需要的数据。请检查文件内容是否正确。");
                     return;
                 }
@@ -458,8 +490,6 @@ namespace Software.其他界面
                     }
                 };
 
-                Debug.WriteLine(json);
-
                 // 将 JSON 对象序列化为字符串
                 string jsonString = JsonConvert.SerializeObject(json, Formatting.Indented, new JsonSerializerSettings
                 {
@@ -492,22 +522,26 @@ namespace Software.其他界面
             }
             catch (Exception ex)
             {
+                MyLoger.Error("发生错误: {error}", ex.ToString());
                 MessageBox.Show($"发生错误: {ex.Message}");
             }
         }
 
         private void Button_Click_Reboot_Software(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             RebootSoftware();
         }
 
         private void Button_Click_Root_Reboot_Software(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             RootRebootSoftware();
         }
 
         private async void Button_Click_City_Address(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             try
             {
                 string address = Text_CityAddress.Text;
@@ -543,12 +577,13 @@ namespace Software.其他界面
                 }
                 else
                 {
+                    MyLoger.Error("未找到对应的adcode，请检查地址是否正确。");
                     MessageBox.Show("未找到对应的adcode，请检查地址是否正确。", "错误", MessageBoxButton.OK);
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                MyLoger.Error("发生错误:{error}", ex.ToString());
                 MessageBox.Show($"发生错误：{ex.Message}", "错误", MessageBoxButton.OK);
             }
         }
@@ -564,29 +599,38 @@ namespace Software.其他界面
                 {
                     case "ToggleSwitch_Button_GenshinMap_Display":
                         mainWindow.Button_GenshinMap.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_GenshinMap to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_SelectUP_Display":
                         mainWindow.Button_SelectUP.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_SelectUP to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_PlayGames_Display":
                         mainWindow.Button_PlayGames.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_PlayGames to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_GenshinRole_Display":
                         mainWindow.Button_GenshinRole.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_GenshinRole to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_HonkaiImpact3_Display":
                         mainWindow.Button_HonkaiImpact3.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_HonkaiImpact3 to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_StarRail_Display":
                         mainWindow.Button_StarRail.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_StarRail to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_MoveChest_Display":
                         mainWindow.Button_MoveChest.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_MoveChest to Visible.", name);
                         break;
                     case "ToggleSwitch_Button_Bing_Display":
                         mainWindow.Button_Bing.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_Bing to Visible.", name);
                         break;
                     default:
+                        MyLoger.Warning("Unknown ToggleSwitch {name} checked.", name);
                         break;
                 }
             }
@@ -604,29 +648,38 @@ namespace Software.其他界面
                 {
                     case "ToggleSwitch_Button_GenshinMap_Display":
                         mainWindow.Button_GenshinMap.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_GenshinMap to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_SelectUP_Display":
                         mainWindow.Button_SelectUP.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_SelectUP to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_PlayGames_Display":
                         mainWindow.Button_PlayGames.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_PlayGames to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_GenshinRole_Display":
                         mainWindow.Button_GenshinRole.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_GenshinRole to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_HonkaiImpact3_Display":
                         mainWindow.Button_HonkaiImpact3.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_HonkaiImpact3 to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_StarRail_Display":
                         mainWindow.Button_StarRail.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_StarRail to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_MoveChest_Display":
                         mainWindow.Button_MoveChest.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_MoveChest to Collapsed.", name);
                         break;
                     case "ToggleSwitch_Button_Bing_Display":
                         mainWindow.Button_Bing.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_Bing to Collapsed.", name);
                         break;
                     default:
+                        MyLoger.Warning("Unknown ToggleSwitch {name} unchecked.", name);
                         break;
                 }
             }
@@ -649,12 +702,14 @@ namespace Software.其他界面
             }
             catch (Exception ex)
             {
+                MyLoger.Error("保存设置时发生错误: {error}", ex.ToString());
                 MessageBox.Show("保存设置时发生错误: " + ex.Message);
             }
         }
 
         private void Button_Click_Open_LogDashboard(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             OpenUrl("http://localhost:5000/logdashboard");
         }
 
