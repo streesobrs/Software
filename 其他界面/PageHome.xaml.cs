@@ -578,5 +578,10 @@ namespace Software.其他界面
             }
         }
 
+        private void Button_Click_cs(object sender, RoutedEventArgs e)
+        {
+            其他窗口.WindowUpdate nextwindow = new();
+            nextwindow.Show();
+        }
     }
 }
