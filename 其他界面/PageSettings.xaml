@@ -127,6 +127,10 @@
                                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">Bing</TextBlock>
                                 <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                             </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">StreePortal</TextBlock>
+                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            </DockPanel>
                         </StackPanel>
                     </Expander>
                 </StackPanel>

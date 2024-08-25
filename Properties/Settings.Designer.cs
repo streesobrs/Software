@@ -118,5 +118,17 @@ namespace Software.Properties {
                 this["Button_Bing_Display"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Button_StreePortal_Display {
+            get {
+                return ((bool)(this["Button_StreePortal_Display"]));
+            }
+            set {
+                this["Button_StreePortal_Display"] = value;
+            }
+        }
     }
 }

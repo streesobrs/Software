@@ -139,7 +139,7 @@
     <value>崩坏三</value>
   </data>
   <data name="Button_Bing" xml:space="preserve">
-    <value>Bing一下</value>
+    <value>必应</value>
   </data>
   <data name="Button_Updata" xml:space="preserve">
     <value>检查更新</value>
@@ -155,5 +155,8 @@
   </data>
   <data name="Button_Settings" xml:space="preserve">
     <value>设置</value>
+  </data>
+  <data name="Button_StreePortal" xml:space="preserve">
+    <value>StreePortal</value>
   </data>
 </root>

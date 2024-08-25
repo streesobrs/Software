@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Newtonsoft.Json.Linq;
+using System.Configuration;
 
 namespace Software.其他窗口
 {
@@ -81,6 +82,10 @@ namespace Software.其他窗口
         private Stopwatch stopwatch = new Stopwatch();
         private Config config;
 
+        // 读取配置文件
+        private string newUpdatePath = ConfigurationManager.AppSettings["newUpdatePath"];
+        private string JsonUrl = ConfigurationManager.AppSettings["UpdateLogUrl"];
+
         public WindowUpdate()
         {
             InitializeComponent();
@@ -91,7 +96,7 @@ namespace Software.其他窗口
         private async void LoadUpdateInfo()
         {
             UpdateModeComboBox.IsEnabled = false;
-            string configUrl = "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json";
+            string configUrl = newUpdatePath;
             config = await ConfigManager.LoadConfigFromUrlAsync(configUrl);
             if (config != null)
             {
@@ -110,7 +115,7 @@ namespace Software.其他窗口
 
         private async void LoadUpdateLog()
         {
-            string updateLogUrl = "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json"; // 替换为你的 update_log.json 文件 URL
+            string updateLogUrl = JsonUrl;
             UpdateLog updateLog = await UpdateLogManager.LoadUpdateLogFromUrlAsync(updateLogUrl);
 
             // 显示所有版本的更新内容

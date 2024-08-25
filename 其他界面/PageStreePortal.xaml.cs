@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Software.其他界面
 {
     /// <summary>
-    /// PageDehURL.xaml 的交互逻辑
+    /// PageStreePortal.xaml 的交互逻辑
     /// </summary>
-    public partial class PageDehURL : Page
+    public partial class PageStreePortal : Page
     {
-        public PageDehURL()
+        public PageStreePortal()
         {
             InitializeComponent();
         }

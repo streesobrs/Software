@@ -156,4 +156,7 @@
   <data name="Button_Settings" xml:space="preserve">
     <value>Setting</value>
   </data>
+  <data name="Button_StreePortal" xml:space="preserve">
+    <value>StreePortal</value>
+  </data>
 </root>

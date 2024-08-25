@@ -151,6 +151,15 @@ namespace Software.Properties {
         }
         
         /// <summary>
+        ///   查找类似 StreePortal 的本地化字符串。
+        /// </summary>
+        public static string Button_StreePortal {
+            get {
+                return ResourceManager.GetString("Button_StreePortal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Updata 的本地化字符串。
         /// </summary>
         public static string Button_Updata {

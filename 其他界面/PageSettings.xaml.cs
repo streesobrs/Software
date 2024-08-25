@@ -101,6 +101,8 @@ namespace Software.其他界面
             ToggleSwitch_Button_MoveChest_Display.Unchecked -= ToggleSwitch_Unchecked;
             ToggleSwitch_Button_Bing_Display.Checked -= ToggleSwitch_Checked;
             ToggleSwitch_Button_Bing_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_StreePortal_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_StreePortal_Display.Unchecked -= ToggleSwitch_Unchecked;
 
             try
             {
@@ -112,6 +114,7 @@ namespace Software.其他界面
                 ToggleSwitch_Button_StarRail_Display.IsChecked = (bool)Properties.Settings.Default["Button_StarRail_Display"];
                 ToggleSwitch_Button_MoveChest_Display.IsChecked = (bool)Properties.Settings.Default["Button_MoveChest_Display"];
                 ToggleSwitch_Button_Bing_Display.IsChecked = (bool)Properties.Settings.Default["Button_Bing_Display"];
+                ToggleSwitch_Button_StreePortal_Display.IsChecked = (bool)Properties.Settings.Default["Button_StreePortal_Display"];
             }
             catch (Exception ex)
             {
@@ -136,6 +139,8 @@ namespace Software.其他界面
             ToggleSwitch_Button_MoveChest_Display.Unchecked += ToggleSwitch_Unchecked;
             ToggleSwitch_Button_Bing_Display.Checked += ToggleSwitch_Checked;
             ToggleSwitch_Button_Bing_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_StreePortal_Display.Checked += ToggleSwitch_Checked;
+            ToggleSwitch_Button_StreePortal_Display.Unchecked += ToggleSwitch_Unchecked;
         }
 
         public void RebootSoftware()
@@ -629,6 +634,10 @@ namespace Software.其他界面
                         mainWindow.Button_Bing.Visibility = Visibility.Visible;
                         MyLoger.Information("ToggleSwitch {name} checked, setting Button_Bing to Visible.", name);
                         break;
+                    case "ToggleSwitch_Button_StreePortal_Display":
+                        mainWindow.Button_StreePortal.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_StreePortal to Visible.", name);
+                        break;
                     default:
                         MyLoger.Warning("Unknown ToggleSwitch {name} checked.", name);
                         break;
@@ -678,6 +687,10 @@ namespace Software.其他界面
                         mainWindow.Button_Bing.Visibility = Visibility.Collapsed;
                         MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_Bing to Collapsed.", name);
                         break;
+                    case "ToggleSwitch_Button_StreePortal_Display":
+                        mainWindow.Button_StreePortal.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_StreePortal to Collapsed.", name);
+                        break;
                     default:
                         MyLoger.Warning("Unknown ToggleSwitch {name} unchecked.", name);
                         break;
@@ -698,6 +711,7 @@ namespace Software.其他界面
                 Properties.Settings.Default["Button_StarRail_Display"] = ToggleSwitch_Button_StarRail_Display.IsChecked;
                 Properties.Settings.Default["Button_MoveChest_Display"] = ToggleSwitch_Button_MoveChest_Display.IsChecked;
                 Properties.Settings.Default["Button_Bing_Display"] = ToggleSwitch_Button_Bing_Display.IsChecked;
+                Properties.Settings.Default["Button_StreePortal_Display"] = ToggleSwitch_Button_StreePortal_Display.IsChecked;
                 Properties.Settings.Default.Save();
             }
             catch (Exception ex)

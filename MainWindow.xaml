@@ -120,6 +120,12 @@
                             ToolTip="你猜猜Bing一下是干什么的"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Name="Button_StreePortal"
+                            Click="Button_Click_StreePortal"
+                            Content="{x:Static resx:Resource.Button_StreePortal}"
+                            ToolTip="打开StreePortal网页"/>
+
+                            <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_Updata"
                             Click="Button_Click_Updata"
                             Content="{x:Static resx:Resource.Button_Updata}"

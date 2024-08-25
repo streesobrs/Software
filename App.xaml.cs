@@ -78,6 +78,7 @@ namespace Software
 		<add key=""UpdateTimeColor"" value=""Blue""/>
         <add key=""Culture"" value=""zh-CN""/>
         <add key=""EnableAutoUpdate"" value=""true""/>
+        <add key=""NewUpdatePath"" value=""https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json""/>
     </appSettings>
 </configuration>";
                         byte[] data = Encoding.UTF8.GetBytes(defaultSettings);
@@ -104,6 +105,7 @@ namespace Software
                     CheckAndAddSetting(appSettings, "UpdateTimeColor", "Blue");
                     CheckAndAddSetting(appSettings, "Culture", "zh-CN");
                     CheckAndAddSetting(appSettings, "EnableAutoUpdate", "true");
+                    CheckAndAddSetting(appSettings, "NewUpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json");
                     // 保存修改后的配置文件
                     doc.Save("Software.dll.config");
                 }

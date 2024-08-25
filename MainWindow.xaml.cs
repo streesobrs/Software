@@ -38,6 +38,7 @@ namespace Software
         Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
         Frame frameImage = new Frame() { Content = new 其他界面.PageImage() };
         Frame frameLog = new Frame() { Content = new 其他界面.PageLog() };
+        Frame frameStreePortal = new Frame() { Content = new 其他界面.PageStreePortal() };
 
         private 其他界面.PageSettings pageSettings;
 
@@ -93,6 +94,7 @@ namespace Software
                 SetButtonVisibility(Button_StarRail, "Button_StarRail_Display");
                 SetButtonVisibility(Button_MoveChest, "Button_MoveChest_Display");
                 SetButtonVisibility(Button_Bing, "Button_Bing_Display");
+                SetButtonVisibility(Button_StreePortal, "Button_StreePortal_Display");
             }
             catch (Exception ex)
             {
@@ -370,6 +372,13 @@ namespace Software
         {
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameImage;
+            this.beta_tabel.Visibility = Visibility.Hidden;
+        }
+
+        private void Button_Click_StreePortal(object sender, RoutedEventArgs e)
+        {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
+            contentcon.Content = frameStreePortal;
             this.beta_tabel.Visibility = Visibility.Hidden;
         }
     }
