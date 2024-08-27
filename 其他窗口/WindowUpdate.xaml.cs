@@ -90,7 +90,6 @@ namespace Software.其他窗口
         {
             InitializeComponent();
             LoadUpdateInfo();
-            LoadUpdateLog();
         }
 
         private async void LoadUpdateInfo()
@@ -110,19 +109,57 @@ namespace Software.其他窗口
                     UpdateModeComboBox.Items.Add(detail.UpdateMode);
                 }
                 UpdateModeComboBox.IsEnabled = true;
+
+                // 获取当前正在执行的程序集
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                // 获取版本信息
+                System.Version version = assembly.GetName().Version;
+                // 将版本信息转换为字符串
+                string versionString = version.ToString();
+                CurrentVersion.Text = versionString;
+
+                // 读取并显示上次更新时间
+                LastUpdate.Text = Properties.Settings.Default.LastUpdateTime;
+
+                // 加载更新日志
+                await LoadUpdateLog();
             }
         }
 
-        private async void LoadUpdateLog()
+        private async Task LoadUpdateLog()
         {
-            string updateLogUrl = JsonUrl;
-            UpdateLog updateLog = await UpdateLogManager.LoadUpdateLogFromUrlAsync(updateLogUrl);
-
-            // 显示所有版本的更新内容
-            var allUpdates = updateLog.Updates;
-            if (allUpdates != null)
+            try
             {
-                ReleaseNotes.Text = string.Join("\n\n", allUpdates.Select(update => $"版本 {update.Version} ({update.UpdateTime}):\n{string.Join("\n", update.UpdateContent)}"));
+                UpdateStatus("加载更新日志...");
+                string updateLogUrl = JsonUrl;
+                UpdateLog updateLog = await UpdateLogManager.LoadUpdateLogFromUrlAsync(updateLogUrl);
+
+                // 获取当前版本号
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                System.Version currentVersion = assembly.GetName().Version;
+                string currentVersionString = currentVersion.ToString();
+
+                // 显示从最新版本到当前版本之间的更新内容
+                var allUpdates = updateLog.Updates;
+                if (allUpdates != null)
+                {
+                    var updatesToShow = allUpdates
+                        .TakeWhile(update => string.Compare(update.Version, currentVersionString) >= 0)
+                        .ToList();
+
+                    ReleaseNotes.Text = string.Join("\n\n", updatesToShow.Select(update => $"版本 {update.Version} ({update.UpdateTime}):\n{string.Join("\n", update.UpdateContent)}"));
+                    UpdateStatus("更新日志加载完成。");
+                }
+                else
+                {
+                    ReleaseNotes.Text = "没有可用的更新日志。";
+                    UpdateStatus("没有可用的更新日志。");
+                }
+            }
+            catch (Exception ex)
+            {
+                ReleaseNotes.Text = "加载更新日志时出错，请检查网络连接或联系支持。";
+                UpdateStatus($"加载更新日志时出错: {ex.Message}");
             }
         }
 
@@ -148,18 +185,104 @@ namespace Software.其他窗口
                 var selectedDetail = config.Details.FirstOrDefault(detail => detail.UpdateMode == selectedUpdateMode);
                 if (selectedDetail != null)
                 {
-                    // 关闭软件
-                    CloseSoftware();
-
                     string updateUrl = selectedDetail.UpdateURL;
-                    string filePath = await DownloadUpdate(updateUrl);
+                    string fileName = Path.GetFileName(updateUrl);
+                    string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+                    string updateFolderPath = Path.Combine(rootPath, "update");
+                    string filePath = Path.Combine(updateFolderPath, fileName);
 
-                    // 下载完成后，保存文件路径以便安装按钮使用
-                    Application.Current.Properties["DownloadedFilePath"] = filePath;
-
-                    MessageBox.Show("下载完成，请点击安装按钮进行安装。");
+                    UpdateStatus("检查文件是否存在...");
+                    if (File.Exists(filePath))
+                    {
+                        if (ValidateFileChecksum(filePath, selectedDetail.Checksum))
+                        {
+                            UpdateStatus("文件校验成功，开始更新...");
+                            InstallUpdate(filePath, selectedUpdateMode);
+                        }
+                        else
+                        {
+                            UpdateStatus("文件校验失败，重新下载...");
+                            filePath = await DownloadUpdate(updateUrl);
+                            if (ValidateFileChecksum(filePath, selectedDetail.Checksum))
+                            {
+                                UpdateStatus("文件校验成功，开始更新...");
+                                InstallUpdate(filePath, selectedUpdateMode);
+                            }
+                            else
+                            {
+                                UpdateStatus("文件校验失败，请检查网络连接或联系支持。");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        UpdateStatus("文件不存在，开始下载...");
+                        filePath = await DownloadUpdate(updateUrl);
+                        if (ValidateFileChecksum(filePath, selectedDetail.Checksum))
+                        {
+                            UpdateStatus("文件校验成功，开始更新...");
+                            InstallUpdate(filePath, selectedUpdateMode);
+                        }
+                        else
+                        {
+                            UpdateStatus("文件校验失败，请检查网络连接或联系支持。");
+                        }
+                    }
                 }
             }
+        }
+
+        private async Task StartUpdater(string filePath, string updateMode)
+        {
+            string tempExtractPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_update");
+            Directory.CreateDirectory(tempExtractPath);
+
+            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    string destinationPath = Path.Combine(tempExtractPath, entry.FullName);
+
+                    // 确保目标目录存在
+                    string destinationDir = Path.GetDirectoryName(destinationPath);
+                    if (!Directory.Exists(destinationDir))
+                    {
+                        Directory.CreateDirectory(destinationDir);
+                    }
+
+                    // 删除已存在的文件
+                    if (File.Exists(destinationPath))
+                    {
+                        File.Delete(destinationPath);
+                    }
+
+                    // 解压并覆盖现有文件
+                    entry.ExtractToFile(destinationPath, true);
+                }
+            }
+
+            UpdateStatus($"解压完成！临时解压路径: {tempExtractPath}");
+
+            // 启动辅助程序进行更新
+            string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.exe");
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = updaterPath,
+                Arguments = $"\"{tempExtractPath}\" \"{AppDomain.CurrentDomain.BaseDirectory}\"",
+                UseShellExecute = true
+            });
+
+            // 关闭主程序
+            Application.Current.Shutdown();
+        }
+
+        private void UpdateStatus(string status)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ProgressBar.Value += 10; // 根据需要调整进度条的增量
+                StatusTextBlock.Text = status;
+            });
         }
 
         private async Task<string> DownloadUpdate(string url)
@@ -198,86 +321,135 @@ namespace Software.其他窗口
                     stopwatch.Stop();
                 }
             }
-
-            MessageBox.Show($"下载完成！文件路径: {filePath}");
             await Task.Delay(1000); // 添加延迟
             return filePath;
         }
 
-        private void CloseSoftware()
+        private bool ValidateFileChecksum(string filePath, List<Checksum> checksums)
         {
-            // 获取当前进程的名称
-            string processName = Process.GetCurrentProcess().ProcessName;
-
-            // 查找所有与当前进程名称相同的进程
-            foreach (var process in Process.GetProcessesByName(processName))
+            using (var md5 = System.Security.Cryptography.MD5.Create())
             {
-                if (process.Id != Process.GetCurrentProcess().Id)
+                using (var stream = File.OpenRead(filePath))
                 {
-                    process.Kill(); // 关闭其他进程
+                    var hash = md5.ComputeHash(stream);
+                    var fileChecksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    return checksums.Any(c => c.MD5.ToLowerInvariant() == fileChecksum);
                 }
             }
         }
 
-        private void ExtractAndOpen(string filePath)
+        private bool ExtractAndOpen(string filePath)
         {
-            string extractPath = AppDomain.CurrentDomain.BaseDirectory;
-            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            try
             {
-                foreach (ZipArchiveEntry entry in archive.Entries)
+                string tempExtractPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_update");
+                Directory.CreateDirectory(tempExtractPath);
+
+                using (ZipArchive archive = ZipFile.OpenRead(filePath))
                 {
-                    string destinationPath = Path.Combine(extractPath, entry.FullName);
-                    if (File.Exists(destinationPath))
+                    foreach (ZipArchiveEntry entry in archive.Entries)
                     {
-                        File.Delete(destinationPath); // 删除已存在的文件
+                        string destinationPath = Path.Combine(tempExtractPath, entry.FullName);
+
+                        // 确保目标目录存在
+                        string destinationDir = Path.GetDirectoryName(destinationPath);
+                        if (!Directory.Exists(destinationDir))
+                        {
+                            Directory.CreateDirectory(destinationDir);
+                        }
+
+                        // 删除已存在的文件
+                        if (File.Exists(destinationPath))
+                        {
+                            File.Delete(destinationPath);
+                        }
+
+                        // 解压并覆盖现有文件
+                        entry.ExtractToFile(destinationPath, true);
                     }
-                    entry.ExtractToFile(destinationPath, true); // 解压并覆盖现有文件
                 }
+                UpdateStatus($"解压完成！临时解压路径: {tempExtractPath}");
+
+                // 标记需要在下次启动时进行文件替换
+                Properties.Settings.Default.PendingUpdatePath = tempExtractPath;
+                Properties.Settings.Default.Save();
+
+                return true; // 解压成功
             }
-            MessageBox.Show($"解压完成！解压路径: {extractPath}");
-            Process.Start(new ProcessStartInfo
+            catch (Exception ex)
             {
-                FileName = extractPath,
-                UseShellExecute = true
-            });
+                UpdateStatus($"解压时出错: {ex.Message}");
+                return false; // 解压失败
+            }
         }
 
-        private void InstallPackage(string filePath)
+        private bool InstallPackage(string filePath)
         {
-            Process.Start(new ProcessStartInfo
+            try
             {
-                FileName = filePath,
-                UseShellExecute = true
-            });
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true
+                });
+
+                return true; // 安装成功
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus($"安装时出错: {ex.Message}");
+                return false; // 安装失败
+            }
         }
 
-        private void InstallUpdate_Click(object sender, RoutedEventArgs e)
+        private void InstallUpdate(string filePath, string updateMode)
         {
-            if (Application.Current.Properties["DownloadedFilePath"] != null)
+            bool updateSuccessful = false;
+
+            if (updateMode.Contains("zip"))
             {
-                string filePath = Application.Current.Properties["DownloadedFilePath"].ToString();
-                string selectedUpdateMode = UpdateModeComboBox.SelectedItem.ToString();
+                UpdateStatus("开始解压...");
+                string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.exe");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = updaterPath,
+                    Arguments = $"\"{filePath}\" \"{AppDomain.CurrentDomain.BaseDirectory}\"",
+                    UseShellExecute = true
+                });
 
-                MessageBox.Show($"安装模式: {selectedUpdateMode}\n文件路径: {filePath}");
-
-                if (selectedUpdateMode.Contains("zip"))
-                {
-                    MessageBox.Show("开始解压...");
-                    ExtractAndOpen(filePath);
-                }
-                else if (selectedUpdateMode.Contains("installer"))
-                {
-                    MessageBox.Show("开始安装...");
-                    InstallPackage(filePath);
-                }
-                else
-                {
-                    MessageBox.Show("未知的更新模式。");
-                }
+                // 关闭主程序
+                Application.Current.Shutdown();
+            }
+            else if (updateMode.Contains("installer"))
+            {
+                UpdateStatus("开始安装...");
+                updateSuccessful = InstallPackage(filePath);
             }
             else
             {
-                MessageBox.Show("请先下载更新。");
+                UpdateStatus("未知的更新模式。");
+            }
+
+            // 只有在更新成功完成时才删除更新文件
+            if (updateSuccessful)
+            {
+                DeleteUpdateFile(filePath);
+            }
+        }
+
+        private void DeleteUpdateFile(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    UpdateStatus("更新文件已删除。");
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus($"删除更新文件时出错: {ex.Message}");
             }
         }
 

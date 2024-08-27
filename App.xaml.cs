@@ -2,19 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows;
+using System.Data;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using LogDashboard;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-using System.Windows;
 using System.Xml.Linq;
 using Software.Models;
 
@@ -29,6 +27,8 @@ namespace Software
         {
             try
             {
+                var settings = Software.Properties.Settings.Default;
+
                 base.OnStartup(e);
 
                 #region Serilog配置
@@ -54,6 +54,50 @@ namespace Software
 
                 SettingsMigrator migrator = new SettingsMigrator();
                 migrator.MigrateSettings();
+
+                // 检查是否有待处理的更新
+                string pendingUpdatePath = Software.Properties.Settings.Default.PendingUpdatePath;
+                if (!string.IsNullOrEmpty(pendingUpdatePath) && Directory.Exists(pendingUpdatePath))
+                {
+                    try
+                    {
+                        string rootPath = AppDomain.CurrentDomain.BaseDirectory;
+                        foreach (string file in Directory.GetFiles(pendingUpdatePath, "*", SearchOption.AllDirectories))
+                        {
+                            string relativePath = file.Substring(pendingUpdatePath.Length + 1);
+                            string destinationPath = Path.Combine(rootPath, relativePath);
+
+                            // 确保目标目录存在
+                            string destinationDir = Path.GetDirectoryName(destinationPath);
+                            if (!Directory.Exists(destinationDir))
+                            {
+                                Directory.CreateDirectory(destinationDir);
+                            }
+
+                            // 删除已存在的文件
+                            if (File.Exists(destinationPath))
+                            {
+                                File.Delete(destinationPath);
+                            }
+
+                            // 移动文件到目标目录
+                            File.Move(file, destinationPath);
+                        }
+
+                        // 删除临时更新目录
+                        Directory.Delete(pendingUpdatePath, true);
+
+                        // 清除待处理的更新路径
+                        Software.Properties.Settings.Default.PendingUpdatePath = string.Empty;
+                        Software.Properties.Settings.Default.Save();
+
+                        MessageBox.Show("更新已完成。");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"更新时出错: {ex.Message}");
+                    }
+                }
 
                 // 检查配置文件是否存在
                 if (!File.Exists("Software.dll.config"))

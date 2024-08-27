@@ -130,5 +130,29 @@ namespace Software.Properties {
                 this["Button_StreePortal_Display"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastUpdateTime {
+            get {
+                return ((string)(this["LastUpdateTime"]));
+            }
+            set {
+                this["LastUpdateTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PendingUpdatePath {
+            get {
+                return ((string)(this["PendingUpdatePath"]));
+            }
+            set {
+                this["PendingUpdatePath"] = value;
+            }
+        }
     }
 }

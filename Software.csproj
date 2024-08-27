@@ -46,6 +46,11 @@
     <None Remove="resources\sound\music\music_001.mp3" />
     <None Remove="resources\sound\music\xxxCr3 - Illusionary Daytime.flac" />
     <None Remove="resources\update_log.json" />
+    <None Remove="Updater.deps.json" />
+    <None Remove="Updater.dll" />
+    <None Remove="Updater.exe" />
+    <None Remove="Updater.pdb" />
+    <None Remove="Updater.runtimeconfig.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +83,21 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="resources\update_log.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Updater.deps.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Updater.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Updater.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Updater.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Updater.runtimeconfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
