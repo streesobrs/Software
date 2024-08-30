@@ -126,7 +126,7 @@ namespace Software
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -140,7 +140,36 @@ namespace Software
                 string dd_updatePath = config.AppSettings.Settings["updatePath"].Value;
                 if (dd_enableAutoUpdate)
                 {
-                    AutoUpdater.Start($"{dd_updatePath}");
+                    string updatePath = config.AppSettings.Settings["updatePath"].Value;
+
+                    // 获取更新服务器的IP地址
+                    var UpdateIP = updatePath;
+                    // 获取当前正在执行的程序集
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                    // 获取版本信息
+                    System.Version softwareversion = assembly.GetName().Version;
+
+                    // 创建一个新的HttpClient实例
+                    var httpClient = new HttpClient();
+                    // 从更新服务器获取XML字符串
+                    var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
+
+                    // 解析XML字符串
+                    var xdoc = XDocument.Parse(xmlString);
+                    // 获取XML中的"version"元素
+                    var versionElement = xdoc.Descendants("version").FirstOrDefault();
+                    if (versionElement != null)
+                    {
+                        // 解析"version"元素的值为Version对象
+                        var version = Version.Parse(versionElement.Value);
+
+                        // 如果服务器的版本高于当前版本，则启动自动更新
+                        if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                        {
+                            其他窗口.WindowUpdate nextwindow = new();
+                            nextwindow.Show();
+                        }
+                    }
                 }
 
                 其他界面.PageSettings pageSettings = new 其他界面.PageSettings();
@@ -184,8 +213,6 @@ namespace Software
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameMap;
             beta_tabel.Visibility = Visibility.Hidden;
-            //其他窗口.WindowGenshinMap nextwindow = new();
-            //nextwindow.Show();
         }
 
         private void Button_Click_SelectUP(object sender, RoutedEventArgs e)
