@@ -231,7 +231,7 @@ namespace Software.其他界面
 
         private void EnableCountingCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
+            MyLoger.Information("CheckBox clicked: {CheckBoxName}", ((CheckBox)sender).Name);
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             UpdateEnableCounting(true);
             mainWindow.LaunchCount.Visibility = Visibility.Visible;
@@ -239,7 +239,7 @@ namespace Software.其他界面
 
         private void EnableCountingCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
+            MyLoger.Information("CheckBox clicked: {CheckBoxName}", ((CheckBox)sender).Name);
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             UpdateEnableCounting(false);
             mainWindow.LaunchCount.Visibility = Visibility.Hidden;
@@ -255,11 +255,13 @@ namespace Software.其他界面
 
         private void EnableAutoUpdateCheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("CheckBox clicked: {CheckBoxName}", ((CheckBox)sender).Name);
             UpdateAutoUpdateCounting(true);
         }
 
         private void EnableAutoUpdateCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
+            MyLoger.Information("CheckBox clicked: {CheckBoxName}", ((CheckBox)sender).Name);
             UpdateAutoUpdateCounting(false);
         }
 

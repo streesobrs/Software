@@ -3,6 +3,13 @@
   "version": "0.1.10.0",
   "updates": [
     {
+      "version": "0.1.10.1",
+      "updateTime": "2024/08/31",
+      "updateContent": [
+        "修复了在特定情况下导致无法打开设置界面的问题"
+      ]
+    },
+    {
       "version": "0.1.10.0",
       "updateTime": "2024/08/31",
       "updateContent": [
