@@ -1,10 +1,10 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.1.9.0",
+  "version": "0.1.10.0",
   "updates": [
     {
       "version": "0.1.10.0",
-      "updateTime": "",
+      "updateTime": "2024/08/31",
       "updateContent": [
         "更新了依赖",
         "添加了软件日志",
