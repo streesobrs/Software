@@ -15,6 +15,7 @@ using Serilog;
 using Serilog.Events;
 using System.Xml.Linq;
 using Software.Models;
+using Microsoft.Data.Sqlite;
 
 namespace Software
 {
@@ -30,6 +31,8 @@ namespace Software
                 var settings = Software.Properties.Settings.Default;
 
                 base.OnStartup(e);
+
+                InitializeDatabase();
 
                 #region Serilog配置
                 string logOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} || {Level} || {SourceContext:l} || {Message} || {Exception} ||end {NewLine}";
@@ -246,6 +249,200 @@ namespace Software
                         }
                     }
                 }
+            }
+        }
+
+        // 获取数据库路径的方法
+        private string GetDatabasePath()
+        {
+            // 获取用户文档目录的路径
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            // 在文档目录下创建一个名为StreeDB的文件夹
+            string folderPath = Path.Combine(documentsPath, "StreeDB");
+
+            // 如果文件夹不存在，则创建它
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // 根据编译条件（Debug或Release）设置数据库文件的名称
+#if DEBUG
+            return Path.Combine(folderPath, "debug_SoftwareDatabase.db");
+#else
+        return Path.Combine(folderPath, "SoftwareDatabase.db");
+#endif
+        }
+
+        // 初始化数据库的方法
+        private void InitializeDatabase()
+        {
+            // 获取数据库文件的完整路径
+            string databasePath = GetDatabasePath();
+            // 判断数据库文件是否存在
+            bool isNewDatabase = !File.Exists(databasePath);
+
+            // 使用SQLite连接到数据库
+            using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+            {
+                connection.Open();
+
+                // 如果是新数据库，则创建表格并插入初始数据
+                if (isNewDatabase)
+                {
+                    // 创建Settings表格
+                    string createTableQuery = "CREATE TABLE IF NOT EXISTS Settings (Id INTEGER PRIMARY KEY AUTOINCREMENT, UUID TEXT NOT NULL UNIQUE, Key TEXT NOT NULL UNIQUE, Value TEXT NOT NULL);";
+                    var command = new SqliteCommand(createTableQuery, connection);
+                    command.ExecuteNonQuery();
+
+                    // 插入初始数据
+                    InsertInitialData(connection);
+                }
+                else
+                {
+                    // 检查并补充缺失的键
+                    CheckAndInsertMissingKeys(connection);
+                }
+
+                // 进行数据迁移
+                MigrateDataFromConfig(connection);
+            }
+        }
+
+        // 生成UUID的方法
+        private string GenerateUUID()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        // 插入初始数据的方法
+        private void InsertInitialData(SqliteConnection connection)
+        {
+            // 插入初始数据的SQL查询
+            string insertInitialDataQuery = @"
+            INSERT INTO Settings (UUID, Key, Value) VALUES 
+            (@uuid1, 'GamePath', ''),
+            (@uuid2, 'TextContent', ''),
+            (@uuid3, 'UpdatePath', 'https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml'),
+            (@uuid4, 'LaunchCount', '0'),
+            (@uuid5, 'EnableCounting', 'false'),
+            (@uuid6, 'RetryCount', '2'),
+            (@uuid7, 'RetryDelay', '5'),
+            (@uuid8, 'adcode', ''),
+            (@uuid9, 'UpdateLogUrl', 'https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json'),
+            (@uuid10, 'VersionColor', 'Red'),
+            (@uuid11, 'UpdateTimeColor', 'Blue'),
+            (@uuid12, 'Culture', 'zh-CN'),
+            (@uuid13, 'EnableAutoUpdate', 'true'),
+            (@uuid14, 'NewUpdatePath', 'https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json');";
+
+            // 创建SQL命令并添加参数
+            var insertCommand = new SqliteCommand(insertInitialDataQuery, connection);
+            insertCommand.Parameters.AddWithValue("@uuid1", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid2", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid3", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid4", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid5", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid6", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid7", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid8", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid9", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid10", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid11", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid12", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid13", GenerateUUID());
+            insertCommand.Parameters.AddWithValue("@uuid14", GenerateUUID());
+            insertCommand.ExecuteNonQuery();
+        }
+
+        // 检查并补充缺失的键的方法
+        private void CheckAndInsertMissingKeys(SqliteConnection connection)
+        {
+            // 定义所有需要的键和值
+            var requiredKeys = new Dictionary<string, string>
+        {
+            { "GamePath", "" },
+            { "TextContent", "" },
+            { "UpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml" },
+            { "LaunchCount", "0" },
+            { "EnableCounting", "false" },
+            { "RetryCount", "2" },
+            { "RetryDelay", "5" },
+            { "adcode", "" },
+            { "UpdateLogUrl", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json" },
+            { "VersionColor", "Red" },
+            { "UpdateTimeColor", "Blue" },
+            { "Culture", "zh-CN" },
+            { "EnableAutoUpdate", "true" },
+            { "NewUpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json" }
+        };
+
+            // 获取数据库中已有的键
+            string selectKeysQuery = "SELECT Key FROM Settings;";
+            var selectCommand = new SqliteCommand(selectKeysQuery, connection);
+            var existingKeys = new HashSet<string>();
+
+            using (var reader = selectCommand.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    existingKeys.Add(reader.GetString(0));
+                }
+            }
+
+            // 插入缺失的键
+            foreach (var key in requiredKeys)
+            {
+                if (!existingKeys.Contains(key.Key))
+                {
+                    string insertKeyQuery = "INSERT INTO Settings (UUID, Key, Value) VALUES (@uuid, @key, @value);";
+                    var insertCommand = new SqliteCommand(insertKeyQuery, connection);
+                    insertCommand.Parameters.AddWithValue("@uuid", GenerateUUID());
+                    insertCommand.Parameters.AddWithValue("@key", key.Key);
+                    insertCommand.Parameters.AddWithValue("@value", key.Value);
+                    insertCommand.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // 从配置文件迁移数据的方法
+        private void MigrateDataFromConfig(SqliteConnection connection)
+        {
+            try
+            {
+                // 检查是否已经进行过迁移
+                string checkMigrationQuery = "SELECT COUNT(*) FROM Settings WHERE Key = 'MigrationCompleted';";
+                var checkCommand = new SqliteCommand(checkMigrationQuery, connection);
+                int migrationCount = Convert.ToInt32(checkCommand.ExecuteScalar());
+
+                if (migrationCount == 0)
+                {
+                    // 读取配置文件中的数据
+                    var appSettings = ConfigurationManager.AppSettings;
+                    foreach (var key in appSettings.AllKeys)
+                    {
+                        string value = appSettings[key];
+                        string upsertKeyQuery = @"
+                        INSERT INTO Settings (UUID, Key, Value) VALUES (@uuid, @key, @value)
+                        ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
+                        var upsertCommand = new SqliteCommand(upsertKeyQuery, connection);
+                        upsertCommand.Parameters.AddWithValue("@uuid", GenerateUUID());
+                        upsertCommand.Parameters.AddWithValue("@key", key);
+                        upsertCommand.Parameters.AddWithValue("@value", value);
+                        upsertCommand.ExecuteNonQuery();
+                    }
+
+                    // 标记迁移已完成
+                    string markMigrationQuery = "INSERT INTO Settings (UUID, Key, Value) VALUES (@uuid, 'MigrationCompleted', 'true');";
+                    var markCommand = new SqliteCommand(markMigrationQuery, connection);
+                    markCommand.Parameters.AddWithValue("@uuid", GenerateUUID());
+                    markCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                // 记录错误日志或显示错误消息
+                MessageBox.Show($"数据迁移失败: {ex.Message}");
             }
         }
 
