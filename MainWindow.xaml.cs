@@ -22,6 +22,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Xml.Linq;
+using Software.Models;
+using Microsoft.Data.Sqlite;
+using Windows.Devices.Geolocation;
 
 namespace Software
 {
@@ -41,6 +44,8 @@ namespace Software
         Frame frameStreePortal = new Frame() { Content = new 其他界面.PageStreePortal() };
 
         private 其他界面.PageSettings pageSettings;
+
+        string databasePath = DatabaseHelper.GetDatabasePath();
 
         private ILogger logger;
 
@@ -86,15 +91,24 @@ namespace Software
         {
             try
             {
-                SetButtonVisibility(Button_GenshinMap, "Button_GenshinMap_Display");
-                SetButtonVisibility(Button_SelectUP, "Button_SelectUP_Display");
-                SetButtonVisibility(Button_PlayGames, "Button_PlayGames_Display");
-                SetButtonVisibility(Button_GenshinRole, "Button_GenshinRole_Display");
-                SetButtonVisibility(Button_HonkaiImpact3, "Button_HonkaiImpact3_Display");
-                SetButtonVisibility(Button_StarRail, "Button_StarRail_Display");
-                SetButtonVisibility(Button_MoveChest, "Button_MoveChest_Display");
-                SetButtonVisibility(Button_Bing, "Button_Bing_Display");
-                SetButtonVisibility(Button_StreePortal, "Button_StreePortal_Display");
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string selectQuery = "SELECT ButtonName, IsVisible FROM ButtonVisibility;";
+                    var selectCommand = new SqliteCommand(selectQuery, connection);
+
+                    using (var reader = selectCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string buttonName = reader.GetString(0);
+                            bool isVisible = reader.GetInt32(1) == 1;
+
+                            SetButtonVisibility(buttonName, isVisible);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -103,9 +117,13 @@ namespace Software
             }
         }
 
-        private void SetButtonVisibility(Button button, string settingName)
+        private void SetButtonVisibility(string buttonName, bool isVisible)
         {
-            button.Visibility = (bool)Properties.Settings.Default[settingName] ? Visibility.Visible : Visibility.Collapsed;
+            var button = FindName(buttonName) as Button;
+            if (button != null)
+            {
+                button.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         public bool IsRunningAsAdministrator()
@@ -126,48 +144,103 @@ namespace Software
             }
         }
 
+        private void MoveUpdaterFilesIfNeeded()
+        {
+            // 获取用户文档文件夹路径
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            // 构建目标目录路径
+            string targetDir = Path.Combine(documentsPath, "StreeDB", "update");
+
+            // 确保目标目录存在
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+
+            // 定义需要移动的文件列表
+            string[] filesToMove = new string[]
+            {
+                "Updater.deps.json",
+                "Updater.dll",
+                "Updater.exe",
+                "Updater.pdb",
+                "Updater.runtimeconfig.json"
+            };
+
+            foreach (string fileName in filesToMove)
+            {
+                string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+                string targetPath = Path.Combine(targetDir, fileName);
+
+                // 检查目标路径是否存在
+                if (!File.Exists(targetPath))
+                {
+                    // 移动文件到目标路径
+                    File.Move(sourcePath, targetPath);
+                    MyLoger.Information("{fileName} 已移动到: {targetPath}",fileName,targetPath);
+                }
+                else
+                {
+                    MyLoger.Information("{fileName} 已存在于目标路径。", fileName);
+                }
+            }
+        }
+
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 读取配置文件
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                MoveUpdaterFilesIfNeeded();
 
-                // 检查 "EnableAutoUpdate" 配置项的值是否为 null
-                string enableAutoUpdateValue = ConfigurationManager.AppSettings["EnableAutoUpdate"];
-                bool dd_enableAutoUpdate = enableAutoUpdateValue != null ? bool.Parse(enableAutoUpdateValue) : true;
+                // 从数据库读取配置
+                string databasePath = DatabaseHelper.GetDatabasePath();
 
-                string dd_updatePath = config.AppSettings.Settings["updatePath"].Value;
-                if (dd_enableAutoUpdate)
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
-                    string updatePath = config.AppSettings.Settings["updatePath"].Value;
+                    connection.Open();
 
-                    // 获取更新服务器的IP地址
-                    var UpdateIP = updatePath;
-                    // 获取当前正在执行的程序集
-                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                    // 获取版本信息
-                    System.Version softwareversion = assembly.GetName().Version;
+                    // 读取 "EnableAutoUpdate" 配置项的值
+                    string enableAutoUpdateQuery = "SELECT Value FROM Settings WHERE Key = 'EnableAutoUpdate';";
+                    var enableAutoUpdateCommand = new SqliteCommand(enableAutoUpdateQuery, connection);
+                    string enableAutoUpdateValue = enableAutoUpdateCommand.ExecuteScalar()?.ToString();
+                    bool dd_enableAutoUpdate = enableAutoUpdateValue != null ? bool.Parse(enableAutoUpdateValue) : true;
 
-                    // 创建一个新的HttpClient实例
-                    var httpClient = new HttpClient();
-                    // 从更新服务器获取XML字符串
-                    var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
+                    // 读取 "updatePath" 配置项的值
+                    string updatePathQuery = "SELECT Value FROM Settings WHERE Key = 'UpdatePath';";
+                    var updatePathCommand = new SqliteCommand(updatePathQuery, connection);
+                    string dd_updatePath = updatePathCommand.ExecuteScalar()?.ToString();
 
-                    // 解析XML字符串
-                    var xdoc = XDocument.Parse(xmlString);
-                    // 获取XML中的"version"元素
-                    var versionElement = xdoc.Descendants("version").FirstOrDefault();
-                    if (versionElement != null)
+                    if (dd_enableAutoUpdate)
                     {
-                        // 解析"version"元素的值为Version对象
-                        var version = Version.Parse(versionElement.Value);
+                        string updatePath = dd_updatePath;
 
-                        // 如果服务器的版本高于当前版本，则启动自动更新
-                        if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                        // 获取更新服务器的IP地址
+                        var UpdateIP = updatePath;
+                        // 获取当前正在执行的程序集
+                        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                        // 获取版本信息
+                        System.Version softwareversion = assembly.GetName().Version;
+
+                        // 创建一个新的HttpClient实例
+                        var httpClient = new HttpClient();
+                        // 从更新服务器获取XML字符串
+                        var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
+
+                        // 解析XML字符串
+                        var xdoc = XDocument.Parse(xmlString);
+                        // 获取XML中的"version"元素
+                        var versionElement = xdoc.Descendants("version").FirstOrDefault();
+                        if (versionElement != null)
                         {
-                            其他窗口.WindowUpdate nextwindow = new();
-                            nextwindow.Show();
+                            // 解析"version"元素的值为Version对象
+                            var version = Version.Parse(versionElement.Value);
+
+                            // 如果服务器的版本高于当前版本，则启动自动更新
+                            if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                            {
+                                其他窗口.WindowUpdate nextwindow = new();
+                                nextwindow.Show();
+                            }
                         }
                     }
                 }
@@ -227,24 +300,38 @@ namespace Software
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             try
             {
-                string gamePath = ConfigurationManager.AppSettings["GamePath"];
-                if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
-                    // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
-                    var dialog = new OpenFileDialog();
-                    dialog.ValidateNames = false;
-                    dialog.CheckFileExists = true;
-                    dialog.CheckPathExists = true;
-                    dialog.FileName = "Select Game";
-                    if (dialog.ShowDialog() == true)
+                    connection.Open();
+
+                    // 读取游戏路径
+                    string gamePathQuery = "SELECT Value FROM Settings WHERE Key = 'GamePath';";
+                    var gamePathCommand = new SqliteCommand(gamePathQuery, connection);
+                    string gamePath = gamePathCommand.ExecuteScalar()?.ToString();
+
+                    if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
                     {
-                        gamePath = dialog.FileName;
-                        UpdateGamePath(gamePath);  // 保存新的游戏路径
+                        // 如果游戏路径没有被设置或者文件不存在，那么打开一个对话框让用户选择一个路径
+                        var dialog = new OpenFileDialog();
+                        dialog.ValidateNames = false;
+                        dialog.CheckFileExists = true;
+                        dialog.CheckPathExists = true;
+                        dialog.FileName = "Select Game";
+                        if (dialog.ShowDialog() == true)
+                        {
+                            gamePath = dialog.FileName;
+                            // 保存新的游戏路径
+                            string updateGamePathQuery = "UPDATE Settings SET Value = @value WHERE Key = 'GamePath';";
+                            var updateCommand = new SqliteCommand(updateGamePathQuery, connection);
+                            updateCommand.Parameters.AddWithValue("@value", gamePath);
+                            updateCommand.ExecuteNonQuery();
+                        }
                     }
-                }
-                if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
-                {
-                    _ = System.Diagnostics.Process.Start(gamePath);
+
+                    if (!string.IsNullOrEmpty(gamePath) && System.IO.File.Exists(gamePath))
+                    {
+                        _ = System.Diagnostics.Process.Start(gamePath);
+                    }
                 }
             }
             catch (Exception ex)
@@ -252,14 +339,6 @@ namespace Software
                 MyLoger.Error(ex, "An error occurred while performing an operation.");
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        private void UpdateGamePath(string newPath)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["GamePath"].Value = newPath;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
         }
 
         private void Button_Click_GenshinRole(object sender, RoutedEventArgs e)
@@ -302,58 +381,61 @@ namespace Software
             //nextwindow.Show();
         }
 
-        private async void Button_Click_Updata(object sender, RoutedEventArgs e)
+        private void Button_Click_Updata(object sender, RoutedEventArgs e)
         {
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
-            // 初始化一个空的字符串变量
-            string versionString = string.Empty;
 
-            try
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                string updatePath = config.AppSettings.Settings["updatePath"].Value;
+            其他窗口.WindowUpdate nextwindow = new();
+            nextwindow.Show();
+            
+            //// 初始化一个空的字符串变量
+            //string versionString = string.Empty;
+            //try
+            //{
+            //    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            //    string updatePath = config.AppSettings.Settings["updatePath"].Value;
 
-                // 获取更新服务器的IP地址
-                var UpdateIP = updatePath;
-                // 获取当前正在执行的程序集
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                // 获取版本信息
-                System.Version softwareversion = assembly.GetName().Version;
-                // 将版本信息转换为字符串
-                versionString = softwareversion.ToString();
+            //    // 获取更新服务器的IP地址
+            //    var UpdateIP = updatePath;
+            //    // 获取当前正在执行的程序集
+            //    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            //    // 获取版本信息
+            //    System.Version softwareversion = assembly.GetName().Version;
+            //    // 将版本信息转换为字符串
+            //    versionString = softwareversion.ToString();
 
-                // 创建一个新的HttpClient实例
-                var httpClient = new HttpClient();
-                // 从更新服务器获取XML字符串
-                var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
+            //    // 创建一个新的HttpClient实例
+            //    var httpClient = new HttpClient();
+            //    // 从更新服务器获取XML字符串
+            //    var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
 
-                // 解析XML字符串
-                var xdoc = XDocument.Parse(xmlString);
-                // 获取XML中的"version"元素
-                var versionElement = xdoc.Descendants("version").FirstOrDefault();
-                if (versionElement != null)
-                {
-                    // 解析"version"元素的值为Version对象
-                    var version = Version.Parse(versionElement.Value);
+            //    // 解析XML字符串
+            //    var xdoc = XDocument.Parse(xmlString);
+            //    // 获取XML中的"version"元素
+            //    var versionElement = xdoc.Descendants("version").FirstOrDefault();
+            //    if (versionElement != null)
+            //    {
+            //        // 解析"version"元素的值为Version对象
+            //        var version = Version.Parse(versionElement.Value);
 
-                    // 如果服务器的版本高于当前版本，则启动自动更新
-                    if (version > Assembly.GetExecutingAssembly().GetName().Version)
-                    {
-                        AutoUpdater.Start($"{UpdateIP}");
-                    }
-                    else
-                    {
-                        // 如果当前版本已经是最新的，则显示消息框
-                        MessageBox.Show($"当前{versionString}已是最新版本");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // 在这里处理异常，例如显示错误消息
-                MyLoger.Error(ex, "An error occurred while performing an operation.");
-                MessageBox.Show($"更新检查失败：{ex.Message}");
-            }
+            //        // 如果服务器的版本高于当前版本，则启动自动更新
+            //        if (version > Assembly.GetExecutingAssembly().GetName().Version)
+            //        {
+            //            AutoUpdater.Start($"{UpdateIP}");
+            //        }
+            //        else
+            //        {
+            //            // 如果当前版本已经是最新的，则显示消息框
+            //            MessageBox.Show($"当前{versionString}已是最新版本");
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    // 在这里处理异常，例如显示错误消息
+            //    MyLoger.Error(ex, "An error occurred while performing an operation.");
+            //    MessageBox.Show($"更新检查失败：{ex.Message}");
+            //}
 
         }
 

@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Data.Sqlite;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using Software.Models;
 using Software.ViewModels;
 using System;
 using System.Configuration;
@@ -27,6 +29,9 @@ namespace Software.其他界面
         private MainWindow mainWindow;
 
         private ViewModels.MusicPlayer musicPlayer;
+        
+        string databasePath = DatabaseHelper.GetDatabasePath();
+
 
         private ILogger logger;
 
@@ -106,15 +111,53 @@ namespace Software.其他界面
 
             try
             {
-                ToggleSwitch_Button_GenshinMap_Display.IsChecked = (bool)Properties.Settings.Default["Button_GenshinMap_Display"];
-                ToggleSwitch_Button_SelectUP_Display.IsChecked = (bool)Properties.Settings.Default["Button_SelectUP_Display"];
-                ToggleSwitch_Button_PlayGames_Display.IsChecked = (bool)Properties.Settings.Default["Button_PlayGames_Display"];
-                ToggleSwitch_Button_GenshinRole_Display.IsChecked = (bool)Properties.Settings.Default["Button_GenshinRole_Display"];
-                ToggleSwitch_Button_HonkaiImpact3_Display.IsChecked = (bool)Properties.Settings.Default["Button_HonkaiImpact3_Display"];
-                ToggleSwitch_Button_StarRail_Display.IsChecked = (bool)Properties.Settings.Default["Button_StarRail_Display"];
-                ToggleSwitch_Button_MoveChest_Display.IsChecked = (bool)Properties.Settings.Default["Button_MoveChest_Display"];
-                ToggleSwitch_Button_Bing_Display.IsChecked = (bool)Properties.Settings.Default["Button_Bing_Display"];
-                ToggleSwitch_Button_StreePortal_Display.IsChecked = (bool)Properties.Settings.Default["Button_StreePortal_Display"];
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string selectQuery = "SELECT ButtonName, IsVisible FROM ButtonVisibility;";
+                    var selectCommand = new SqliteCommand(selectQuery, connection);
+
+                    using (var reader = selectCommand.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string buttonName = reader.GetString(0);
+                            bool isVisible = reader.GetInt32(1) == 1;
+
+                            switch (buttonName)
+                            {
+                                case "Button_GenshinMap":
+                                    ToggleSwitch_Button_GenshinMap_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_SelectUP":
+                                    ToggleSwitch_Button_SelectUP_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_PlayGames":
+                                    ToggleSwitch_Button_PlayGames_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_GenshinRole":
+                                    ToggleSwitch_Button_GenshinRole_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_HonkaiImpact3":
+                                    ToggleSwitch_Button_HonkaiImpact3_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_StarRail":
+                                    ToggleSwitch_Button_StarRail_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_MoveChest":
+                                    ToggleSwitch_Button_MoveChest_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_Bing":
+                                    ToggleSwitch_Button_Bing_Display.IsChecked = isVisible;
+                                    break;
+                                case "Button_StreePortal":
+                                    ToggleSwitch_Button_StreePortal_Display.IsChecked = isVisible;
+                                    break;
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -184,49 +227,87 @@ namespace Software.其他界面
 
         public void HandleLaunchCount()
         {
-            // 读取"EnableCounting"的值
-            string enableCountingValue = ConfigurationManager.AppSettings["EnableCounting"];
-            bool enableCounting = enableCountingValue != null ? bool.Parse(enableCountingValue) : false;
-
-            // 设置CheckBox的状态
-            EnableCountingCheckBox.IsChecked = enableCounting;
-
-            // 如果启用计数，则执行计数逻辑
-            if (enableCounting)
+            try
             {
-                // 读取并增加启动次数
-                int launchCount = int.Parse(ConfigurationManager.AppSettings["LaunchCount"]) + 1;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
 
-                // 更新启动次数
-                UpdateLaunchCount(launchCount);
+                    // 读取 "EnableCounting" 的值
+                    string enableCountingQuery = "SELECT Value FROM Settings WHERE Key = 'EnableCounting';";
+                    var enableCountingCommand = new SqliteCommand(enableCountingQuery, connection);
+                    string enableCountingValue = enableCountingCommand.ExecuteScalar()?.ToString();
+                    bool enableCounting = enableCountingValue != null ? bool.Parse(enableCountingValue) : false;
 
-                // 显示启动次数
-                MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-                mainWindow.LaunchCount.Content = $"软件已启动 {launchCount} 次 ";
+                    // 设置 CheckBox 的状态
+                    EnableCountingCheckBox.IsChecked = enableCounting;
+
+                    // 如果启用计数，则执行计数逻辑
+                    if (enableCounting)
+                    {
+                        // 读取并增加启动次数
+                        string launchCountQuery = "SELECT Value FROM Settings WHERE Key = 'LaunchCount';";
+                        var launchCountCommand = new SqliteCommand(launchCountQuery, connection);
+                        int launchCount = int.Parse(launchCountCommand.ExecuteScalar()?.ToString() ?? "0") + 1;
+
+                        // 更新启动次数
+                        UpdateLaunchCount(launchCount);
+
+                        // 显示启动次数
+                        MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+                        mainWindow.LaunchCount.Content = $"软件已启动 {launchCount} 次 ";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取或更新启动次数时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取或更新启动次数时发生错误: " + ex.Message);
             }
         }
 
         private void UpdateLaunchCount(int launchCount)
         {
-            // 打开配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
 
-            // 更新启动次数
-            config.AppSettings.Settings["LaunchCount"].Value = launchCount.ToString();
-
-            // 保存配置文件
-            config.Save(ConfigurationSaveMode.Modified);
-
-            // 刷新配置文件
-            ConfigurationManager.RefreshSection("appSettings");
+                    // 更新启动次数
+                    string updateLaunchCountQuery = "UPDATE Settings SET Value = @value WHERE Key = 'LaunchCount';";
+                    var updateCommand = new SqliteCommand(updateLaunchCountQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", launchCount.ToString());
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("更新启动次数时发生错误:{error}", ex.ToString());
+                MessageBox.Show("更新启动次数时发生错误: " + ex.Message);
+            }
         }
 
         private void UpdateEnableCounting(bool enableCounting)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["EnableCounting"].Value = enableCounting.ToString();
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    // 更新 EnableCounting 的值
+                    string updateEnableCountingQuery = "UPDATE Settings SET Value = @value WHERE Key = 'EnableCounting';";
+                    var updateCommand = new SqliteCommand(updateEnableCountingQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", enableCounting.ToString());
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("更新 EnableCounting 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("更新 EnableCounting 时发生错误: " + ex.Message);
+            }
         }
 
         private void EnableCountingCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -247,10 +328,24 @@ namespace Software.其他界面
 
         private void UpdateAutoUpdateCounting(bool enableAutoUpdate)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["EnableAutoUpdate"].Value = enableAutoUpdate.ToString();
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    // 更新 EnableAutoUpdate 的值
+                    string updateAutoUpdateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'EnableAutoUpdate';";
+                    var updateCommand = new SqliteCommand(updateAutoUpdateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", enableAutoUpdate.ToString());
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("更新 EnableAutoUpdate 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("更新 EnableAutoUpdate 时发生错误: " + ex.Message);
+            }
         }
 
         private void EnableAutoUpdateCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -267,30 +362,68 @@ namespace Software.其他界面
 
         private void Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string text = Update_IP_address.Text;
-            // 保存到配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["UpdatePath"].Value = text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            try
+            {
+                string text = Update_IP_address.Text;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'UpdatePath';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", text);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 UpdatePath 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 UpdatePath 时发生错误: " + ex.Message);
+            }
         }
 
         private void Update_Log_IP_address_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string text = Update_Log_IP_address.Text;
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["UpdateLogUrl"].Value = text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            try
+            {
+                string text = Update_Log_IP_address.Text;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'UpdateLogUrl';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", text);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 UpdateLogUrl 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 UpdateLogUrl 时发生错误: " + ex.Message);
+            }
         }
 
         private void Text_GamePath_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string text = Text_GamePath.Text;
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["GamePath"].Value = text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("aappSettings");
+            try
+            {
+                string text = Text_GamePath.Text;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'GamePath';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", text);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 GamePath 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 GamePath 时发生错误: " + ex.Message);
+            }
         }
 
         private void RadioButton_Click_English(object sender, RoutedEventArgs e)
@@ -307,10 +440,23 @@ namespace Software.其他界面
 
         private void SaveCultureInfo(string cultureName)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["Culture"].Value = cultureName;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'Culture';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", cultureName);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 Culture 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 Culture 时发生错误: " + ex.Message);
+            }
         }
 
         //要删除的文件夹名
@@ -441,8 +587,17 @@ namespace Software.其他界面
                 Uri musicUri = new Uri(musicPath);
                 string musicUrl = musicUri.AbsoluteUri;
 
-                //获取文本
-                string contentTextBox = ConfigurationManager.AppSettings["TextContent"];
+                // 从数据库获取文本
+                string contentTextBox;
+
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string contentTextBoxQuery = "SELECT Value FROM Settings WHERE Key = 'TextContent';";
+                    var contentTextBoxCommand = new SqliteCommand(contentTextBoxQuery, connection);
+                    contentTextBox = contentTextBoxCommand.ExecuteScalar()?.ToString();
+                }
 
                 // 从文件中读取数据
                 string result;
@@ -705,16 +860,41 @@ namespace Software.其他界面
         {
             try
             {
-                Properties.Settings.Default["Button_GenshinMap_Display"] = ToggleSwitch_Button_GenshinMap_Display.IsChecked;
-                Properties.Settings.Default["Button_SelectUP_Display"] = ToggleSwitch_Button_SelectUP_Display.IsChecked;
-                Properties.Settings.Default["Button_PlayGames_Display"] = ToggleSwitch_Button_PlayGames_Display.IsChecked;
-                Properties.Settings.Default["Button_GenshinRole_Display"] = ToggleSwitch_Button_GenshinRole_Display.IsChecked;
-                Properties.Settings.Default["Button_HonkaiImpact3_Display"] = ToggleSwitch_Button_HonkaiImpact3_Display.IsChecked;
-                Properties.Settings.Default["Button_StarRail_Display"] = ToggleSwitch_Button_StarRail_Display.IsChecked;
-                Properties.Settings.Default["Button_MoveChest_Display"] = ToggleSwitch_Button_MoveChest_Display.IsChecked;
-                Properties.Settings.Default["Button_Bing_Display"] = ToggleSwitch_Button_Bing_Display.IsChecked;
-                Properties.Settings.Default["Button_StreePortal_Display"] = ToggleSwitch_Button_StreePortal_Display.IsChecked;
-                Properties.Settings.Default.Save();
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    // 创建一个新的 SqliteCommand 对象，并设置其 CommandText
+                    var updateCommand = new SqliteCommand
+                    {
+                        CommandText = @"
+                            UPDATE ButtonVisibility SET IsVisible = @isVisible WHERE ButtonName = @buttonName;
+                            INSERT INTO ButtonVisibility (ButtonName, IsVisible) 
+                            SELECT @buttonName, @isVisible 
+                            WHERE NOT EXISTS (SELECT 1 FROM ButtonVisibility WHERE ButtonName = @buttonName);",
+                        Connection = connection
+                    };
+
+                    updateCommand.Parameters.Add(new SqliteParameter("@buttonName", SqliteType.Text));
+                    updateCommand.Parameters.Add(new SqliteParameter("@isVisible", SqliteType.Integer));
+
+                    void UpdateButtonVisibility(string buttonName, bool isVisible)
+                    {
+                        updateCommand.Parameters["@buttonName"].Value = buttonName;
+                        updateCommand.Parameters["@isVisible"].Value = isVisible ? 1 : 0;
+                        updateCommand.ExecuteNonQuery();
+                    }
+
+                    UpdateButtonVisibility("Button_GenshinMap", ToggleSwitch_Button_GenshinMap_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_SelectUP", ToggleSwitch_Button_SelectUP_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_PlayGames", ToggleSwitch_Button_PlayGames_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_GenshinRole", ToggleSwitch_Button_GenshinRole_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_HonkaiImpact3", ToggleSwitch_Button_HonkaiImpact3_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_StarRail", ToggleSwitch_Button_StarRail_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_MoveChest", ToggleSwitch_Button_MoveChest_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_Bing", ToggleSwitch_Button_Bing_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_StreePortal", ToggleSwitch_Button_StreePortal_Display.IsChecked == true);
+                }
             }
             catch (Exception ex)
             {

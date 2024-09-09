@@ -3,6 +3,17 @@
   "version": "0.1.10.0",
   "updates": [
     {
+      "version": "0.1.11.0",
+      "updateTime": "",
+      "updateContent": [
+        "添加了数据库",
+        "添加了对老存储的迁移功能",
+        "移除了老的存储方法与存储设置",
+        "删除了测试按钮",
+        "修改了检查更新按钮"
+      ]
+    },
+    {
       "version": "0.1.10.1",
       "updateTime": "2024/08/31",
       "updateContent": [

@@ -165,12 +165,6 @@
                         Click="Button_Click_RefreshWeather">
                         天气刷新
                     </ui:Button>
-                    <ui:Button Margin="0,0,0,0" Width="100" Height="28" Foreground="Black"
-    DockPanel.Dock="Top"
-    HorizontalAlignment="Left" VerticalAlignment="Top" 
-    Click="Button_Click_cs">
-                        测试
-                    </ui:Button>
                 </DockPanel>
 
                 <StackPanel Width="auto" Height="Auto">

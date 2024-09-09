@@ -409,7 +409,10 @@ namespace Software.其他窗口
             if (updateMode.Contains("zip"))
             {
                 UpdateStatus("开始解压...");
-                string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.exe");
+                // 获取用户文档文件夹路径
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 构建Updater.exe的相对路径
+                string updaterPath = Path.Combine(documentsPath, "StreeDB", "update", "Updater.exe");
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = updaterPath,
