@@ -1,5 +1,8 @@
 ﻿using AutoUpdaterDotNET;
+using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
+using Serilog;
+using Software.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -38,12 +41,30 @@ namespace Software.其他界面
     /// </summary>
     public partial class PageVersion : Page
     {
+        string databasePath = DatabaseHelper.GetDatabasePath();
+
         private int refreshCount = 0;
         private const int RefreshThreshold = 5;
         private string version;
         private const string DefaultJsonFilePath = "resources\\update_log.json";
         private string jsonFilePath = DefaultJsonFilePath;
-        private string JsonUrl = ConfigurationManager.AppSettings["UpdateLogUrl"];  // 从app.config文件中读取UpdateLogUrl
+        private string JsonUrl;
+        private string versionColor;
+        private string updateTimeColor;
+
+        private ILogger logger;
+
+        public ILogger MyLoger
+        {
+            get
+            {
+                if (logger == null)
+                {
+                    logger = Log.ForContext<PageVersion>();
+                }
+                return logger;
+            }
+        }
 
         public PageVersion()
         {
@@ -59,7 +80,38 @@ namespace Software.其他界面
             // 在文本块中显示版本信息
             VersionTextBlock.Text = "当前版本：" + versionString;
 
+            JsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
+            versionColor = GetConfigValueFromDatabase(databasePath, "VersionColor");
+            updateTimeColor = GetConfigValueFromDatabase(databasePath, "UpdateTimeColor");
+
             _ = DownloadUpdates();
+        }
+
+        /// <summary>
+        /// 从数据库中读取配置值
+        /// </summary>
+        /// <param name="dbPath">数据库路径</param>
+        /// <param name="key">配置键</param>
+        /// <returns>配置值</returns>
+        private string GetConfigValueFromDatabase(string dbPath, string key)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@Key", key);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取配置值时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取配置值时发生错误: " + ex.Message);
+                return null;
+            }
         }
 
         // 读取本地文件的方法
@@ -167,9 +219,6 @@ namespace Software.其他界面
 
                 // 读取文件内容
                 string json = File.ReadAllText(jsonFilePath);
-                // 获取颜色配置
-                string versionColor = ConfigurationManager.AppSettings["VersionColor"];
-                string updateTimeColor = ConfigurationManager.AppSettings["UpdateTimeColor"];
 
                 // 检查文件内容是否为空
                 if (string.IsNullOrEmpty(json))

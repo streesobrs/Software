@@ -26,6 +26,12 @@ namespace Software.其他界面
     /// </summary>
     public partial class PageSettings : Page
     {
+        private bool enableCounting;
+        private bool enableAutoUpdate;
+        private string updatePath;
+        private string updateLogPath;
+        private string currentPath;
+
         private MainWindow mainWindow;
 
         private ViewModels.MusicPlayer musicPlayer;
@@ -55,22 +61,76 @@ namespace Software.其他界面
             MyLoger.Information("PageSettings初始化完成");
         }
 
+        /// <summary>
+        /// 从数据库中读取配置值
+        /// </summary>
+        /// <param name="dbPath">数据库路径</param>
+        /// <param name="key">配置键</param>
+        /// <returns>配置值</returns>
+        private string GetConfigValueFromDatabase(string dbPath, string key)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@Key", key);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取配置值时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取配置值时发生错误: " + ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 从数据库中读取布尔值
+        /// </summary>
+        /// <param name="dbPath">数据库路径</param>
+        /// <param name="key">配置键</param>
+        /// <returns>布尔值</returns>
+        private bool GetBooleanConfigValueFromDatabase(string dbPath, string key)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@Key", key);
+                    string result = command.ExecuteScalar()?.ToString();
+                    return result == "1" || result.Equals("true", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取布尔配置值时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取布尔配置值时发生错误: " + ex.Message);
+                return false;
+            }
+        }
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // 读取配置文件
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            // 读取"EnableCounting"的值
-            bool enableCounting = bool.Parse(ConfigurationManager.AppSettings["EnableCounting"]);
-            bool enableAutoUpdate = bool.Parse(ConfigurationManager.AppSettings["EnableAutoUpdate"]);
-            //读取值
-            string updatePath = config.AppSettings.Settings["updatePath"].Value;
-            string updateLogPath = config.AppSettings.Settings["UpdateLogUrl"].Value;
-            string currentPath = config.AppSettings.Settings["GamePath"].Value;
+            // 从数据库读取布尔值
+            enableCounting = GetBooleanConfigValueFromDatabase(databasePath, "EnableCounting");
+            enableAutoUpdate = GetBooleanConfigValueFromDatabase(databasePath, "EnableAutoUpdate");
 
             // 设置CheckBox的状态
             EnableCountingCheckBox.IsChecked = enableCounting;
             EnableAutoUpdateCheckBox.IsChecked = enableAutoUpdate;
+
+            // 从数据库读取其他配置值
+            updatePath = GetConfigValueFromDatabase(databasePath, "updatePath");
+            updateLogPath = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
+            currentPath = GetConfigValueFromDatabase(databasePath, "GamePath");
+
             // 设置TextBox的内容
             Update_IP_address.Text = updatePath;
             Update_Log_IP_address.Text = updateLogPath;
@@ -295,11 +355,9 @@ namespace Software.其他界面
                 using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
                     connection.Open();
-
-                    // 更新 EnableCounting 的值
                     string updateEnableCountingQuery = "UPDATE Settings SET Value = @value WHERE Key = 'EnableCounting';";
                     var updateCommand = new SqliteCommand(updateEnableCountingQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@value", enableCounting.ToString());
+                    updateCommand.Parameters.AddWithValue("@value", enableCounting ? "true" : "false");
                     updateCommand.ExecuteNonQuery();
                 }
             }
@@ -333,11 +391,9 @@ namespace Software.其他界面
                 using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
                     connection.Open();
-
-                    // 更新 EnableAutoUpdate 的值
                     string updateAutoUpdateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'EnableAutoUpdate';";
                     var updateCommand = new SqliteCommand(updateAutoUpdateQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@value", enableAutoUpdate.ToString());
+                    updateCommand.Parameters.AddWithValue("@value", enableAutoUpdate ? "true" : "false");
                     updateCommand.ExecuteNonQuery();
                 }
             }

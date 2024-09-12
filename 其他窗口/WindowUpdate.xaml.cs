@@ -10,6 +10,9 @@ using System.Windows;
 using System.Windows.Controls;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
+using Software.Models;
+using Microsoft.Data.Sqlite;
+using Serilog;
 
 namespace Software.其他窗口
 {
@@ -82,14 +85,55 @@ namespace Software.其他窗口
         private Stopwatch stopwatch = new Stopwatch();
         private Config config;
 
-        // 读取配置文件
-        private string newUpdatePath = ConfigurationManager.AppSettings["newUpdatePath"];
-        private string JsonUrl = ConfigurationManager.AppSettings["UpdateLogUrl"];
+        private string newUpdatePath;
+        private string JsonUrl;
+
+        private ILogger logger;
+
+        public ILogger MyLoger
+        {
+            get
+            {
+                if (logger == null)
+                {
+                    logger = Log.ForContext<MainWindow>();
+                }
+                return logger;
+            }
+        }
+
+        string databasePath = DatabaseHelper.GetDatabasePath();
 
         public WindowUpdate()
         {
             InitializeComponent();
+
+            // 从数据库读取配置文件
+            newUpdatePath = GetConfigValueFromDatabase(databasePath, "newUpdatePath");
+            JsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
+
             LoadUpdateInfo();
+        }
+
+        private string GetConfigValueFromDatabase(string dbPath, string key)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@Key", key);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取配置值时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取配置值时发生错误: " + ex.Message);
+                return null;
+            }
         }
 
         private async void LoadUpdateInfo()
@@ -118,13 +162,57 @@ namespace Software.其他窗口
                 string versionString = version.ToString();
                 CurrentVersion.Text = versionString;
 
-                // 读取并显示上次更新时间
-                LastUpdate.Text = Properties.Settings.Default.LastUpdateTime;
+                // 从数据库读取并显示上次更新时间
+                LastUpdate.Text = LastUpdateTime();
+
+                // 保存当前时间为上次更新时间
+                SaveLastUpdateTime(databasePath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 // 加载更新日志
                 await LoadUpdateLog();
             }
         }
+
+        private void SaveLastUpdateTime(string dbPath, string lastUpdateTime)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('LastUpdateTime', @LastUpdateTime);";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@LastUpdateTime", lastUpdateTime);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存LastUpdateTime时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存LastUpdateTime时发生错误: " + ex.Message);
+            }
+        }
+
+        private string LastUpdateTime()
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = 'LastUpdateTime';";
+                    var command = new SqliteCommand(query, connection);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取LastUpdateTime时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取LastUpdateTime时发生错误: " + ex.Message);
+                return null;
+            }
+        }
+
 
         private async Task LoadUpdateLog()
         {
@@ -232,10 +320,14 @@ namespace Software.其他窗口
             }
         }
 
-        private async Task StartUpdater(string filePath, string updateMode)
+        private Task StartUpdater(string filePath, string updateMode)
         {
-            string tempExtractPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_update");
-            Directory.CreateDirectory(tempExtractPath);
+            string tempExtractPath = GetPendingUpdatePath(databasePath);
+            if (string.IsNullOrEmpty(tempExtractPath))
+            {
+                tempExtractPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_update");
+                Directory.CreateDirectory(tempExtractPath);
+            }
 
             using (ZipArchive archive = ZipFile.OpenRead(filePath))
             {
@@ -274,6 +366,29 @@ namespace Software.其他窗口
 
             // 关闭主程序
             Application.Current.Shutdown();
+
+            // 返回已完成的任务
+            return Task.CompletedTask;
+        }
+
+        private string GetPendingUpdatePath(string dbPath)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = 'PendingUpdatePath';";
+                    var command = new SqliteCommand(query, connection);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取PendingUpdatePath时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取PendingUpdatePath时发生错误: " + ex.Message);
+                return null;
+            }
         }
 
         private void UpdateStatus(string status)
@@ -371,8 +486,7 @@ namespace Software.其他窗口
                 UpdateStatus($"解压完成！临时解压路径: {tempExtractPath}");
 
                 // 标记需要在下次启动时进行文件替换
-                Properties.Settings.Default.PendingUpdatePath = tempExtractPath;
-                Properties.Settings.Default.Save();
+                SaveTempExtractPath(databasePath, tempExtractPath);
 
                 return true; // 解压成功
             }
@@ -380,6 +494,26 @@ namespace Software.其他窗口
             {
                 UpdateStatus($"解压时出错: {ex.Message}");
                 return false; // 解压失败
+            }
+        }
+
+        private void SaveTempExtractPath(string dbPath, string pendingUpdatePath)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('PendingUpdatePath', @PendingUpdatePath);";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@PendingUpdatePath", pendingUpdatePath);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存PendingUpdatePath时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存PendingUpdatePath时发生错误: " + ex.Message);
             }
         }
 

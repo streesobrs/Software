@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Data.Sqlite;
+using Newtonsoft.Json.Linq;
+using Serilog;
+using Software.Models;
 using System;
 using System.ComponentModel; // 引用System.ComponentModel命名空间以使用INotifyPropertyChanged接口
 using System.Configuration; // 引用System.Configuration命名空间以读取App.config文件中的设置
@@ -11,6 +14,21 @@ namespace Software.ViewModels
 {
     class Weather : INotifyPropertyChanged
     {
+        string databasePath = DatabaseHelper.GetDatabasePath();
+
+        private ILogger logger;
+
+        public ILogger MyLoger
+        {
+            get
+            {
+                if (logger == null)
+                {
+                    logger = Log.ForContext<Weather>();
+                }
+                return logger;
+            }
+        }
 
         private string _data_Province;
         public string Data_Province
@@ -136,19 +154,70 @@ namespace Software.ViewModels
             await LoadDataAsync("resources\\weather.json");
         }
 
+        /// <summary>
+        /// 从数据库中读取 adcode
+        /// </summary>
+        /// <param name="dbPath">数据库路径</param>
+        /// <returns>adcode 值</returns>
+        private string GetAdcodeFromDatabase(string dbPath)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = 'adcode';";
+                    var command = new SqliteCommand(query, connection);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("读取adcode时发生错误:{error}", ex.ToString());
+                MessageBox.Show("读取adcode时发生错误: " + ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 保存 adcode 到数据库
+        /// </summary>
+        /// <param name="dbPath">数据库路径</param>
+        /// <param name="adcode">adcode 值</param>
+        private void SaveAdcodeToDatabase(string dbPath, string adcode)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('adcode', @Adcode);";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@Adcode", adcode);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存adcode时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存adcode时发生错误: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 异步加载数据
+        /// </summary>
         public async Task LoadAsync()
         {
-            string city = ConfigurationManager.AppSettings["adcode"];
+            // 从数据库读取 adcode
+            string city = GetAdcodeFromDatabase(databasePath);
             if (string.IsNullOrEmpty(city))
             {
+                // 如果数据库中没有 adcode，则获取并保存
                 city = await GetCityCodeAsync();
-                // 保存到配置文件
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                config.AppSettings.Settings["adcode"].Value = city;
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
+                SaveAdcodeToDatabase(databasePath, city);
             }
-            // 下载天气数据并保存到文件
+            // 下载数据
             await DownloadDataAsync(city, "resources\\weather.json");
         }
 
