@@ -96,7 +96,7 @@ namespace Software.其他窗口
             {
                 if (logger == null)
                 {
-                    logger = Log.ForContext<MainWindow>();
+                    logger = Log.ForContext<WindowUpdate>();
                 }
                 return logger;
             }
@@ -109,7 +109,7 @@ namespace Software.其他窗口
             InitializeComponent();
 
             // 从数据库读取配置文件
-            newUpdatePath = GetConfigValueFromDatabase(databasePath, "newUpdatePath");
+            newUpdatePath = GetConfigValueFromDatabase(databasePath, "NewUpdatePath");
             JsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
 
             LoadUpdateInfo();
@@ -138,38 +138,47 @@ namespace Software.其他窗口
 
         private async void LoadUpdateInfo()
         {
-            UpdateModeComboBox.IsEnabled = false;
-            string configUrl = newUpdatePath;
-            config = await ConfigManager.LoadConfigFromUrlAsync(configUrl);
-            if (config != null)
+            try
             {
-                VersionInfo.Text = config.Version;
-                DownloadSize.Text = config.DownloadSize;
-                CurrentVersion.Text = config.CurrentVersion;
-                LastUpdate.Text = config.LastUpdate;
-                ReleaseNotes.Text = config.ReleaseNotes;
-                foreach (UpdateDetail detail in config.Details)
+                UpdateModeComboBox.IsEnabled = false;
+                string configUrl = newUpdatePath;
+                Uri updateUri = new Uri(configUrl);
+                config = await ConfigManager.LoadConfigFromUrlAsync(updateUri.ToString());
+                if (config != null)
                 {
-                    UpdateModeComboBox.Items.Add(detail.UpdateMode);
+                    VersionInfo.Text = config.Version;
+                    DownloadSize.Text = config.DownloadSize;
+                    CurrentVersion.Text = config.CurrentVersion;
+                    LastUpdate.Text = config.LastUpdate;
+                    ReleaseNotes.Text = config.ReleaseNotes;
+                    foreach (UpdateDetail detail in config.Details)
+                    {
+                        UpdateModeComboBox.Items.Add(detail.UpdateMode);
+                    }
+                    UpdateModeComboBox.IsEnabled = true;
+
+                    // 获取当前正在执行的程序集
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                    // 获取版本信息
+                    System.Version version = assembly.GetName().Version;
+                    // 将版本信息转换为字符串
+                    string versionString = version.ToString();
+                    CurrentVersion.Text = versionString;
+
+                    // 从数据库读取并显示上次更新时间
+                    LastUpdate.Text = LastUpdateTime();
+
+                    // 保存当前时间为上次更新时间
+                    SaveLastUpdateTime(databasePath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                    // 加载更新日志
+                    await LoadUpdateLog();
                 }
-                UpdateModeComboBox.IsEnabled = true;
-
-                // 获取当前正在执行的程序集
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                // 获取版本信息
-                System.Version version = assembly.GetName().Version;
-                // 将版本信息转换为字符串
-                string versionString = version.ToString();
-                CurrentVersion.Text = versionString;
-
-                // 从数据库读取并显示上次更新时间
-                LastUpdate.Text = LastUpdateTime();
-
-                // 保存当前时间为上次更新时间
-                SaveLastUpdateTime(databasePath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-
-                // 加载更新日志
-                await LoadUpdateLog();
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("发生错误:{error}", ex.ToString());
+                MessageBox.Show("发生错误: " + ex.Message);
             }
         }
 
@@ -225,14 +234,13 @@ namespace Software.其他窗口
                 // 获取当前版本号
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 System.Version currentVersion = assembly.GetName().Version;
-                string currentVersionString = currentVersion.ToString();
 
                 // 显示从最新版本到当前版本之间的更新内容
                 var allUpdates = updateLog.Updates;
                 if (allUpdates != null)
                 {
                     var updatesToShow = allUpdates
-                        .TakeWhile(update => string.Compare(update.Version, currentVersionString) >= 0)
+                        .TakeWhile(update => Version.TryParse(update.Version, out var updateVersion) && updateVersion >= currentVersion)
                         .ToList();
 
                     ReleaseNotes.Text = string.Join("\n\n", updatesToShow.Select(update => $"版本 {update.Version} ({update.UpdateTime}):\n{string.Join("\n", update.UpdateContent)}"));
