@@ -24,9 +24,9 @@ namespace Software.Models
 
             // 根据编译条件（Debug或Release）设置数据库文件的名称
             #if DEBUG
-                        return Path.Combine(folderPath, "debug_SoftwareDatabase.db");
+                return Path.Combine(folderPath, "debug_SoftwareDatabase.db");
             #else
-                    return Path.Combine(folderPath, "SoftwareDatabase.db");
+                return Path.Combine(folderPath, "SoftwareDatabase.db");
             #endif
         }
     }

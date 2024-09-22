@@ -127,7 +127,7 @@ namespace Software.其他界面
             EnableAutoUpdateCheckBox.IsChecked = enableAutoUpdate;
 
             // 从数据库读取其他配置值
-            updatePath = GetConfigValueFromDatabase(databasePath, "updatePath");
+            updatePath = GetConfigValueFromDatabase(databasePath, "UpdatePath");
             updateLogPath = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
             currentPath = GetConfigValueFromDatabase(databasePath, "GamePath");
 
