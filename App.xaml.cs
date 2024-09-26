@@ -290,7 +290,7 @@ namespace Software
                 int currentVersion = Convert.ToInt32(getVersionCommand.ExecuteScalar());
 
                 // 定义最新的迁移版本
-                int latestVersion = 5; // 设置数据库版本号
+                int latestVersion = 1; // 设置数据库版本号
 
                 // 逐个版本进行迁移
                 for (int version = currentVersion + 1; version <= latestVersion; version++)
@@ -336,36 +336,118 @@ namespace Software
         {
             try
             {
-                // 检查是否已经进行过迁移
+                // 检查是否已经进行过迁移  
                 string checkMigrationQuery = "SELECT COUNT(*) FROM Settings WHERE Key = 'MigrationCompleted';";
-                var checkCommand = new SqliteCommand(checkMigrationQuery, connection);
-                int migrationCount = Convert.ToInt32(checkCommand.ExecuteScalar());
-
-                if (migrationCount == 0)
+                using (var checkCommand = new SqliteCommand(checkMigrationQuery, connection))
                 {
-                    // 读取配置文件中的数据
-                    var appSettings = ConfigurationManager.AppSettings;
-                    foreach (var key in appSettings.AllKeys)
-                    {
-                        string value = appSettings[key];
-                        string upsertKeyQuery = @"
-                INSERT INTO Settings (Key, Value) VALUES (@key, @value)
-                ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
-                        var upsertCommand = new SqliteCommand(upsertKeyQuery, connection);
-                        upsertCommand.Parameters.AddWithValue("@key", key);
-                        upsertCommand.Parameters.AddWithValue("@value", value);
-                        upsertCommand.ExecuteNonQuery();
-                    }
+                    int migrationCount = Convert.ToInt32(checkCommand.ExecuteScalar());
 
-                    // 标记迁移已完成
-                    string markMigrationQuery = "INSERT INTO Settings (Key, Value) VALUES ('MigrationCompleted', 'true');";
-                    var markCommand = new SqliteCommand(markMigrationQuery, connection);
-                    markCommand.ExecuteNonQuery();
+                    if (migrationCount == 0)
+                    {
+                        // 读取配置文件中的所有设置项（这里假设是 app.config 或其他配置文件）  
+                        var appSettings = ConfigurationManager.AppSettings;
+
+                        // 遍历所有设置项的键，并插入到 Settings 表中  
+                        foreach (var key in appSettings.AllKeys)
+                        {
+                            string value = appSettings[key];
+                            string upsertKeyQuery = @"  
+INSERT INTO Settings (Key, Value) VALUES (@key, @value)  
+ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
+                            using (var upsertCommand = new SqliteCommand(upsertKeyQuery, connection))
+                            {
+                                upsertCommand.Parameters.AddWithValue("@key", key);
+                                upsertCommand.Parameters.AddWithValue("@value", value);
+                                upsertCommand.ExecuteNonQuery();
+                            }
+                        }
+
+                        // 获取以“Software_Url_”开头的文件夹  
+                        var settingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Software");
+                        var softwareUrlDirectories = Directory.GetDirectories(settingsDirectory)
+                            .Where(dir => Path.GetFileName(dir).StartsWith("Software_Url_"));
+
+                        // 假设我们只关心第一个这样的文件夹  
+                        var firstSoftwareUrlDirectory = softwareUrlDirectories.FirstOrDefault();
+                        if (firstSoftwareUrlDirectory != null)
+                        {
+                            // 获取该文件夹下的第一个子文件夹  
+                            var firstSubDirectory = Directory.GetDirectories(firstSoftwareUrlDirectory)
+                                .FirstOrDefault();
+                            if (firstSubDirectory != null)
+                            {
+                                // 构建 user.config 文件的完整路径  
+                                var userConfigPath = Path.Combine(firstSubDirectory, "user.config");
+
+                                // 使用 XDocument 读取 XML 文件  
+                                XDocument doc = XDocument.Load(userConfigPath);
+
+                                // 正确地导航到 <Software.Properties.Settings> 元素  
+                                var settingsElement = doc.Root.Element("userSettings").Element("Software.Properties.Settings");
+                                if (settingsElement != null)
+                                {
+                                    foreach (var setting in settingsElement.Elements("setting"))
+                                    {
+                                        string rawKey = setting.Attribute("name").Value; // 获取原始的 name 属性值  
+                                        string key = rawKey.EndsWith("_Display") ? rawKey.Substring(0, rawKey.Length - "_Display".Length) : rawKey; // 去除 "_Display" 后缀  
+
+                                        string value = setting.Element("value").Value; // 获取 value 元素的值  
+                                        if (key != "LastUpdateTime")
+                                        {
+                                            bool isVisible;
+                                            if (bool.TryParse(value, out isVisible))
+                                            {
+                                                // 插入或更新数据库，使用修改后的 key  
+                                                string upsertButtonVisibilityQuery = @"  
+INSERT INTO ButtonVisibility (ButtonName, IsVisible)  
+VALUES (@ButtonName, @IsVisible)  
+ON CONFLICT(ButtonName) DO UPDATE SET IsVisible = excluded.IsVisible;";
+
+                                                using (var upsertCommand = new SqliteCommand(upsertButtonVisibilityQuery, connection))
+                                                {
+                                                    int isVisibleInt = isVisible ? 1 : 0;
+                                                    upsertCommand.Parameters.AddWithValue("@ButtonName", key);
+                                                    upsertCommand.Parameters.AddWithValue("@IsVisible", isVisibleInt);
+                                                    upsertCommand.ExecuteNonQuery();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // 处理无法解析为布尔值的情况  
+                                                MessageBox.Show($"警告: 无法解析键 '{key}' 的布尔值: {value}");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // 直接插入或更新 "LastUpdateTime" 到 Settings 表，使用原始 key  
+                                            string upsertKeyQuery = @"  
+INSERT INTO Settings (Key, Value) VALUES (@key, @value)  
+ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
+
+                                            using (var upsertCommand = new SqliteCommand(upsertKeyQuery, connection))
+                                            {
+                                                upsertCommand.Parameters.AddWithValue("@key", rawKey); // 注意这里使用原始 key  
+                                                upsertCommand.Parameters.AddWithValue("@value", value);
+                                                upsertCommand.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // 标记迁移已完成  
+                        string markMigrationQuery = "INSERT INTO Settings (Key, Value) VALUES ('MigrationCompleted', 'true');";
+                        using (var markCommand = new SqliteCommand(markMigrationQuery, connection))
+                        {
+                            markCommand.ExecuteNonQuery();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
-                // 记录错误日志或显示错误消息
+                // 记录错误日志或显示错误消息  
                 MessageBox.Show($"数据迁移失败: {ex.Message}");
             }
         }

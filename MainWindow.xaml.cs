@@ -160,11 +160,7 @@ namespace Software
             // 定义需要移动的文件列表
             string[] filesToMove = new string[]
             {
-                "Updater.deps.json",
-                "Updater.dll",
-                "Updater.exe",
-                "Updater.pdb",
-                "Updater.runtimeconfig.json"
+                "Updater.exe"
             };
 
             foreach (string fileName in filesToMove)

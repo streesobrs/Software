@@ -8,9 +8,12 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Wpf.Ui.Controls;
@@ -518,29 +521,37 @@ namespace Software.其他界面
         //要删除的文件夹名
         string[] folderPaths = new string[]
         {
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "win-x64"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ar"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cs"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "da"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "de"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "es"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fr"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "it"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ja-JP"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ko"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lv"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "nl"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pl"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pt"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pt-BR"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ru"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sk"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sv"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "th"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tr"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zh-TW"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "win-x64"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ar"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cs"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "da"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "de"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "es"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fr"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "it"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ja-JP"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ko"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lv"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "nl"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pl"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pt"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pt-BR"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ru"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sk"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sv"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "th"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tr"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zh-TW"),
         };
-        
+        //要删除的文件名
+        string[] filePaths = new string[]
+        {
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.deps.json"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.dll"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.pdb"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.runtimeconfig.json"),
+        };
+
         //添加ToolTip
         string publishJson = "此功能迁移完成";
         //添加打开文件夹
@@ -578,6 +589,7 @@ namespace Software.其他界面
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             bool hasError = false;
 
+            // 删除文件夹
             foreach (string folderPath in folderPaths)
             {
                 if (Directory.Exists(folderPath))
@@ -599,10 +611,34 @@ namespace Software.其他界面
                     MessageBox.Show($"根目录下没有名为“{Path.GetFileName(folderPath)}”的文件夹/你删过了", "删除文件夹提示");
                 }
             }
+
+            // 删除文件
+            foreach (string filePath in filePaths)
+            {
+                if (File.Exists(filePath))
+                {
+                    try
+                    {
+                        File.Delete(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MyLoger.Error("删除文件 {filePath} 时发生错误: {error}", filePath, ex.ToString());
+                        MessageBox.Show($"删除文件{filePath}失败：{ex.Message}", "删除文件错误");
+                        hasError = true;
+                    }
+                }
+                else
+                {
+                    MyLoger.Error("根目录下没有名为“{filePath}”的文件/你删过了", filePath);
+                    MessageBox.Show($"根目录下没有名为“{Path.GetFileName(filePath)}”的文件/你删过了", "删除文件提示");
+                }
+            }
+
             if (!hasError)
             {
-                MyLoger.Information("所有文件夹删除成功");
-                MessageBox.Show("所有文件夹删除成功", "删除文件夹提示");
+                MyLoger.Information("所有文件夹和文件删除成功");
+                MessageBox.Show("所有文件夹和文件删除成功", "删除提示");
             }
         }
 
@@ -973,5 +1009,60 @@ namespace Software.其他界面
                 CreateNoWindow = true
             });
         }
+
+        private async void TestNetworkConnectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            string targetAddress = TargetAddressTextBox.Text;
+            if (string.IsNullOrEmpty(targetAddress))
+            {
+                NetworkTestResultTextBlock.Text = "请输入目标地址。";
+                return;
+            }
+
+            try
+            {
+                string host;
+
+                // 检查输入是否为URL
+                if (Uri.IsWellFormedUriString(targetAddress, UriKind.Absolute))
+                {
+                    Uri uri = new Uri(targetAddress);
+                    host = uri.Host;
+                }
+                else
+                {
+                    host = targetAddress;
+                }
+
+                Ping pingSender = new Ping();
+                PingReply reply = await Task.Run(() => pingSender.Send(host, 5000)); // 设置超时时间为5000毫秒
+
+                if (reply != null && reply.Status == IPStatus.Success)
+                {
+                    NetworkTestResultTextBlock.Text = $"网络连接成功。\n" +
+                                                      $"地址: {reply.Address}\n" +
+                                                      $"往返时间: {reply.RoundtripTime}ms\n" +
+                                                      $"TTL: {reply.Options.Ttl}\n" +
+                                                      $"缓冲区大小: {reply.Buffer.Length}";
+                }
+                else if (reply != null)
+                {
+                    NetworkTestResultTextBlock.Text = $"网络连接失败：{reply.Status}";
+                }
+                else
+                {
+                    NetworkTestResultTextBlock.Text = "网络连接失败：未收到回复。";
+                }
+            }
+            catch (PingException ex)
+            {
+                NetworkTestResultTextBlock.Text = $"网络连接失败：{ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                NetworkTestResultTextBlock.Text = $"网络连接失败：{ex.Message}";
+            }
+        }
+
     }
 }

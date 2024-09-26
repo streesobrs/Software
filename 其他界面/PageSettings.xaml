@@ -11,129 +11,165 @@
       FontFamily="../resources/Fonts/#得意黑"
       Title="PageSettings" Loaded="Page_Loaded">
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#B1D0F3" Margin="5">
+    <Page.Resources>
+        <!-- 定义样式和模板 -->
+        <Style x:Key="DockPanelStyle" TargetType="DockPanel">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style x:Key="TextBlockStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        <Style x:Key="ButtonStyle" TargetType="ui:Button">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="#89CFF0"/>
+            <!-- 更加柔和的蓝色 -->
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Gray" BlurRadius="10" ShadowDepth="2"/>
+                    <!-- 灰色阴影 -->
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
         <ScrollViewer>
-            <StackPanel Margin="1,1,1,1">
-                <DockPanel Margin="5">
-                    <TextBlock Text="启动计数" FontSize="24" Foreground="Black"/>
-                    <CheckBox DockPanel.Dock="Top" Foreground="Black"
-                        Name="EnableCountingCheckBox" 
-                        Content="" 
-                        Checked="EnableCountingCheckBox_Checked" 
-                        Unchecked="EnableCountingCheckBox_Unchecked"/>
-                </DockPanel>
+            <StackPanel Margin="10">
+                <!-- 启动设置 -->
+                <GroupBox Header="启动设置" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Text="启动计数" FontSize="24" VerticalAlignment="Center" Foreground="Black"/>
+                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
+                                Name="EnableCountingCheckBox" 
+                                Content="" 
+                                Checked="EnableCountingCheckBox_Checked" 
+                                Unchecked="EnableCountingCheckBox_Unchecked"/>
+                        </DockPanel>
 
-                <DockPanel Margin="5">
-                    <TextBlock Text="自动更新" FontSize="24" Foreground="Black"/>
-                    <CheckBox DockPanel.Dock="Top" Foreground="Black"
-                        Name="EnableAutoUpdateCheckBox" 
-                        Content="" 
-                        Checked="EnableAutoUpdateCheckBox_Checked" 
-                        Unchecked="EnableAutoUpdateCheckBox_Unchecked"/>
-                </DockPanel>
-
-                <DockPanel Margin="2">
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
-                        软件更新地址：
-                    </TextBlock>
-                    <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-
-                </DockPanel>
-                <DockPanel Margin="2">
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
-                        日志更新地址：
-                    </TextBlock>
-                    <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-                </DockPanel>
-                <DockPanel Margin="2">
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">
-                        游戏启动路径：
-                    </TextBlock>
-                    <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-                </DockPanel>
-                <DockPanel Margin="2">
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18" 
-                               ToolTip="填写结构化地址信息:省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写">
-                        输入地址信息：
-                    </TextBlock>
-                    <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
-                    <ui:Button Foreground="Black" Background="#D8E8F9" Click="Button_Click_City_Address">确定</ui:Button>
-                </DockPanel>
-
-                <DockPanel Margin="2" Visibility="Collapsed">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                        <RadioButton Content="英文" Click="RadioButton_Click_English" Foreground="Black"/>
-                        <RadioButton Content="中文" IsChecked="True" Click="RadioButton_Click_Chinese" Foreground="Black"/>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Text="自动更新" FontSize="24" VerticalAlignment="Center" Foreground="Black"/>
+                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
+                                Name="EnableAutoUpdateCheckBox" 
+                                Content="" 
+                                Checked="EnableAutoUpdateCheckBox_Checked" 
+                                Unchecked="EnableAutoUpdateCheckBox_Unchecked"/>
+                        </DockPanel>
                     </StackPanel>
-                </DockPanel>
+                </GroupBox>
 
-                <StackPanel Margin="2">
-                    <Expander Header="更多选项" Foreground="Black" Background="#D8E8F9">
-                        <StackPanel>
-                            <ui:Button Foreground="Black" Name="Open_LogDashboard"
-                        Click="Button_Click_Open_LogDashboard" Margin="0,5" Background="#D8E8F9">打开日志面板</ui:Button>
-                            <ui:Button Foreground="Black" Name="BuildJson"
-                       Click="Button_Click_BuildJson" Margin="0,5" Background="#D8E8F9">输出Json</ui:Button>
-                            <ui:Button Foreground="Black" Name="Open_Root_Directory_Folder"
-                       Click="Button_Click_Open_Root_Directory_Folder" Margin="0,5" Background="#D8E8F9">打开软件根目录</ui:Button>
-                            <ui:Button Foreground="Black" Name="Open_Log_Folder"
-                       Click="Button_Click_Open_Log_Folder" Margin="0,5" Background="#D8E8F9">打开Log文件夹</ui:Button>
-                            <ui:Button Foreground="Black" Name="Open_Resources_Folder"
-                       Click="Button_Click_Open_Resources_Folder" Margin="0,5" Background="#D8E8F9">打开resources文件夹</ui:Button>
-                            <ui:Button Foreground="Black" Name="Open_Music_Folder"
-                       Click="Button_Click_Open_Music_Folder" Margin="0,5" Background="#D8E8F9">打开music文件夹</ui:Button>
-                            <ui:Button Foreground="Black" Name="Delete_Folder"
-                       Click="Button_Click_Delete_Folder" Margin="0,5" Background="#D8E8F9">删除文件夹</ui:Button>
-                            <ui:Button Foreground="Black" Name="Reboot_Software"
-                       Click="Button_Click_Reboot_Software" Margin="0,5" Background="#D8E8F9">重启软件</ui:Button>
-                            <ui:Button Foreground="Black" Name="Root_Reboot_Software"
-                       Click="Button_Click_Root_Reboot_Software" Margin="0,5" Background="#D8E8F9">管理员重启软件</ui:Button>
-                        </StackPanel>
-                    </Expander>
-                </StackPanel>
+                <!-- 更新地址 -->
+                <GroupBox Header="更新地址" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="软件更新地址：" VerticalAlignment="Center" />
+                            <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
 
-                <StackPanel Margin="2">
-                    <Expander Header="隐藏开关" Foreground="Black" Background="#D8E8F9">
-                        <StackPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">地图</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinMap_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">查询</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_SelectUP_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">游戏</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_PlayGames_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">原神角色</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinRole_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">崩坏三角色</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_HonkaiImpact3_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">崩坏星穹铁道角色</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StarRail_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">推箱子</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MoveChest_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">Bing</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" FontSize="18">StreePortal</TextBlock>
-                                <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
-                            </DockPanel>
-                        </StackPanel>
-                    </Expander>
-                </StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="日志更新地址：" VerticalAlignment="Center" />
+                            <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 路径设置 -->
+                <GroupBox Header="路径设置" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏启动路径：" VerticalAlignment="Center" />
+                            <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+                
+                <!-- 天气地址 -->
+                <GroupBox Header="天气地址" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="输入地址信息：" ToolTip="填写结构化地址信息:省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写" VerticalAlignment="Center" />
+                            <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
+                            <ui:Button Style="{StaticResource ButtonStyle}" Click="Button_Click_City_Address">确定</ui:Button>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 文件操作 -->
+                <GroupBox Header="文件操作" Margin="5">
+                    <StackPanel>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Log_Folder" Click="Button_Click_Open_Log_Folder">打开Log文件夹</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Resources_Folder" Click="Button_Click_Open_Resources_Folder">打开resources文件夹</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Music_Folder" Click="Button_Click_Open_Music_Folder">打开music文件夹</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Folder" Click="Button_Click_Delete_Folder">删除文件夹</ui:Button>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 软件操作 -->
+                <GroupBox Header="软件操作" Margin="5">
+                    <StackPanel>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_LogDashboard" Click="Button_Click_Open_LogDashboard">打开日志面板</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson">输出Json</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Root_Directory_Folder" Click="Button_Click_Open_Root_Directory_Folder">打开软件根目录</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software">重启软件</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software">管理员重启软件</ui:Button>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="网络连接测试" Margin="5">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TextBlockStyle}" Text="目标地址"  VerticalAlignment="Center" />
+                        <TextBox Name="TargetAddressTextBox" Width="200" Margin="5,0,0,0"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Content="测试网络连接" Click="TestNetworkConnectionButton_Click" Margin="10,0,0,0"/>
+                        <TextBlock Name="NetworkTestResultTextBlock" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 隐藏开关 -->
+                <GroupBox Header="隐藏开关" Margin="5">
+                    <StackPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="地图" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinMap_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="查询" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_SelectUP_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_PlayGames_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="原神角色" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinRole_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏三角色" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_HonkaiImpact3_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏星穹铁道角色" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StarRail_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="推箱子" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MoveChest_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="Bing" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="StreePortal" VerticalAlignment="Center" />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
 
             </StackPanel>
         </ScrollViewer>
