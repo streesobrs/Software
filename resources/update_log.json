@@ -5,7 +5,7 @@
     {
       "version": "0.2.0.1",
       "updateTime": "2024/09/30",
-      "updateContent" [
+      "updateContent": [
         "修复了启动软件时无错报错的问题"
       ]
     },
