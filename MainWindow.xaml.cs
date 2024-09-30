@@ -168,17 +168,12 @@ namespace Software
                 string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
                 string targetPath = Path.Combine(targetDir, fileName);
 
-                // 检查目标路径是否存在
-                if (!File.Exists(targetPath))
-                {
-                    // 移动文件到目标路径
-                    File.Move(sourcePath, targetPath);
-                    MyLoger.Information("{fileName} 已移动到: {targetPath}",fileName,targetPath);
-                }
-                else
-                {
-                    MyLoger.Information("{fileName} 已存在于目标路径。", fileName);
-                }
+                // 复制文件到目标路径并覆盖
+                File.Copy(sourcePath, targetPath, true);
+                MyLoger.Information("{fileName} 已复制到: {targetPath}", fileName, targetPath);
+
+                // 删除源文件
+                File.Delete(sourcePath);
             }
         }
 
