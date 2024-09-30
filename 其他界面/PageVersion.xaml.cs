@@ -314,7 +314,9 @@ namespace Software.其他界面
             // 下载文件
             string jsonFilePath = "resources\\update_log.json";
             string tempFilePath = "resources\\temp_update_log.json";
-            string jsonUrl = ConfigurationManager.AppSettings["UpdateLogUrl"];
+
+            string jsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
+
             WebClient client = new WebClient();
             try
             {
