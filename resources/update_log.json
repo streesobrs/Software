@@ -1,10 +1,17 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.0.0",
+  "version": "0.2.0.1",
   "updates": [
     {
+      "version": "0.2.0.1",
+      "updateTime": "2024/09/30",
+      "updateContent" [
+        "修复了启动软件时无错报错的问题"
+      ]
+    },
+    {
       "version": "0.2.0.0",
-      "updateTime": "",
+      "updateTime": "2024/09/30",
       "updateContent": [
         "添加了数据库",
         "添加了更新后首次启动对老存储的迁移功能",

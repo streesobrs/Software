@@ -146,35 +146,42 @@ namespace Software
 
         private void MoveUpdaterFilesIfNeeded()
         {
-            // 获取用户文档文件夹路径
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            // 构建目标目录路径
-            string targetDir = Path.Combine(documentsPath, "StreeDB", "update");
-
-            // 确保目标目录存在
-            if (!Directory.Exists(targetDir))
+            try
             {
-                Directory.CreateDirectory(targetDir);
-            }
+                // 获取用户文档文件夹路径
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                // 构建目标目录路径
+                string targetDir = Path.Combine(documentsPath, "StreeDB", "update");
 
-            // 定义需要移动的文件列表
-            string[] filesToMove = new string[]
-            {
+                // 确保目标目录存在
+                if (!Directory.Exists(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+
+                // 定义需要移动的文件列表
+                string[] filesToMove = new string[]
+                {
                 "Updater.exe"
-            };
+                };
 
-            foreach (string fileName in filesToMove)
-            {
-                string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-                string targetPath = Path.Combine(targetDir, fileName);
+                foreach (string fileName in filesToMove)
+                {
+                    string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+                    string targetPath = Path.Combine(targetDir, fileName);
 
-                // 复制文件到目标路径并覆盖
-                File.Copy(sourcePath, targetPath, true);
-                MyLoger.Information("{fileName} 已复制到: {targetPath}", fileName, targetPath);
+                    // 复制文件到目标路径并覆盖
+                    File.Copy(sourcePath, targetPath, true);
+                    MyLoger.Information("{fileName} 已复制到: {targetPath}", fileName, targetPath);
 
-                // 删除源文件
-                File.Delete(sourcePath);
+                    // 删除源文件
+                    File.Delete(sourcePath);
+                }
             }
+            catch (Exception ex)
+            {
+                MyLoger.Warning(ex.ToString());
+            }            
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
