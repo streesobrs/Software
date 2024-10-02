@@ -40,11 +40,12 @@
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
         <ScrollViewer>
             <StackPanel Margin="10">
+                
                 <!-- 启动设置 -->
                 <GroupBox Header="启动设置" Margin="5">
                     <StackPanel>
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Text="启动计数" FontSize="24" VerticalAlignment="Center" Foreground="Black"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="启动计数" VerticalAlignment="Center"/>
                             <CheckBox DockPanel.Dock="Top" Foreground="Black"
                                 Name="EnableCountingCheckBox" 
                                 Content="" 
@@ -53,7 +54,7 @@
                         </DockPanel>
 
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Text="自动更新" FontSize="24" VerticalAlignment="Center" Foreground="Black"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="自动更新" VerticalAlignment="Center"/>
                             <CheckBox DockPanel.Dock="Top" Foreground="Black"
                                 Name="EnableAutoUpdateCheckBox" 
                                 Content="" 
@@ -102,6 +103,7 @@
                 <!-- 文件操作 -->
                 <GroupBox Header="文件操作" Margin="5">
                     <StackPanel>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Root_Directory_Folder" Click="Button_Click_Open_Root_Directory_Folder">打开软件根目录</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Log_Folder" Click="Button_Click_Open_Log_Folder">打开Log文件夹</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Resources_Folder" Click="Button_Click_Open_Resources_Folder">打开resources文件夹</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Music_Folder" Click="Button_Click_Open_Music_Folder">打开music文件夹</ui:Button>
@@ -114,7 +116,6 @@
                     <StackPanel>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_LogDashboard" Click="Button_Click_Open_LogDashboard">打开日志面板</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson">输出Json</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Root_Directory_Folder" Click="Button_Click_Open_Root_Directory_Folder">打开软件根目录</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software">重启软件</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software">管理员重启软件</ui:Button>
                     </StackPanel>
