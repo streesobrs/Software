@@ -6,16 +6,19 @@ using Software.Models;
 using Software.ViewModels;
 using System;
 using System.Configuration;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Button = Wpf.Ui.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
@@ -41,6 +44,9 @@ namespace Software.其他界面
         
         string databasePath = DatabaseHelper.GetDatabasePath();
 
+        private StatusViewModel _viewModel;
+        private DispatcherTimer _timer;
+        private PerformanceCounter cpuCounter;
 
         private ILogger logger;
 
@@ -58,10 +64,51 @@ namespace Software.其他界面
 
         public PageSettings()
         {
-            InitializeComponent();
-            musicPlayer = new MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton);
+            try
+            {
+                InitializeComponent();
+                musicPlayer = new MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton);
 
-            MyLoger.Information("PageSettings初始化完成");
+                // 确保所有对象都已初始化
+                _viewModel = new StatusViewModel();
+                this.DataContext = _viewModel;
+
+                // 初始化 PerformanceCounter
+                cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+
+                // 定时更新状态
+                _timer = new DispatcherTimer();
+                _timer.Interval = TimeSpan.FromSeconds(1);
+                _timer.Tick += UpdateStatus;
+                _timer.Start();
+
+                MyLoger.Information("PageSettings初始化完成");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void UpdateStatus(object sender, EventArgs e)
+        {
+            try
+            {
+                var process = Process.GetCurrentProcess();
+                _viewModel.MemoryUsage = process.WorkingSet64 / (1024.0 * 1024.0); // 将内存使用转换为MB
+                _viewModel.CPUUsage = GetCpuUsage();
+                _viewModel.Uptime = DateTime.Now - process.StartTime;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发生了一个意外错误: {ex.Message}");
+            }
+        }
+
+        private double GetCpuUsage()
+        {
+            // 获取 CPU 使用率
+            return cpuCounter.NextValue() / Environment.ProcessorCount;
         }
 
         /// <summary>

@@ -6,6 +6,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:Software.其他界面"
       xmlns:resx="clr-namespace:Software.Properties" 
+      xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       FontFamily="../resources/Fonts/#得意黑"
@@ -23,7 +24,6 @@
         <Style x:Key="ButtonStyle" TargetType="ui:Button">
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="Background" Value="#89CFF0"/>
-            <!-- 更加柔和的蓝色 -->
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Padding" Value="10,5"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -40,7 +40,27 @@
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
         <ScrollViewer>
             <StackPanel Margin="10">
-                
+                <GroupBox Header="软件状态" Margin="5">
+                    <StackPanel>
+                        <TextBlock Text="内存使用：" Style="{StaticResource TextBlockStyle}" />
+                        <DockPanel>
+                            <TextBlock Text="{Binding MemoryUsage}" Style="{StaticResource TextBlockStyle}" />
+                            <ProgressBar Value="{Binding MemoryUsage}" Maximum="100" Height="20" Margin="0,5,0,10"/>
+                        </DockPanel>
+
+                        <TextBlock Text="CPU 使用率：" Style="{StaticResource TextBlockStyle}" />
+                        <DockPanel>
+                            <TextBlock Text="{Binding CPUUsage}" Style="{StaticResource TextBlockStyle}" />
+                            <ProgressBar Value="{Binding CPUUsage}" Maximum="100" Height="20" Margin="0,5,0,10"/>
+                        </DockPanel>
+
+                        <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
+                        <TextBlock Text="{Binding Uptime}" Style="{StaticResource TextBlockStyle}" />
+
+                        <lvc:CartesianChart Series="{Binding SeriesCollection}" Height="180"/>
+                    </StackPanel>
+                </GroupBox>
+
                 <!-- 启动设置 -->
                 <GroupBox Header="启动设置" Margin="5">
                     <StackPanel>
