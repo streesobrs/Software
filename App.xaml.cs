@@ -16,6 +16,7 @@ using Serilog.Events;
 using System.Xml.Linq;
 using Software.Models;
 using Microsoft.Data.Sqlite;
+using System.Data.Common;
 
 namespace Software
 {
@@ -96,36 +97,59 @@ namespace Software
         // 初始化数据库的方法
         private void InitializeDatabase()
         {
-            // 获取数据库文件的完整路径
+            // 获取数据库文件的完整路径  
             string databasePath = GetDatabasePath();
-            // 判断数据库文件是否存在
+            // 判断数据库文件是否存在  
             bool isNewDatabase = !File.Exists(databasePath);
 
-            // 使用SQLite连接到数据库
             using (var connection = new SqliteConnection($"Data Source={databasePath}"))
             {
                 connection.Open();
 
-                // 如果是新数据库，则创建表格并插入初始数据
-                if (isNewDatabase)
+                try
                 {
-                    CreateSettingsTable(connection);
-                    CreateButtonVisibilityTable(connection);
-                    InsertInitialData(connection);
+                    // 如果是新数据库，则创建表格并插入初始数据  
+                    if (isNewDatabase)
+                    {
+                        CreateSettingsTable(connection); // 创建设置表  
+                        CreateButtonVisibilityTable(connection); // 创建按钮可见性表  
+                        InsertInitialData(connection); // 插入初始数据  
+                    }
+                    else
+                    {
+                        // 检查 Settings 表中是否存在 MigrationVersion 列，如果存在则删除（假设这是迁移逻辑的一部分）  
+                        // 注意：在实际应用中，删除列应该非常谨慎，因为这可能会导致数据丢失  
+                        if (ColumnExists(connection, "Settings", "MigrationVersion"))
+                        {
+                            // 删除 MigrationVersion 列（仅当确定不再需要时）  
+                            DeleteColumn(connection, "Settings", "MigrationVersion");
+                        }
+
+                        // 创建（或确保存在）所需的表格（尽管在新数据库创建时已经创建过，但这里是为了确保旧数据库也符合结构）  
+                        // 注意：通常，CREATE TABLE IF NOT EXISTS 可以避免重复创建表的问题  
+                        CreateSettingsTable(connection); // 确保设置表存在  
+                        CreateButtonVisibilityTable(connection); // 确保按钮可见性表存在  
+
+                        // 检查并补充缺失的键（例如，设置中的默认项）  
+                        CheckSettingsKeys(connection);
+                        // 检查并补充按钮可见性的缺失键  
+                        CheckButtonVisibilityKeys(connection);
+
+                        // 执行其他可能的迁移逻辑（确保不依赖于已删除的列）  
+                        PerformOriginalMigration(connection); // 执行原始迁移逻辑（可能包括数据迁移、表结构更新等）  
+
+                        // 注意：MigrateDataFromConfig(connection); 被注释掉了，如果需要，请确保在适当的位置调用它  
+                        // MigrateDataFromConfig(connection); // 从配置文件迁移数据（如果需要的话）  
+                    }
+
+                    // 可以在这里添加其他初始化逻辑，例如设置数据库连接池参数、初始化索引等  
                 }
-                else
+                catch (Exception ex)
                 {
-                    // 先创建表格
-                    CreateSettingsTable(connection);
-                    CreateButtonVisibilityTable(connection);
-
-                    // 然后检查并补充缺失的键
-                    CheckSettingsKeys(connection);
-                    CheckButtonVisibilityKeys(connection);
+                    // 处理初始化数据库时发生的异常（例如，记录日志、通知用户、回滚事务等）  
+                    // 注意：SQLite 在默认模式下是自动提交的，每个命令执行后都会立即生效，因此没有显式的事务回滚  
+                    Console.WriteLine("Database initialization failed: " + ex.Message);
                 }
-
-                // 进行数据迁移
-                MigrateDataFromConfig(connection);
             }
         }
 
@@ -279,6 +303,44 @@ namespace Software
             }
         }
 
+        // 检查指定表中是否存在指定的列  
+        private bool ColumnExists(SqliteConnection connection, string tableName, string columnName)
+        {
+            bool columnExists = false;
+
+            // 构建查询 PRAGMA table_info 的 SQL 语句  
+            string sql = $"PRAGMA table_info({tableName});";
+
+            // 执行 SQL 语句并读取结果  
+            using (var command = new SqliteCommand(sql, connection))
+            using (var reader = command.ExecuteReader())
+            {
+                // 遍历结果集，检查列名是否匹配  
+                while (reader.Read())
+                {
+                    string columnNameInTable = reader.GetString(1); // 第二列是列名  
+                    if (columnNameInTable == columnName)
+                    {
+                        columnExists = true;
+                        break;
+                    }
+                }
+            }
+
+            return columnExists;
+        }
+
+        // 删除指定表中的指定列  
+        private void DeleteColumn(SqliteConnection connection, string tableName, string columnName)
+        {
+            // 执行删除列的 SQL 语句  
+            string deleteColumnSql = $"ALTER TABLE {tableName} DROP COLUMN {columnName};";
+            using (var command = new SqliteCommand(deleteColumnSql, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
+
         // 从配置文件迁移数据的方法
         private void MigrateDataFromConfig(SqliteConnection connection)
         {
@@ -310,9 +372,6 @@ namespace Software
                     updateVersionCommand.Parameters.AddWithValue("@version", version);
                     updateVersionCommand.ExecuteNonQuery();
                 }
-
-                // 执行你原本的迁移方法
-                PerformOriginalMigration(connection);
             }
             catch (Exception ex)
             {

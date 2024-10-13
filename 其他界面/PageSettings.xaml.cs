@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -36,6 +37,7 @@ namespace Software.其他界面
         private bool enableAutoUpdate;
         private string updatePath;
         private string updateLogPath;
+        private string newUpdatePath;
         private string currentPath;
 
         private MainWindow mainWindow;
@@ -45,7 +47,7 @@ namespace Software.其他界面
         string databasePath = DatabaseHelper.GetDatabasePath();
 
         private StatusViewModel _viewModel;
-        private DispatcherTimer _timer;
+        private System.Timers.Timer _timer;
         private PerformanceCounter cpuCounter;
 
         private ILogger logger;
@@ -77,10 +79,10 @@ namespace Software.其他界面
                 cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
 
                 // 定时更新状态
-                _timer = new DispatcherTimer();
-                _timer.Interval = TimeSpan.FromSeconds(1);
-                _timer.Tick += UpdateStatus;
-                _timer.Start();
+                _timer = new System.Timers.Timer(1000); // 每秒更新一次
+                _timer.Elapsed += UpdateStatus;
+                _timer.AutoReset = true;
+                _timer.Enabled = true;
 
                 MyLoger.Information("PageSettings初始化完成");
             }
@@ -90,14 +92,22 @@ namespace Software.其他界面
             }
         }
 
-        private void UpdateStatus(object sender, EventArgs e)
+        private void UpdateStatus(object sender, ElapsedEventArgs e)
         {
             try
             {
                 var process = Process.GetCurrentProcess();
-                _viewModel.MemoryUsage = process.WorkingSet64 / (1024.0 * 1024.0); // 将内存使用转换为MB
-                _viewModel.CPUUsage = GetCpuUsage();
-                _viewModel.Uptime = DateTime.Now - process.StartTime;
+                var memoryUsage = process.WorkingSet64 / (1024.0 * 1024.0); // 将内存使用转换为MB
+                var cpuUsage = GetCpuUsage();
+                var uptime = DateTime.Now - process.StartTime;
+
+                // 使用 Dispatcher 确保数据更新在UI线程上执行
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    _viewModel.MemoryUsage = memoryUsage;
+                    _viewModel.CPUUsage = cpuUsage;
+                    _viewModel.Uptime = uptime;
+                });
             }
             catch (Exception ex)
             {
@@ -180,10 +190,12 @@ namespace Software.其他界面
             updatePath = GetConfigValueFromDatabase(databasePath, "UpdatePath");
             updateLogPath = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
             currentPath = GetConfigValueFromDatabase(databasePath, "GamePath");
+            newUpdatePath = GetConfigValueFromDatabase(databasePath, "NewUpdatePath");
 
             // 设置TextBox的内容
             Update_IP_address.Text = updatePath;
             Update_Log_IP_address.Text = updateLogPath;
+            New_Update_IP_address.Text = newUpdatePath;
             Text_GamePath.Text = currentPath;
 
             //设置按钮的ToolTip
@@ -507,6 +519,28 @@ namespace Software.其他界面
             {
                 MyLoger.Error("保存 UpdateLogUrl 时发生错误:{error}", ex.ToString());
                 MessageBox.Show("保存 UpdateLogUrl 时发生错误: " + ex.Message);
+            }
+        }
+
+        private void New_Update_IP_address_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                string text = New_Update_IP_address.Text;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'NewUpdatePath';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", text);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 NewUpdatePath 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 NewUpdatePath 时发生错误: " + ex.Message);
             }
         }
 

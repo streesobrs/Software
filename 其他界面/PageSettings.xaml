@@ -35,30 +35,96 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="TabControl">
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TabPanel Grid.Row="0" IsItemsHost="True" Background="Transparent" Margin="0,0,0,10"/>
+                            <ContentPresenter Grid.Row="1" ContentSource="SelectedContent" Margin="10"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid>
+                            <Border Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,0,0,2">
+                                <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="White"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="DodgerBlue"/>
+                                <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,2"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Page.Resources>
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
         <ScrollViewer>
             <StackPanel Margin="10">
+                
                 <GroupBox Header="软件状态" Margin="5">
-                    <StackPanel>
-                        <TextBlock Text="内存使用：" Style="{StaticResource TextBlockStyle}" />
-                        <DockPanel>
-                            <TextBlock Text="{Binding MemoryUsage}" Style="{StaticResource TextBlockStyle}" />
-                            <ProgressBar Value="{Binding MemoryUsage}" Maximum="100" Height="20" Margin="0,5,0,10"/>
-                        </DockPanel>
+                    <TabControl>
+                        <TabItem Header="文字信息">
+                            <StackPanel>
+                                <DockPanel>
+                                    <TextBlock Text="内存使用：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                </DockPanel>
 
-                        <TextBlock Text="CPU 使用率：" Style="{StaticResource TextBlockStyle}" />
-                        <DockPanel>
-                            <TextBlock Text="{Binding CPUUsage}" Style="{StaticResource TextBlockStyle}" />
-                            <ProgressBar Value="{Binding CPUUsage}" Maximum="100" Height="20" Margin="0,5,0,10"/>
-                        </DockPanel>
+                                <DockPanel>
+                                    <TextBlock Text="CPU 使用率：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding CPUUsage, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                </DockPanel>
 
-                        <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
-                        <TextBlock Text="{Binding Uptime}" Style="{StaticResource TextBlockStyle}" />
+                                <DockPanel>
+                                    <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding Uptime, StringFormat={}{0:hh\\:mm\\:ss}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
 
-                        <lvc:CartesianChart Series="{Binding SeriesCollection}" Height="180"/>
-                    </StackPanel>
+                                </DockPanel>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="图表">
+                            <lvc:CartesianChart Series="{Binding SeriesCollection}" Height="180">
+                                <lvc:CartesianChart.DataTooltip>
+                                    <lvc:DefaultTooltip Background="White" Foreground="Black" />
+                                </lvc:CartesianChart.DataTooltip>
+                                <lvc:CartesianChart.AxisX>
+                                    <lvc:Axis Title="时间" LabelFormatter="{Binding Formatter}" />
+                                </lvc:CartesianChart.AxisX>
+                                <lvc:CartesianChart.AxisY>
+                                    <lvc:Axis Title="值" />
+                                </lvc:CartesianChart.AxisY>
+                            </lvc:CartesianChart>
+                        </TabItem>
+                    </TabControl>
                 </GroupBox>
 
                 <!-- 启动设置 -->
@@ -95,6 +161,11 @@
                         <DockPanel Style="{StaticResource DockPanelStyle}">
                             <TextBlock Style="{StaticResource TextBlockStyle}" Text="日志更新地址：" VerticalAlignment="Center" />
                             <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
+
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="新软件更新地址：" VerticalAlignment="Center" />
+                            <TextBox Name="New_Update_IP_address" HorizontalAlignment="Left" TextChanged="New_Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
