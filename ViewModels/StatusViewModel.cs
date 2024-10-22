@@ -71,11 +71,11 @@ namespace Software.ViewModels
         {
             await Task.Run(() =>
             {
-                if (SeriesCollection[0].Values.Count > 100)
+                if (SeriesCollection[0].Values.Count > 30)
                 {
                     SeriesCollection[0].Values.RemoveAt(0);
                 }
-                if (SeriesCollection[1].Values.Count > 100)
+                if (SeriesCollection[1].Values.Count > 30)
                 {
                     SeriesCollection[1].Values.RemoveAt(0);
                 }

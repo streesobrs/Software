@@ -20,6 +20,7 @@
         <Style x:Key="TextBlockStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontSize" Value="18"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style x:Key="ButtonStyle" TargetType="ui:Button">
             <Setter Property="Foreground" Value="Black"/>
@@ -89,7 +90,8 @@
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
         <ScrollViewer>
             <StackPanel Margin="10">
-                
+
+                <!-- 软件状态 -->
                 <GroupBox Header="软件状态" Margin="5">
                     <TabControl>
                         <TabItem Header="文字信息">
@@ -127,67 +129,13 @@
                     </TabControl>
                 </GroupBox>
 
-                <!-- 启动设置 -->
-                <GroupBox Header="启动设置" Margin="5">
+                <!-- 软件操作 -->
+                <GroupBox Header="软件操作" Margin="5">
                     <StackPanel>
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="启动计数" VerticalAlignment="Center"/>
-                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
-                                Name="EnableCountingCheckBox" 
-                                Content="" 
-                                Checked="EnableCountingCheckBox_Checked" 
-                                Unchecked="EnableCountingCheckBox_Unchecked"/>
-                        </DockPanel>
-
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="自动更新" VerticalAlignment="Center"/>
-                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
-                                Name="EnableAutoUpdateCheckBox" 
-                                Content="" 
-                                Checked="EnableAutoUpdateCheckBox_Checked" 
-                                Unchecked="EnableAutoUpdateCheckBox_Unchecked"/>
-                        </DockPanel>
-                    </StackPanel>
-                </GroupBox>
-
-                <!-- 更新地址 -->
-                <GroupBox Header="更新地址" Margin="5">
-                    <StackPanel>
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="软件更新地址：" VerticalAlignment="Center" />
-                            <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-                        </DockPanel>
-
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="日志更新地址：" VerticalAlignment="Center" />
-                            <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-                        </DockPanel>
-
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="新软件更新地址：" VerticalAlignment="Center" />
-                            <TextBox Name="New_Update_IP_address" HorizontalAlignment="Left" TextChanged="New_Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-                        </DockPanel>
-                    </StackPanel>
-                </GroupBox>
-
-                <!-- 路径设置 -->
-                <GroupBox Header="路径设置" Margin="5">
-                    <StackPanel>
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏启动路径：" VerticalAlignment="Center" />
-                            <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
-                        </DockPanel>
-                    </StackPanel>
-                </GroupBox>
-                
-                <!-- 天气地址 -->
-                <GroupBox Header="天气地址" Margin="5">
-                    <StackPanel>
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="输入地址信息：" ToolTip="填写结构化地址信息:省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写" VerticalAlignment="Center" />
-                            <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
-                            <ui:Button Style="{StaticResource ButtonStyle}" Click="Button_Click_City_Address">确定</ui:Button>
-                        </DockPanel>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_LogDashboard" Click="Button_Click_Open_LogDashboard">打开日志面板</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson">输出Json</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software">重启软件</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software">管理员重启软件</ui:Button>
                     </StackPanel>
                 </GroupBox>
 
@@ -202,22 +150,56 @@
                     </StackPanel>
                 </GroupBox>
 
-                <!-- 软件操作 -->
-                <GroupBox Header="软件操作" Margin="5">
+                <!-- 启动设置 -->
+                <GroupBox Header="启动设置" Margin="5">
                     <StackPanel>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_LogDashboard" Click="Button_Click_Open_LogDashboard">打开日志面板</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson">输出Json</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software">重启软件</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software">管理员重启软件</ui:Button>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="启动计数" />
+                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
+                                Name="EnableCountingCheckBox" 
+                                Content="" 
+                                Checked="EnableCountingCheckBox_Checked" 
+                                Unchecked="EnableCountingCheckBox_Unchecked"/>
+                        </DockPanel>
+
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="自动更新" />
+                            <CheckBox DockPanel.Dock="Top" Foreground="Black"
+                                Name="EnableAutoUpdateCheckBox" 
+                                Content="" 
+                                Checked="EnableAutoUpdateCheckBox_Checked" 
+                                Unchecked="EnableAutoUpdateCheckBox_Unchecked"/>
+                        </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="网络连接测试" Margin="5">
+                <!-- 更新地址 -->
+                <GroupBox Header="更新地址" Margin="5">
                     <StackPanel>
-                        <TextBlock Style="{StaticResource TextBlockStyle}" Text="目标地址"  VerticalAlignment="Center" />
-                        <TextBox Name="TargetAddressTextBox" Width="200" Margin="5,0,0,0"/>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Content="测试网络连接" Click="TestNetworkConnectionButton_Click" Margin="10,0,0,0"/>
-                        <TextBlock Name="NetworkTestResultTextBlock" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="软件更新地址："  />
+                            <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
+
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="日志更新地址："  />
+                            <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
+
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="新软件更新地址："  />
+                            <TextBox Name="New_Update_IP_address" HorizontalAlignment="Left" TextChanged="New_Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 路径设置 -->
+                <GroupBox Header="路径设置" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏启动路径："  />
+                            <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
+                        </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
@@ -225,44 +207,80 @@
                 <GroupBox Header="隐藏开关" Margin="5">
                     <StackPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="地图" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="地图"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinMap_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="查询" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="查询"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_SelectUP_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_PlayGames_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="原神角色" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="原神角色"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinRole_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏三角色" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏三角色"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_HonkaiImpact3_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏星穹铁道角色" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏星穹铁道角色"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StarRail_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="推箱子" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="推箱子"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MoveChest_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="Bing" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="Bing"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="StreePortal" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="StreePortal"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
+                <!-- 天气地址 -->
+                <GroupBox Header="天气地址" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="输入地址信息：" ToolTip="填写结构化地址信息:省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写"/>
+                            <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
+                            <ui:Button Style="{StaticResource ButtonStyle}" Click="Button_Click_City_Address">确定</ui:Button>
+                        </DockPanel>
+                        <TextBox />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 颜色设置 -->
+                <GroupBox Header="颜色设置" Margin="5">
+                    <StackPanel>
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="VersionColor："/>
+                            <ui:TextBox Name="Text_VersionColor" TextChanged="Text_VersionColor_TextChanged"></ui:TextBox>
+                        </DockPanel>
+
+                        <DockPanel Style="{StaticResource DockPanelStyle}">
+                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="UpdateTimeColor："/>
+                            <ui:TextBox Name="Text_UpdateTimeColor" TextChanged="Text_UpdateTimeColor_TextChanged"></ui:TextBox>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+                
+                <!-- 网络连接测试 -->
+                <GroupBox Header="网络连接测试" Margin="5">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TextBlockStyle}" Text="目标地址"   />
+                        <TextBox Name="TargetAddressTextBox" Width="200" Margin="5,0,0,0"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Content="测试网络连接" Click="TestNetworkConnectionButton_Click" Margin="10,0,0,0"/>
+                        <TextBlock Name="NetworkTestResultTextBlock" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </ScrollViewer>
     </Grid>

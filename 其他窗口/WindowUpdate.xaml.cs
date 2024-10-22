@@ -28,6 +28,7 @@ namespace Software.其他窗口
 
     public class UpdateDetail
     {
+        public string UpdateSource {  get; set; }
         public string UpdateMode { get; set; }
         public string UpdateURL { get; set; }
         public string FileSize { get; set; }
@@ -153,7 +154,8 @@ namespace Software.其他窗口
                     ReleaseNotes.Text = config.ReleaseNotes;
                     foreach (UpdateDetail detail in config.Details)
                     {
-                        UpdateModeComboBox.Items.Add(detail.UpdateMode);
+                        string item = $"{detail.UpdateSource} - {detail.UpdateMode}";
+                        UpdateModeComboBox.Items.Add(item);
                     }
                     UpdateModeComboBox.IsEnabled = true;
 

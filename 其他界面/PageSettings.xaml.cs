@@ -39,6 +39,8 @@ namespace Software.其他界面
         private string updateLogPath;
         private string newUpdatePath;
         private string currentPath;
+        private string versionColor;
+        private string updateTimeColor;
 
         private MainWindow mainWindow;
 
@@ -191,12 +193,16 @@ namespace Software.其他界面
             updateLogPath = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
             currentPath = GetConfigValueFromDatabase(databasePath, "GamePath");
             newUpdatePath = GetConfigValueFromDatabase(databasePath, "NewUpdatePath");
+            versionColor = GetConfigValueFromDatabase(databasePath, "VersionColor");
+            updateTimeColor = GetConfigValueFromDatabase(databasePath, "UpdateTimeColor");
 
             // 设置TextBox的内容
             Update_IP_address.Text = updatePath;
             Update_Log_IP_address.Text = updateLogPath;
             New_Update_IP_address.Text = newUpdatePath;
             Text_GamePath.Text = currentPath;
+            Text_VersionColor.Text = versionColor;
+            Text_UpdateTimeColor.Text = updateTimeColor;
 
             //设置按钮的ToolTip
             BuildJson.ToolTip = publishJson;
@@ -1145,5 +1151,48 @@ namespace Software.其他界面
             }
         }
 
+        private void Text_VersionColor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                string text = Text_VersionColor.Text;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'VersionColor';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", text);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 VersionColor 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 VersionColor 时发生错误: " + ex.Message);
+            }
+        }
+
+        private void Text_UpdateTimeColor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                string text = Text_UpdateTimeColor.Text;
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'UpdateTimeColor';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", text);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 UpdateTimeColor 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 UpdateTimeColor 时发生错误: " + ex.Message);
+            }
+        }
     }
 }
