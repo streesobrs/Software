@@ -196,13 +196,13 @@ namespace Software
             // 插入ButtonVisibility表的初始数据
             string insertButtonVisibilityDataQuery = @"
             INSERT INTO ButtonVisibility (ButtonName, IsVisible) VALUES 
-            ('Button_GenshinMap', 1),
-            ('Button_SelectUP', 1),
-            ('Button_PlayGames', 1),
-            ('Button_GenshinRole', 1),
-            ('Button_HonkaiImpact3', 1),
-            ('Button_StarRail', 1),
-            ('Button_MoveChest', 1),
+            ('Button_GenshinMap', 0),
+            ('Button_SelectUP', 0),
+            ('Button_PlayGames', 0),
+            ('Button_GenshinRole', 0),
+            ('Button_HonkaiImpact3', 0),
+            ('Button_StarRail', 0),
+            ('Button_MoveChest', 0),
             ('Button_Bing', 1),
             ('Button_StreePortal', 1);";
 
@@ -265,13 +265,13 @@ namespace Software
             // 定义所有需要的按钮及其可见性
             var requiredButtons = new Dictionary<string, int>
             {
-                { "Button_GenshinMap", 1 },
-                { "Button_SelectUP", 1 },
-                { "Button_PlayGames", 1 },
-                { "Button_GenshinRole", 1 },
-                { "Button_HonkaiImpact3", 1 },
-                { "Button_StarRail", 1 },
-                { "Button_MoveChest", 1 },
+                { "Button_GenshinMap", 0 },
+                { "Button_SelectUP", 0 },
+                { "Button_PlayGames", 0 },
+                { "Button_GenshinRole", 0 },
+                { "Button_HonkaiImpact3", 0 },
+                { "Button_StarRail", 0 },
+                { "Button_MoveChest", 0 },
                 { "Button_Bing", 1 },
                 { "Button_StreePortal", 1 }
             };
