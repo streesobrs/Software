@@ -6,7 +6,8 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:Software.其他界面"
       xmlns:resx="clr-namespace:Software.Properties" 
-      xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" 
+      xmlns:viewModels="clr-namespace:Software.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       FontFamily="../resources/Fonts/#得意黑"
@@ -120,7 +121,25 @@
                                 <DockPanel>
                                     <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
                                     <TextBlock Text="{Binding Uptime, StringFormat={}{0:hh\\:mm\\:ss}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                </DockPanel>
 
+                                <!-- 新增信息 -->
+                                <DockPanel>
+                                    <TextBlock Text="可用磁盘空间：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding DiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                </DockPanel>
+                                <DockPanel>
+                                    <TextBlock Text="总磁盘空间：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding TotalDiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                </DockPanel>
+                                <DockPanel>
+                                    <TextBlock Text="已用磁盘空间：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding UsedDiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                </DockPanel>
+
+                                <DockPanel>
+                                    <TextBlock Text="网络状态：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding NetworkStatus}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
                                 </DockPanel>
                             </StackPanel>
                         </TabItem>
@@ -269,20 +288,19 @@
                 </GroupBox>
 
                 <!-- 颜色设置 -->
-                <GroupBox Header="颜色设置" Margin="5">
+                <GroupBox Header="颜色设置" Margin="5" >
                     <StackPanel>
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="VersionColor："/>
-                            <ui:TextBox Name="Text_VersionColor" TextChanged="Text_VersionColor_TextChanged"></ui:TextBox>
+                        <DockPanel>
+                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="VersionColor：" />
+                            <ui:TextBox Name="Text_VersionColor" TextChanged="Text_VersionColor_TextChanged" />
                         </DockPanel>
-
-                        <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="UpdateTimeColor："/>
-                            <ui:TextBox Name="Text_UpdateTimeColor" TextChanged="Text_UpdateTimeColor_TextChanged"></ui:TextBox>
+                        <DockPanel>
+                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="UpdateTimeColor：" />
+                            <ui:TextBox Name="Text_UpdateTimeColor" TextChanged="Text_UpdateTimeColor_TextChanged" />
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
-                
+
                 <!-- 网络连接测试 -->
                 <GroupBox Header="网络连接测试" Margin="5">
                     <StackPanel>
@@ -292,6 +310,15 @@
                         <TextBlock Name="NetworkTestResultTextBlock" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
                     </StackPanel>
                 </GroupBox>
+                
+                <!-- 关于 -->
+                <!--<GroupBox Header="关于" Margin="5">
+                    <StackPanel>
+                        <ui:Anchor NavigateUri="https://" Content="XXX" Icon="{ui:SymbolIcon Link24}"/>
+
+                    </StackPanel>
+                </GroupBox>-->
+                
             </StackPanel>
         </ScrollViewer>
     </Grid>

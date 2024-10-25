@@ -67,17 +67,21 @@ namespace Software
 
             ApplySavedCultureInfo();
 
-            // 在窗口加载完成后检查是否以管理员权限运行
+
             this.Loaded += (s, e) =>
             {
+                string titleSuffix = "";
+                //检查是否为管理员启动
                 if (IsRunningAsAdministrator())
                 {
-                    this.Title = "MainWindow (Administrator)";
+                    titleSuffix += " (Administrator)";
                 }
-                else
+                //检查是否为debug版
+                if (IsDebugMode())
                 {
-                    this.Title = "MainWindow";
+                    titleSuffix += " Debug";
                 }
+                this.Title = "MainWindow" + titleSuffix;
                 MyLoger.Information("MainWindow加载完成");
             };
             
@@ -132,6 +136,15 @@ namespace Software
             var wp = new WindowsPrincipal(wi);
 
             return wp.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private bool IsDebugMode()
+        {
+            #if DEBUG
+                return true;
+            #else
+                return false;
+            #endif
         }
 
         private void ApplySavedCultureInfo()

@@ -49,6 +49,7 @@ namespace Software.其他界面
         string databasePath = DatabaseHelper.GetDatabasePath();
 
         private StatusViewModel _viewModel;
+
         private System.Timers.Timer _timer;
         private PerformanceCounter cpuCounter;
 

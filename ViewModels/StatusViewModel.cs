@@ -3,6 +3,9 @@ using LiveCharts.Wpf;
 using LiveCharts.Defaults;
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Software.ViewModels
@@ -12,6 +15,10 @@ namespace Software.ViewModels
         private double _memoryUsage;
         private double _cpuUsage;
         private TimeSpan _uptime;
+        private double diskSpace;
+        private double totalDiskSpace;
+        private double usedDiskSpace;
+        private string networkStatus;
         private SeriesCollection _seriesCollection;
 
         public double MemoryUsage
@@ -40,6 +47,46 @@ namespace Software.ViewModels
             set { SetProperty(ref _uptime, value); }
         }
 
+        public double DiskSpace
+        {
+            get => diskSpace;
+            set
+            {
+                diskSpace = value;
+                OnPropertyChanged(nameof(DiskSpace));
+            }
+        }
+
+        public double TotalDiskSpace
+        {
+            get => totalDiskSpace;
+            set
+            {
+                totalDiskSpace = value;
+                OnPropertyChanged(nameof(TotalDiskSpace));
+            }
+        }
+
+        public double UsedDiskSpace
+        {
+            get => usedDiskSpace;
+            set
+            {
+                usedDiskSpace = value;
+                OnPropertyChanged(nameof(UsedDiskSpace));
+            }
+        }
+
+        public string NetworkStatus
+        {
+            get => networkStatus;
+            set
+            {
+                networkStatus = value;
+                OnPropertyChanged(nameof(NetworkStatus));
+            }
+        }
+
         public SeriesCollection SeriesCollection
         {
             get { return _seriesCollection; }
@@ -65,6 +112,10 @@ namespace Software.ViewModels
             };
 
             Formatter = value => new DateTime((long)value).ToString("HH:mm:ss");
+
+            // 初始化磁盘空间和网络状态
+            UpdateDiskSpace();
+            NetworkStatus = GetNetworkStatus();
         }
 
         private async void UpdateSeriesCollection()
@@ -88,18 +139,41 @@ namespace Software.ViewModels
                 {
                     SeriesCollection[0].Values.Add(memoryUsage);
                     SeriesCollection[1].Values.Add(cpuUsage);
+
+                    // 更新磁盘空间和网络状态
+                    UpdateDiskSpace();
+                    NetworkStatus = GetNetworkStatus();
                 });
             });
         }
 
+        private void UpdateDiskSpace()
+        {
+            // 获取当前应用程序所在目录
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            // 获取盘符
+            string driveLetter = Path.GetPathRoot(appDirectory);
+            // 获取磁盘空间的逻辑
+            DriveInfo drive = new DriveInfo(driveLetter);
+            TotalDiskSpace = drive.TotalSize / (1024.0 * 1024 * 1024); // 返回GB
+            DiskSpace = drive.AvailableFreeSpace / (1024.0 * 1024 * 1024); // 返回GB
+            UsedDiskSpace = TotalDiskSpace - DiskSpace;
+        }
+
+        private string GetNetworkStatus()
+        {
+            // 获取网络状态的逻辑
+            return NetworkInterface.GetIsNetworkAvailable() ? "已连接" : "未连接";
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string propertyName)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void SetProperty<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        private void SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
             if (!Equals(field, value))
             {
