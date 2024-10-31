@@ -174,8 +174,10 @@
                     <StackPanel>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Root_Directory_Folder" Click="Button_Click_Open_Root_Directory_Folder">打开软件根目录</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Log_Folder" Click="Button_Click_Open_Log_Folder">打开Log文件夹</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Logs_Folder" Click="Button_Click_Open_Logs_Folder">打开Logs文件夹</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Resources_Folder" Click="Button_Click_Open_Resources_Folder">打开resources文件夹</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Music_Folder" Click="Button_Click_Open_Music_Folder">打开music文件夹</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Logs_Folder" Click="Button_Click_Delete_Logs_Folder">删除Logs文件夹</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Folder" Click="Button_Click_Delete_Folder">删除文件夹</ui:Button>
                     </StackPanel>
                 </GroupBox>
@@ -312,12 +314,25 @@
                 </GroupBox>
                 
                 <!-- 关于 -->
-                <!--<GroupBox Header="关于" Margin="5">
+                <GroupBox Header="关于" Margin="5" Visibility="Collapsed">
                     <StackPanel>
-                        <ui:Anchor NavigateUri="https://" Content="XXX" Icon="{ui:SymbolIcon Link24}"/>
-
+                        <DockPanel>
+                            <ui:Anchor NavigateUri="https://" Content="AngleSharp" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                            <ui:Anchor NavigateUri="https://" Content="Autoupdater.NET.Official" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                            <ui:Anchor NavigateUri="https://" Content="CommunityToolkit.Mvvm" Icon="{ui:SymbolIcon Link24}"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <ui:Anchor NavigateUri="https://" Content="LiveCharts.Wpf" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                            <ui:Anchor NavigateUri="https://" Content="LogDashboard" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                            <ui:Anchor NavigateUri="https://" Content="Microsoft.Data.Sqlite" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <ui:Anchor NavigateUri="https://" Content="LiveCharts.Wpf" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                            <ui:Anchor NavigateUri="https://" Content="LogDashboard" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                            <ui:Anchor NavigateUri="https://" Content="Microsoft.Data.Sqlite" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>
+                        </DockPanel>
                     </StackPanel>
-                </GroupBox>-->
+                </GroupBox>
                 
             </StackPanel>
         </ScrollViewer>

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Button = Wpf.Ui.Controls.Button;
@@ -645,6 +646,7 @@ namespace Software.其他界面
         //添加打开文件夹
         string rootDirectoryFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
         string logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+        string logsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
         string resourcesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources");
         string musicFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources\\sound\\music");
 
@@ -660,6 +662,12 @@ namespace Software.其他界面
             Process.Start("explorer.exe", logFolder);
         }
 
+        private void Button_Click_Open_Logs_Folder(object sender, RoutedEventArgs e)
+        {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
+            Process.Start("explorer.exe", logsFolder);
+        }
+
         private void Button_Click_Open_Resources_Folder(object sender, RoutedEventArgs e)
         {
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
@@ -670,6 +678,43 @@ namespace Software.其他界面
         {
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             Process.Start("explorer.exe", musicFolder);
+        }
+
+        private void Button_Click_Delete_Logs_Folder(object sender, RoutedEventArgs e)
+        {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
+
+            try
+            {
+                if (Directory.Exists(logsFolder))
+                {
+                    foreach (string file in Directory.GetFiles(logsFolder))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                            MyLoger.Information("已删除文件: {FileName}", file);
+                        }
+                        catch (IOException ioEx)
+                        {
+                            MyLoger.Warning(ioEx, "文件被另一个进程占用，无法删除: {FileName}", file);
+                        }
+                        catch (Exception ex)
+                        {
+                            MyLoger.Error(ex, "删除文件时发生错误: {FileName}", file);
+                        }
+                    }
+                    MyLoger.Information("日志文件夹清理成功。");
+                }
+                else
+                {
+                    MyLoger.Warning("日志文件夹不存在。");
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error(ex, "清理日志文件夹时发生错误。");
+            }
         }
 
         private void Button_Click_Delete_Folder(object sender, RoutedEventArgs e)
@@ -1156,6 +1201,19 @@ namespace Software.其他界面
         {
             try
             {
+                // 将 Text 转换为 Brush
+                string textColor = this.Text_VersionColor.Text;
+                BrushConverter converter = new BrushConverter();
+                try
+                {
+                    this.Text_VersionColor.Foreground = (Brush)converter.ConvertFromString(textColor);
+                }
+                catch (FormatException)
+                {
+                    // 如果转换失败，设置为默认颜色
+                    this.Text_VersionColor.Foreground = Brushes.Black;
+                }
+
                 string text = Text_VersionColor.Text;
                 using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
@@ -1178,6 +1236,17 @@ namespace Software.其他界面
         {
             try
             {
+                string updateTimeColor = this.Text_UpdateTimeColor.Text;
+                BrushConverter converter = new BrushConverter();
+                try
+                {
+                    this.Text_UpdateTimeColor.Foreground = (Brush)converter.ConvertFromString(updateTimeColor);
+                }
+                catch (FormatException)
+                {
+                    this.Text_UpdateTimeColor.Foreground = Brushes.Black;
+                }
+
                 string text = Text_UpdateTimeColor.Text;
                 using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
