@@ -45,7 +45,6 @@
     <None Remove="resources\movechest\Level.json" />
     <None Remove="resources\sound\music\music_001.mp3" />
     <None Remove="resources\sound\music\xxxCr3 - Illusionary Daytime.flac" />
-    <None Remove="resources\update_log.json" />
     <None Remove="Updater.exe" />
   </ItemGroup>
 
@@ -76,9 +75,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="resources\fonts\SmileySans-Oblique.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="resources\update_log.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Updater.exe">
@@ -156,6 +152,12 @@
 
   <ItemGroup>
     <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter32.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="resources\update_log.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 	
 </Project>

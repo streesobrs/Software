@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item>
+	<version>0.2.1.0</version><!--最新版本-->
+	<url>https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.1.0%20-%20installer.exe</url><!--更新链接-->
+	<checksum algorithm="MD5">01b1e6885f8cdce0e2fb97d0e4bc2a9d</checksum>
+	<mandatory>false</mandatory>
+</item>
