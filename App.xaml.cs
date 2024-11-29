@@ -175,18 +175,18 @@ namespace Software
             INSERT INTO Settings (Key, Value) VALUES 
             ('GamePath', ''),
             ('TextContent', ''),
-            ('UpdatePath', 'https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml'),
+            ('UpdatePath', 'https://gitee.com/nibadianbanxiaban/software/raw/main/updata/update.xml'),
             ('LaunchCount', '0'),
             ('EnableCounting', 'false'),
             ('RetryCount', '2'),
             ('RetryDelay', '5'),
             ('adcode', ''),
-            ('UpdateLogUrl', 'https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json'),
+            ('UpdateLogUrl', 'https://gitee.com/nibadianbanxiaban/software/raw/main/resources/update_log.json'),
             ('VersionColor', 'Red'),
             ('UpdateTimeColor', 'Blue'),
             ('Culture', 'zh-CN'),
             ('EnableAutoUpdate', 'true'),
-            ('NewUpdatePath', 'https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json'),
+            ('NewUpdatePath', 'https://gitee.com/nibadianbanxiaban/software/raw/main/updata/new_update.json'),
             ('LastUpdateTime', '');";
 
             // 创建SQL命令并执行
@@ -218,18 +218,18 @@ namespace Software
             {
                 { "GamePath", "" },
                 { "TextContent", "" },
-                { "UpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update.xml" },
+                { "UpdatePath", "https://gitee.com/nibadianbanxiaban/software/raw/main/updata/update.xml" },
                 { "LaunchCount", "0" },
                 { "EnableCounting", "false" },
                 { "RetryCount", "2" },
                 { "RetryDelay", "5" },
                 { "adcode", "" },
-                { "UpdateLogUrl", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/update_log.json" },
+                { "UpdateLogUrl", "https://gitee.com/nibadianbanxiaban/software/raw/main/resources/update_log.json" },
                 { "VersionColor", "Red" },
                 { "UpdateTimeColor", "Blue" },
                 { "Culture", "zh-CN" },
                 { "EnableAutoUpdate", "true" },
-                { "NewUpdatePath", "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/new_update.json" },
+                { "NewUpdatePath", "https://gitee.com/nibadianbanxiaban/software/raw/main/updata/new_update.json" },
                 { "LastUpdateTime", "" }
             };
 
