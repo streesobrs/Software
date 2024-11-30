@@ -318,126 +318,133 @@ namespace Software.其他界面
 
         private async void VersionTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // 省略此方法中的部分代码，与上述修改思路类似，可根据需要进一步优化此方法中
-            // 涉及文件获取的逻辑，这里暂不详细展开修改，可参考前面的修改思路
-            // 比如先判断文件是否存在，不存在则下载等操作
-
-            // 获取当前正在执行的程序集
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            // 获取当前的软件版本
-            System.Version currentVersion = assembly.GetName().Version;
-
-            // 下载文件
-            string jsonFilePath = "resources\\update_log.json";
-            string tempFilePath = "resou rces\\temp_update_log.json";
-
-            string jsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
-
-            WebClient client = new WebClient();
             try
             {
-                // 异步下载文件
-                await client.DownloadFileTaskAsync(new Uri(jsonUrl), tempFilePath);
-                // 如果下载成功，用临时文件覆盖原文件
-                File.Copy(tempFilePath, jsonFilePath, true);
-            }
-            catch (Exception ex)
-            {
-                // 如果下载失败，显示错误信息
-                MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
-            }
-            finally
-            {
-                // 释放WebClient资源
-                ((IDisposable)client)?.Dispose();
-                // 删除临时文件
-                File.Delete(tempFilePath);
-            }
+                // 省略此方法中的部分代码，与上述修改思路类似，可根据需要进一步优化此方法中
+                // 涉及文件获取的逻辑，这里暂不详细展开修改，可参考前面的修改思路
+                // 比如先判断文件是否存在，不存在则下载等操作
 
-            // 读取文件
-            string json = "";
-            try
-            {
-                // 读取文件内容
-                json = File.ReadAllText(jsonFilePath);
-            }
-            catch (Exception ex)
-            {
-                // 如果读取失败，显示错误信息
-                MessageBox.Show("本地读取更新失败，错误信息：\n" + ex.Message);
-            }
+                // 获取当前正在执行的程序集
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                // 获取当前的软件版本
+                System.Version currentVersion = assembly.GetName().Version;
 
-            if (!string.IsNullOrEmpty(json))
-            {
-                // 将json字符串反序列化为对象
-                Root root = JsonConvert.DeserializeObject<Root>(json);
-                version = root.version;
-                // 显示更新信息
-                DisplayUpdates();
-            }
+                // 下载文件
+                string jsonFilePath = "resources\\update_log.json";
+                string tempFilePath = "resources\\temp_update_log.json";
 
-            // 将获取的最新版本转换为System.Version
-            System.Version latestVersion = new System.Version(version);
-            // 比较当前的软件版本和获取的最新版本
-            int comparison = currentVersion.CompareTo(latestVersion);
-            if (comparison < 0)
-            {
-                // 如果当前的软件版本小于获取的最新版本，那么有更新可用
-                MessageBoxResult result = MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n发现新版本，建议您更新以获取最新功能和改进。\n你想现在下载更新吗？", "有更新可用", MessageBoxButton.YesNo);
-                if (result == MessageBoxResult.Yes)
+                string jsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
+
+                WebClient client = new WebClient();
+                try
                 {
-                    // 初始化一个空的字符串变量
-                    string versionString = string.Empty;
+                    // 异步下载文件
+                    await client.DownloadFileTaskAsync(new Uri(jsonUrl), tempFilePath);
+                    // 如果下载成功，用临时文件覆盖原文件
+                    File.Copy(tempFilePath, jsonFilePath, true);
+                }
+                catch (Exception ex)
+                {
+                    // 如果下载失败，显示错误信息
+                    MessageBox.Show("下载更新失败，错误信息：\n" + ex.Message);
+                }
+                finally
+                {
+                    // 释放WebClient资源
+                    ((IDisposable)client)?.Dispose();
+                    // 删除临时文件
+                    File.Delete(tempFilePath);
+                }
 
-                    try
+                // 读取文件
+                string json = "";
+                try
+                {
+                    // 读取文件内容
+                    json = File.ReadAllText(jsonFilePath);
+                }
+                catch (Exception ex)
+                {
+                    // 如果读取失败，显示错误信息
+                    MessageBox.Show("本地读取更新失败，错误信息：\n" + ex.Message);
+                }
+
+                if (!string.IsNullOrEmpty(json))
+                {
+                    // 将json字符串反序列化为对象
+                    Root root = JsonConvert.DeserializeObject<Root>(json);
+                    version = root.version;
+                    // 显示更新信息
+                    DisplayUpdates();
+                }
+
+                // 将获取的最新版本转换为System.Version
+                System.Version latestVersion = new System.Version(version);
+                // 比较当前的软件版本和获取的最新版本
+                int comparison = currentVersion.CompareTo(latestVersion);
+                if (comparison < 0)
+                {
+                    // 如果当前的软件版本小于获取的最新版本，那么有更新可用
+                    MessageBoxResult result = MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n发现新版本，建议您更新以获取最新功能和改进。\n你想现在下载更新吗？", "有更新可用", MessageBoxButton.YesNo);
+                    if (result == MessageBoxResult.Yes)
                     {
-                        // 获取更新服务器的IP地址
-                        var UpdateIP = ConfigurationManager.AppSettings["UpdatePath"];
-                        // 获取版本信息
-                        System.Version softwareversion = assembly.GetName().Version;
-                        // 将版本信息转换为字符串
-                        versionString = softwareversion.ToString();
-                        // 创建一个新的HttpClient实例
-                        var httpClient = new HttpClient();
-                        // 从更新服务器获取XML字符串
-                        var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
-                        // 解析XML字符串
-                        var xdoc = XDocument.Parse(xmlString);
-                        // 获取XML中的"category"元素
-                        var versionElement = xdoc.Descendants("version").FirstOrDefault();
-                        if (versionElement != null)
-                        {
-                            // 解析"category"元素的值为Version对象
-                            var version = Version.Parse(versionElement.Value);
+                        // 初始化一个空的字符串变量
+                        string versionString = string.Empty;
 
-                            // 如果服务器的版本高于当前版本，则启动自动更新
-                            if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                        try
+                        {
+                            // 获取更新服务器的IP地址
+                            var UpdateIP = ConfigurationManager.AppSettings["UpdatePath"];
+                            // 获取版本信息
+                            System.Version softwareversion = assembly.GetName().Version;
+                            // 将版本信息转换为字符串
+                            versionString = softwareversion.ToString();
+                            // 创建一个新的HttpClient实例
+                            var httpClient = new HttpClient();
+                            // 从更新服务器获取XML字符串
+                            var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
+                            // 解析XML字符串
+                            var xdoc = XDocument.Parse(xmlString);
+                            // 获取XML中的"category"元素
+                            var versionElement = xdoc.Descendants("version").FirstOrDefault();
+                            if (versionElement != null)
                             {
-                                AutoUpdater.Start($"{UpdateIP}");
-                            }
-                            else
-                            {
-                                // 如果当前版本已经是最新的，则显示消息框
-                                MessageBox.Show($"当前{versionString}已是最新版本");
+                                // 解析"category"元素的值为Version对象
+                                var version = Version.Parse(versionElement.Value);
+
+                                // 如果服务器的版本高于当前版本，则启动自动更新
+                                if (version > Assembly.GetExecutingAssembly().GetName().Version)
+                                {
+                                    AutoUpdater.Start($"{UpdateIP}");
+                                }
+                                else
+                                {
+                                    // 如果当前版本已经是最新的，则显示消息框
+                                    MessageBox.Show($"当前{versionString}已是最新版本");
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        // 在这里处理异常，例如显示错误消息
-                        MessageBox.Show($"更新检查失败：{ex.Message}");
+                        catch (Exception ex)
+                        {
+                            // 在这里处理异常，例如显示错误消息
+                            MessageBox.Show($"更新检查失败：{ex.Message}");
+                        }
                     }
                 }
+                else if (comparison > 0)
+                {
+                    // 如果当前的软件版本大于获取的最新版本，那么当前的软件是测试版
+                    MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n您正在使用的是预览版，可能包含尚未发布的新功能。");
+                }
+                else
+                {
+                    // 如果当前的软件版本等于获取的最新版本，那么当前的软件是最新版本
+                    MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n您的软件已是最新版本，无需更新。");
+                }
             }
-            else if (comparison > 0)
+            catch(Exception ex)
             {
-                // 如果当前的软件版本大于获取的最新版本，那么当前的软件是测试版
-                MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n您正在使用的是预览版，可能包含尚未发布的新功能。");
-            }
-            else
-            {
-                // 如果当前的软件版本等于获取的最新版本，那么当前的软件是最新版本
-                MessageBox.Show("刷新成功!\n获取的最新版本为：" + version + "\n软件当前的版本为：" + currentVersion + "\n您的软件已是最新版本，无需更新。");
+                MessageBox.Show($"Error: {ex.Message}");
             }
         }
 
