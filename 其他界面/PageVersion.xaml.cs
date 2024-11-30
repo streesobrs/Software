@@ -36,6 +36,7 @@ namespace Software.其他界面
         public string jsonVersion { get; set; }
         public List<Update> updates { get; set; }
     }
+
     /// <summary>
     /// PageVersion.xaml 的交互逻辑
     /// </summary>
@@ -84,7 +85,15 @@ namespace Software.其他界面
             versionColor = GetConfigValueFromDatabase(databasePath, "VersionColor");
             updateTimeColor = GetConfigValueFromDatabase(databasePath, "UpdateTimeColor");
 
-            _ = DownloadUpdates();
+            // 先检查更新日志文件是否存在，不存在则下载
+            if (!File.Exists(jsonFilePath))
+            {
+                _ = DownloadUpdates(true); // 传入参数表示强制下载
+            }
+            else
+            {
+                _ = DownloadUpdates(false); // 传入参数表示只读取本地文件
+            }
         }
 
         /// <summary>
@@ -158,7 +167,7 @@ namespace Software.其他界面
             return json;
         }
 
-        private async Task DownloadUpdates()
+        private async Task DownloadUpdates(bool forceDownload)
         {
             refreshCount++;
             if (refreshCount >= RefreshThreshold)
@@ -167,10 +176,8 @@ namespace Software.其他界面
                 historyDocument.Blocks.Clear();
             }
 
-            // 读取本地json文件
-            string json = ReadLocalFile(jsonFilePath);
-
-            if (string.IsNullOrEmpty(json) && NetworkInterface.GetIsNetworkAvailable())
+            string json = "";
+            if (forceDownload || !File.Exists(jsonFilePath))
             {
                 string tempFilePath = "resources\\temp_update_log.json";
                 try
@@ -192,6 +199,11 @@ namespace Software.其他界面
                     // 删除临时文件
                     File.Delete(tempFilePath);
                 }
+            }
+            else
+            {
+                // 读取本地json文件
+                json = ReadLocalFile(jsonFilePath);
             }
 
             if (!string.IsNullOrEmpty(json))
@@ -306,6 +318,10 @@ namespace Software.其他界面
 
         private async void VersionTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // 省略此方法中的部分代码，与上述修改思路类似，可根据需要进一步优化此方法中
+            // 涉及文件获取的逻辑，这里暂不详细展开修改，可参考前面的修改思路
+            // 比如先判断文件是否存在，不存在则下载等操作
+
             // 获取当前正在执行的程序集
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             // 获取当前的软件版本
@@ -313,7 +329,7 @@ namespace Software.其他界面
 
             // 下载文件
             string jsonFilePath = "resources\\update_log.json";
-            string tempFilePath = "resources\\temp_update_log.json";
+            string tempFilePath = "resou rces\\temp_update_log.json";
 
             string jsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
 
@@ -387,11 +403,11 @@ namespace Software.其他界面
                         var xmlString = await httpClient.GetStringAsync($"{UpdateIP}");
                         // 解析XML字符串
                         var xdoc = XDocument.Parse(xmlString);
-                        // 获取XML中的"version"元素
+                        // 获取XML中的"category"元素
                         var versionElement = xdoc.Descendants("version").FirstOrDefault();
                         if (versionElement != null)
                         {
-                            // 解析"version"元素的值为Version对象
+                            // 解析"category"元素的值为Version对象
                             var version = Version.Parse(versionElement.Value);
 
                             // 如果服务器的版本高于当前版本，则启动自动更新

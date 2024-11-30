@@ -3,6 +3,14 @@
   "version": "0.2.1.0",
   "updates": [
     {
+      "version": "0.2.2.0",
+      "updateTime": "2024/11/30",
+      "updateContent": [
+        "修复了启动时部分文件不存在导致的报错",
+        "修改了数据库内的部分默认路径"
+      ]
+    },
+    {
       "version": "0.2.1.0",
       "updateTime": "2024/10/31",
       "updateContent": [
