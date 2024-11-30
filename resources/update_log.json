@@ -3,6 +3,14 @@
   "version": "0.2.2.0",
   "updates": [
     {
+      "version": "0.2.3.0",
+      "updateTime": "2024/11/30",
+      "updateContent": [
+        "修复了选择更新方式时无法正常获取导致无法更新的问题",
+        "可通过版本页面更新"
+      ]
+    },
+    {
       "version": "0.2.2.0",
       "updateTime": "2024/11/30",
       "updateContent": [
