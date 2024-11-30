@@ -1,15 +1,15 @@
 {
-  "version": "0.2.2.0",
+  "version": "0.2.3.0",
   "date": "2024/11/30",
   "details": [
     {
       "updateSource": "gitee",
       "updateMode": "zip",
-      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/v0.2.2.0/update.zip",
+      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/v0.2.3.0/update.zip",
       "fileSize": "35,075 KB",
       "checksum": [
         {
-          "MD5": "4f6a78b0f1ebebdb99896ecf72570fb1"
+          "MD5": "6cae78c9902a339d4414334f3b406429"
         }
       ],
       "mandatoryUpdate": false
@@ -17,11 +17,11 @@
     {
       "updateSource": "gitee",
       "updateMode": "installer",
-      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.2.0%20-%20installer.exe",
+      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.3.0%20-%20installer.exe",
       "fileSize": "36,343 KB",
       "checksum": [
         {
-          "MD5": "5436a84b28ff72317cfd4b5138e253c0"
+          "MD5": "29f20fd3ed8a90017f8dba166d8362b0"
         }
       ],
       "mandatoryUpdate": false
@@ -33,7 +33,7 @@
       "fileSize": "35,075 KB",
       "checksum": [
         {
-          "MD5": "4f6a78b0f1ebebdb99896ecf72570fb1"
+          "MD5": "6cae78c9902a339d4414334f3b406429"
         }
       ],
       "mandatoryUpdate": false
