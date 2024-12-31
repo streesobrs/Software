@@ -3,6 +3,13 @@
   "version": "0.2.3.0",
   "updates": [
     {
+      "version": "0.2.4.0",
+      "updateTime": "2024/12/31",
+      "updateContent": [
+        "添加了设置页面信息中运行的天数"
+      ]
+    },
+    {
       "version": "0.2.3.0",
       "updateTime": "2024/11/30",
       "updateContent": [

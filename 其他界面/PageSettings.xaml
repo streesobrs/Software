@@ -117,9 +117,10 @@
                                     <TextBlock Text="CPU 使用率：" Style="{StaticResource TextBlockStyle}" />
                                     <TextBlock Text="{Binding CPUUsage, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
                                 </DockPanel>
-
+                                
                                 <DockPanel>
                                     <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
+                                    <TextBlock Text="{Binding Days}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
                                     <TextBlock Text="{Binding Uptime, StringFormat={}{0:hh\\:mm\\:ss}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
                                 </DockPanel>
 
@@ -143,7 +144,7 @@
                                 </DockPanel>
                             </StackPanel>
                         </TabItem>
-                        <TabItem Header="图表">
+                        <TabItem Header="图表" IsEnabled="False" ToolTip="有问题，退休了">
                             <lvc:CartesianChart Series="{Binding SeriesCollection}" Height="180">
                                 <lvc:CartesianChart.DataTooltip>
                                     <lvc:DefaultTooltip Background="White" Foreground="Black" />
