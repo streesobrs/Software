@@ -286,7 +286,6 @@
                             <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
                             <ui:Button Style="{StaticResource ButtonStyle}" Click="Button_Click_City_Address">确定</ui:Button>
                         </DockPanel>
-                        <TextBox />
                     </StackPanel>
                 </GroupBox>
 
@@ -315,7 +314,7 @@
                 </GroupBox>
                 
                 <!-- 关于 -->
-                <GroupBox Header="关于" Margin="5" Visibility="Collapsed">
+                <GroupBox Header="关于" Margin="5">
                     <StackPanel>
                         <DockPanel>
                             <ui:Anchor NavigateUri="https://" Content="AngleSharp" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>

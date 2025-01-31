@@ -114,11 +114,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -132,10 +127,6 @@
     <EmbeddedResource Update="Properties\Resource.zh-CN.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -144,10 +135,6 @@
 
   <ItemGroup>
     <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\DirectShowLib-2005.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="C:\Users\14430\.nuget\packages\wpfmediakit\2.2.0\build\EVRPresenter32.dll" />
   </ItemGroup>
 
   <ItemGroup>
