@@ -117,46 +117,85 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Ts" xml:space="preserve">
+  <data name="MainWindow_Label_Ts" xml:space="preserve">
     <value>现在的内容全是大概</value>
   </data>
-  <data name="Button_Home" xml:space="preserve">
+  <data name="MainWindow_Button_Home" xml:space="preserve">
     <value>主页</value>
   </data>
-  <data name="Button_GenshinMap" xml:space="preserve">
+  <data name="MainWindow_Button_GenshinMap" xml:space="preserve">
     <value>地图</value>
   </data>
-  <data name="Button_SelectUP" xml:space="preserve">
+  <data name="MainWindow_Button_SelectUP" xml:space="preserve">
     <value>UP查询</value>
   </data>
-  <data name="Button_PlayGames" xml:space="preserve">
+  <data name="MainWindow_Button_PlayGames" xml:space="preserve">
     <value>启动游戏</value>
   </data>
-  <data name="Button_GenshinRole" xml:space="preserve">
+  <data name="MainWindow_Button_GenshinRole" xml:space="preserve">
     <value>原神角色</value>
   </data>
-  <data name="Button_HonkaiImpact3" xml:space="preserve">
+  <data name="MainWindow_Button_HonkaiImpact3" xml:space="preserve">
     <value>崩坏三</value>
   </data>
-  <data name="Button_Bing" xml:space="preserve">
+  <data name="MainWindow_Button_Bing" xml:space="preserve">
     <value>必应</value>
   </data>
-  <data name="Button_Updata" xml:space="preserve">
+  <data name="MainWindow_Button_Updata" xml:space="preserve">
     <value>检查更新</value>
   </data>
-  <data name="Button_Version" xml:space="preserve">
+  <data name="MainWindow_Button_Version" xml:space="preserve">
     <value>版本</value>
   </data>
-  <data name="Button_StarRail" xml:space="preserve">
+  <data name="MainWindow_Button_StarRail" xml:space="preserve">
     <value>星铁角色</value>
   </data>
-  <data name="Button_MoveChest" xml:space="preserve">
+  <data name="MainWindow_Button_MoveChest" xml:space="preserve">
     <value>推箱子</value>
   </data>
-  <data name="Button_Settings" xml:space="preserve">
+  <data name="MainWindow_Button_Settings" xml:space="preserve">
     <value>设置</value>
   </data>
-  <data name="Button_StreePortal" xml:space="preserve">
+  <data name="MainWindow_Button_StreePortal" xml:space="preserve">
     <value>StreePortal</value>
+  </data>
+  <data name="MainWindow_Button_Settings_Tip" xml:space="preserve">
+    <value>设置部分功能</value>
+  </data>
+  <data name="MainWindow_Button_Home_Tip" xml:space="preserve">
+    <value>回到主页</value>
+  </data>
+  <data name="MainWindow_Button_GenshinMap_Tip" xml:space="preserve">
+    <value>打开地图界面</value>
+  </data>
+  <data name="MainWindow_Button_SelectUP_Tip" xml:space="preserve">
+    <value>打开查询界面</value>
+  </data>
+  <data name="MainWindow_Button_PlayGames_Tip" xml:space="preserve">
+    <value>启动游戏</value>
+  </data>
+  <data name="MainWindow_Button_GenshinRole_Tip" xml:space="preserve">
+    <value>打开原神角色界面</value>
+  </data>
+  <data name="MainWindow_Button_HonkaiImpact3_Tip" xml:space="preserve">
+    <value>打开崩坏三角色界面</value>
+  </data>
+  <data name="MainWindow_Button_StarRail_Tip" xml:space="preserve">
+    <value>打开崩坏星穹铁道角色界面</value>
+  </data>
+  <data name="MainWindow_Button_MoveChest_Tip" xml:space="preserve">
+    <value>开始推箱子</value>
+  </data>
+  <data name="MainWindow_Button_Bing_Tip" xml:space="preserve">
+    <value>你猜猜Bing一下是干什么的</value>
+  </data>
+  <data name="MainWindow_Button_StreePortal_Tip" xml:space="preserve">
+    <value>打开StreePortal网页</value>
+  </data>
+  <data name="MainWindow_Button_Updata_Tip" xml:space="preserve">
+    <value>字面意思</value>
+  </data>
+  <data name="MainWindow_Button_Version_Tip" xml:space="preserve">
+    <value>打开历史版本更新内容界面</value>
   </data>
 </root>

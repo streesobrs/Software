@@ -167,6 +167,10 @@
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson">输出Json</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software">重启软件</ui:Button>
                         <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software">管理员重启软件</ui:Button>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Style="{StaticResource ButtonStyle}" Tag="zh-CN"  Content="中文" Click="ChangeLanguage_Click"/>
+                            <ui:Button Style="{StaticResource ButtonStyle}" Tag="en-US"  Content="英文" Click="ChangeLanguage_Click"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
@@ -314,7 +318,7 @@
                 </GroupBox>
                 
                 <!-- 关于 -->
-                <GroupBox Header="关于" Margin="5">
+                <GroupBox Header="关于" Margin="5" Visibility="Collapsed">
                     <StackPanel>
                         <DockPanel>
                             <ui:Anchor NavigateUri="https://" Content="AngleSharp" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>

@@ -7,8 +7,10 @@
         xmlns:local="clr-namespace:Software"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:viewModels="clr-namespace:Software.ViewModels"
-        xmlns:resx="clr-namespace:Software.Properties"
-        d:DataContext="{d:DesignInstance Type=viewModels:Weather}"
+        xmlns:lang="clr-namespace:Software.resources.i18n"
+        xmlns:lex="http://wpflocalizeextension.codeplex.com"
+        lex:ResxLocalizationProvider.DefaultAssembly="Software"
+        lex:ResxLocalizationProvider.DefaultDictionary="Lang"
         mc:Ignorable="d"
         Title="MainWindow" 
         Width="900" Height="550"
@@ -60,82 +62,82 @@
                     <Button DockPanel.Dock="Bottom" Width="100" Height="30" Margin="0,10,0,10" BorderBrush="Transparent" Foreground="#ff363232"
                         Name="Button_Settings"
                         Click="Button_Click_Settings"
-                        Content="{x:Static resx:Resource.Button_Settings}"
-                        ToolTip="设置部分功能"/>
+                        Content="{lex:Loc MainWindow_Button_Settings}"
+                        ToolTip="{lex:Loc MainWindow_Button_Settings_Tip}"/>
                     <ScrollViewer>
                         <StackPanel Width="100">
                             <!--左边菜单的选项-->
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_Home"
                             Click="Button_Click_Home"
-                            Content="{x:Static resx:Resource.Button_Home}"
-                            ToolTip="没用的按钮……"/>
+                            Content="{lex:Loc MainWindow_Button_Home}"
+                            ToolTip="{lex:Loc MainWindow_Button_Home_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_GenshinMap"
                             Click="Button_Click_GenshinMap"
-                            Content="{x:Static resx:Resource.Button_GenshinMap}"
-                            ToolTip="打开地图界面"/>
+                            Content="{lex:Loc MainWindow_Button_GenshinMap}"
+                            ToolTip="{lex:Loc MainWindow_Button_GenshinMap_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_SelectUP"
                             Click="Button_Click_SelectUP"
-                            Content="{x:Static resx:Resource.Button_SelectUP}"
-                            ToolTip="打开查询界面"/>
+                            Content="{lex:Loc MainWindow_Button_SelectUP}"
+                            ToolTip="{lex:Loc MainWindow_Button_SelectUP_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_PlayGames"
                             Click="Button_Click_PlayGames"
-                            Content="{x:Static resx:Resource.Button_PlayGames}"
-                            ToolTip="启动游戏"/>
+                            Content="{lex:Loc MainWindow_Button_PlayGames}"
+                            ToolTip="{lex:Loc MainWindow_Button_PlayGames_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_GenshinRole"
                             Click="Button_Click_GenshinRole"
-                            Content="{x:Static resx:Resource.Button_GenshinRole}"
-                            ToolTip="打开原神角色界面"/>
+                            Content="{lex:Loc MainWindow_Button_GenshinRole}"
+                            ToolTip="{lex:Loc MainWindow_Button_GenshinRole_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_HonkaiImpact3"
                             Click="Button_Click_HonkaiImpact3"
-                            Content="{x:Static resx:Resource.Button_HonkaiImpact3}"
-                            ToolTip="打开崩坏三角色界面"/>
+                            Content="{lex:Loc MainWindow_Button_HonkaiImpact3}"
+                            ToolTip="{lex:Loc MainWindow_Button_HonkaiImpact3_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_StarRail"
                             Click="Button_Click_StarRail"
-                            Content="{x:Static resx:Resource.Button_StarRail}"
-                            ToolTip="打开崩坏星穹铁道角色界面"/>
+                            Content="{lex:Loc MainWindow_Button_StarRail}"
+                            ToolTip="{lex:Loc MainWindow_Button_StarRail_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_MoveChest"
                             Click="Button_Click_MoveChest"
-                            Content="{x:Static resx:Resource.Button_MoveChest}"
-                            ToolTip="开始推箱子"/>
+                            Content="{lex:Loc MainWindow_Button_MoveChest}"
+                            ToolTip="{lex:Loc MainWindow_Button_MoveChest_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_Bing"
                             Click="Button_Click_Bing"
-                            Content="{x:Static resx:Resource.Button_Bing}"
-                            ToolTip="你猜猜Bing一下是干什么的"/>
+                            Content="{lex:Loc MainWindow_Button_Bing}"
+                            ToolTip="{lex:Loc MainWindow_Button_Bing_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_StreePortal"
                             Click="Button_Click_StreePortal"
-                            Content="{x:Static resx:Resource.Button_StreePortal}"
-                            ToolTip="打开StreePortal网页"/>
+                            Content="{lex:Loc MainWindow_Button_StreePortal}"
+                            ToolTip="{lex:Loc MainWindow_Button_StreePortal_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_Updata"
                             Click="Button_Click_Updata"
-                            Content="{x:Static resx:Resource.Button_Updata}"
-                            ToolTip="字面意思"/>
+                            Content="{lex:Loc MainWindow_Button_Updata}"
+                            ToolTip="{lex:Loc MainWindow_Button_Updata_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_Version"
                             Click="Button_Click_Version"
-                            Content="{x:Static resx:Resource.Button_Version}"
-                            ToolTip="打开历史版本更新内容界面"/>
+                            Content="{lex:Loc MainWindow_Button_Version}"
+                            ToolTip="{lex:Loc MainWindow_Button_Version_Tip}"/>
 
                         </StackPanel>
                     </ScrollViewer>
@@ -155,7 +157,7 @@
                 <Label FontSize="20" Foreground="Black"
                        Name="Test_Label"
                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                       Content="{x:Static resx:Resource.Ts}" />
+                       Content="{lex:Loc MainWindow_Label_Ts}" />
             </DockPanel>
 
         </Grid>

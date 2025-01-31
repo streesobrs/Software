@@ -8,6 +8,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -22,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Wpf.Ui.Controls;
+using WPFLocalizeExtension.Engine;
 using Button = Wpf.Ui.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 using MessageBoxButton = System.Windows.MessageBoxButton;
@@ -574,29 +576,22 @@ namespace Software.其他界面
             }
         }
 
-        private void RadioButton_Click_English(object sender, RoutedEventArgs e)
-        {
-            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
-            SaveCultureInfo("en-US");
-        }
-
-        private void RadioButton_Click_Chinese(object sender, RoutedEventArgs e)
-        {
-            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
-            SaveCultureInfo("zh-CN");
-        }
-
-        private void SaveCultureInfo(string cultureName)
+        private void ChangeLanguage_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                MyLoger.Information($"Button clicked: {Name}", ((Button)sender).Name);
+                var culture = ((Button)sender).Tag.ToString();
+                var cultureInfo = new CultureInfo(culture);
+                LocalizeDictionary.Instance.Culture = cultureInfo;
+                MyLoger.Information($"Language: [{cultureInfo}]");
                 using (var connection = new SqliteConnection($"Data Source={databasePath}"))
                 {
                     connection.Open();
 
                     string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'Culture';";
                     var updateCommand = new SqliteCommand(updateQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@value", cultureName);
+                    updateCommand.Parameters.AddWithValue("@value", culture);
                     updateCommand.ExecuteNonQuery();
                 }
             }
@@ -1264,5 +1259,7 @@ namespace Software.其他界面
                 MessageBox.Show("保存 UpdateTimeColor 时发生错误: " + ex.Message);
             }
         }
+
+        
     }
 }

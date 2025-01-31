@@ -17,6 +17,10 @@ using System.Xml.Linq;
 using Software.Models;
 using Microsoft.Data.Sqlite;
 using System.Data.Common;
+using System.Globalization;
+using System.Threading;
+using System.Text.RegularExpressions;
+using WPFLocalizeExtension.Engine;
 
 namespace Software
 {
@@ -25,6 +29,52 @@ namespace Software
     /// </summary>
     public partial class App : Application
     {
+        string databasePath = DatabaseHelper.GetDatabasePath();
+
+        private string GetConfigValueFromDatabase(string dbPath, string key)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+                {
+                    connection.Open();
+                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                    var command = new SqliteCommand(query, connection);
+                    command.Parameters.AddWithValue("@Key", key);
+                    return command.ExecuteScalar()?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("读取配置值时发生错误: " + ex.Message);
+                return null;
+            }
+        }
+
+        public App()
+        {
+            var culture = GetConfigValueFromDatabase(databasePath, "Culture");
+            CultureInfo cultureInfo;
+
+            if (!string.IsNullOrEmpty(culture))
+            {
+                try
+                {
+                    cultureInfo = new CultureInfo(culture);
+                }
+                catch (CultureNotFoundException)
+                {
+                    MessageBox.Show($"未找到指定的区域设置: {culture}，将使用默认区域设置。");
+                    cultureInfo = CultureInfo.CurrentCulture;
+                }
+            }
+            else
+            {
+                cultureInfo = CultureInfo.CurrentCulture;
+            }
+            LocalizeDictionary.Instance.Culture = cultureInfo;
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             try

@@ -117,46 +117,85 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Ts" xml:space="preserve">
+  <data name="MainWindow_Label_Ts" xml:space="preserve">
     <value>Now it's all approximate</value>
   </data>
-  <data name="Button_Home" xml:space="preserve">
+  <data name="MainWindow_Button_Home" xml:space="preserve">
     <value>Home</value>
   </data>
-  <data name="Button_GenshinMap" xml:space="preserve">
+  <data name="MainWindow_Button_GenshinMap" xml:space="preserve">
     <value>GenshinMap</value>
   </data>
-  <data name="Button_SelectUP" xml:space="preserve">
+  <data name="MainWindow_Button_SelectUP" xml:space="preserve">
     <value>SelectUP</value>
   </data>
-  <data name="Button_PlayGames" xml:space="preserve">
+  <data name="MainWindow_Button_PlayGames" xml:space="preserve">
     <value>PlayGames</value>
   </data>
-  <data name="Button_GenshinRole" xml:space="preserve">
+  <data name="MainWindow_Button_GenshinRole" xml:space="preserve">
     <value>GenshinRole</value>
   </data>
-  <data name="Button_HonkaiImpact3" xml:space="preserve">
+  <data name="MainWindow_Button_HonkaiImpact3" xml:space="preserve">
     <value>HonkaiImpact3</value>
   </data>
-  <data name="Button_Bing" xml:space="preserve">
+  <data name="MainWindow_Button_Bing" xml:space="preserve">
     <value>Bing</value>
   </data>
-  <data name="Button_Updata" xml:space="preserve">
+  <data name="MainWindow_Button_Updata" xml:space="preserve">
     <value>Updata</value>
   </data>
-  <data name="Button_Version" xml:space="preserve">
+  <data name="MainWindow_Button_Version" xml:space="preserve">
     <value>Version</value>
   </data>
-  <data name="Button_StarRail" xml:space="preserve">
+  <data name="MainWindow_Button_StarRail" xml:space="preserve">
     <value>StarRail</value>
   </data>
-  <data name="Button_MoveChest" xml:space="preserve">
+  <data name="MainWindow_Button_MoveChest" xml:space="preserve">
     <value>MoveChest</value>
   </data>
-  <data name="Button_Settings" xml:space="preserve">
+  <data name="MainWindow_Button_Settings" xml:space="preserve">
     <value>Setting</value>
   </data>
-  <data name="Button_StreePortal" xml:space="preserve">
+  <data name="MainWindow_Button_StreePortal" xml:space="preserve">
     <value>StreePortal</value>
+  </data>
+  <data name="MainWindow_Button_Settings_Tip" xml:space="preserve">
+    <value>Set up some functions</value>
+  </data>
+  <data name="MainWindow_Button_Bing_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_GenshinMap_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_GenshinRole_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_Home_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_HonkaiImpact3_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_MoveChest_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_PlayGames_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_SelectUP_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_StarRail_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_StreePortal_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_Updata_Tip" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MainWindow_Button_Version_Tip" xml:space="preserve">
+    <value></value>
   </data>
 </root>

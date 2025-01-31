@@ -65,9 +65,6 @@ namespace Software
         {
             InitializeComponent();
 
-            ApplySavedCultureInfo();
-
-
             this.Loaded += (s, e) =>
             {
                 string titleSuffix = "";
@@ -145,16 +142,6 @@ namespace Software
             #else
                 return false;
             #endif
-        }
-
-        private void ApplySavedCultureInfo()
-        {
-            string cultureName = ConfigurationManager.AppSettings["Culture"];
-            if (!string.IsNullOrEmpty(cultureName))
-            {
-                Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
-                Thread.CurrentThread.CurrentUICulture = new CultureInfo(cultureName);
-            }
         }
 
         private void MoveUpdaterFilesIfNeeded()
