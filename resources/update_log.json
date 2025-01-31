@@ -1,10 +1,10 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.4.0",
+  "version": "0.2.5.0",
   "updates": [
     {
       "version": "0.2.5.0",
-      "updateTime": "",
+      "updateTime": "2025/01/31",
       "updateContent": [
         "重写了多语言切换效果",
         "修复了切换语言不生效的问题"
