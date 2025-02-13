@@ -5,6 +5,7 @@ using Serilog;
 using Software.Models;
 using Software.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
@@ -55,6 +56,8 @@ namespace Software.其他界面
 
         private System.Timers.Timer _timer;
         private PerformanceCounter cpuCounter;
+
+        private Dictionary<string, double> groupBoxPositions = new Dictionary<string, double>();
 
         private ILogger logger;
 
@@ -216,6 +219,25 @@ namespace Software.其他界面
             Open_Music_Folder.ToolTip = musicFolder;
 
             LoadSettings();
+
+            // 在页面加载完成后获取所有 GroupBox 的位置
+            if (MainScrollViewer.Content is Panel panel)
+            {
+                foreach (UIElement child in panel.Children)
+                {
+                    if (child is GroupBox groupBox)
+                    {
+                        Point position = groupBox.TransformToAncestor(MainScrollViewer).Transform(new Point(0, 0));
+                        double scrollViewerTopMargin = MainScrollViewer.Margin.Top;
+                        double scrollViewerTopPadding = MainScrollViewer.Padding.Top;
+                        double groupBoxTopMargin = groupBox.Margin.Top;
+                        double finalOffset = position.Y + scrollViewerTopMargin + scrollViewerTopPadding + groupBoxTopMargin;
+                        // 手动增加固定的预留空间
+                        finalOffset -= 55;
+                        groupBoxPositions[groupBox.Name] = finalOffset;
+                    }
+                }
+            }
 
         }
 
@@ -1260,6 +1282,28 @@ namespace Software.其他界面
             }
         }
 
-        
+        private void NavigateToGroupBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button button)
+            {
+                string groupBoxName = button.Tag.ToString();
+                if (groupBoxPositions.ContainsKey(groupBoxName))
+                {
+                    double offset = groupBoxPositions[groupBoxName];
+                    // 确保偏移量不小于 0
+                    offset = Math.Max(offset, 0);
+                    MainScrollViewer.ScrollToVerticalOffset(offset);
+                }
+                else
+                {
+                    MessageBox.Show($"未找到名为 {groupBoxName} 的 GroupBox 的位置信息。");
+                }
+            }
+            else
+            {
+                MessageBox.Show("触发事件的对象不是按钮。");
+            }
+        }
+
     }
 }

@@ -187,7 +187,7 @@
     <value>开始推箱子</value>
   </data>
   <data name="MainWindow_Button_Bing_Tip" xml:space="preserve">
-    <value>你猜猜Bing一下是干什么的</value>
+    <value>一个搜索引擎</value>
   </data>
   <data name="MainWindow_Button_StreePortal_Tip" xml:space="preserve">
     <value>打开StreePortal网页</value>
@@ -197,5 +197,125 @@
   </data>
   <data name="MainWindow_Button_Version_Tip" xml:space="preserve">
     <value>打开历史版本更新内容界面</value>
+  </data>
+  <data name="System_MainWindow_Button_About" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="System_MainWindow_Button_DoNotClick" xml:space="preserve">
+    <value>别点</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_LogDashboard" xml:space="preserve">
+    <value>打开日志面板</value>
+  </data>
+  <data name="PageSettings_Button_Click_BuildJson" xml:space="preserve">
+    <value>输出Json</value>
+  </data>
+  <data name="PageSettings_Button_Click_Reboot_Software" xml:space="preserve">
+    <value>重启软件</value>
+  </data>
+  <data name="PageSettings_Button_Click_Root_Reboot_Software" xml:space="preserve">
+    <value>重启软件（管理员）</value>
+  </data>
+  <data name="PageSettings_Button_Luanguage_zh-CN" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="PageSettings_Button_Luanguage_en-US" xml:space="preserve">
+    <value>英文</value>
+  </data>
+  <data name="PageSettings_GroupBox_SoftwareOperation" xml:space="preserve">
+    <value>软件操作</value>
+  </data>
+  <data name="PageSettings_GroupBox_FileOperation" xml:space="preserve">
+    <value>文件操作</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Root_Directory_Folder" xml:space="preserve">
+    <value>打开软件根目录</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Log_Folder" xml:space="preserve">
+    <value>打开Log文件夹</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Logs_Folder" xml:space="preserve">
+    <value>打开Logs文件夹</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Resources_Folder" xml:space="preserve">
+    <value>打开resources文件夹</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Music_Folder" xml:space="preserve">
+    <value>打开music文件夹</value>
+  </data>
+  <data name="PageSettings_Button_Click_Delete_Logs_Folder" xml:space="preserve">
+    <value>删除Logs文件夹</value>
+  </data>
+  <data name="PageSettings_Button_Click_Delete_Folder" xml:space="preserve">
+    <value>删除文件夹</value>
+  </data>
+  <data name="PageSettings_GroupBox_LaunchSettings" xml:space="preserve">
+    <value>启动设置</value>
+  </data>
+  <data name="PageSettings_TextBlock_EnableCountingCheckBox" xml:space="preserve">
+    <value>启动计数</value>
+  </data>
+  <data name="PageSettings_TextBlock_EnableAutoUpdateCheckBox" xml:space="preserve">
+    <value>自动更新</value>
+  </data>
+  <data name="PageSettings_GroupBox_UpdateAddress" xml:space="preserve">
+    <value>更新地址</value>
+  </data>
+  <data name="PageSettings_TextBlock_Update_IP_address_TextChanged" xml:space="preserve">
+    <value>软件更新地址：</value>
+  </data>
+  <data name="PageSettings_TextBlock_Update_Log_IP_address_TextChanged" xml:space="preserve">
+    <value>日志更新地址：</value>
+  </data>
+  <data name="PageSettings_TextBlock_New_Update_IP_address_TextChanged" xml:space="preserve">
+    <value>新软件更新地址：</value>
+  </data>
+  <data name="PageSettings_GroupBox_PathSettings" xml:space="preserve">
+    <value>路径设置</value>
+  </data>
+  <data name="PageSettings_TextBlock_GamePath" xml:space="preserve">
+    <value>游戏启动路径：</value>
+  </data>
+  <data name="PageSettings_GroupBox_HiddenSwitch" xml:space="preserve">
+    <value>隐藏开关</value>
+  </data>
+  <data name="PageSettings_GroupBox_WeatherAddress" xml:space="preserve">
+    <value>天气地址</value>
+  </data>
+  <data name="PageSettings_TextBlock_CityAddress" xml:space="preserve">
+    <value>输入地址信息：</value>
+  </data>
+  <data name="PageSettings_TextBlock_CityAddress_Tip" xml:space="preserve">
+    <value>填写结构化地址信息：省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写</value>
+  </data>
+  <data name="PageSettings_Button_Click_City_Address" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="PageSettings_GroupBox_ColorSettings" xml:space="preserve">
+    <value>颜色设置</value>
+  </data>
+  <data name="PageSettings_GroupBox_NetworkTest" xml:space="preserve">
+    <value>网络连接测试</value>
+  </data>
+  <data name="PageSettings_TextBlock_TargetAddress" xml:space="preserve">
+    <value>目标地址</value>
+  </data>
+  <data name="PageSettings_Button_TestNetworkConnection" xml:space="preserve">
+    <value>测试网络连接</value>
+  </data>
+  <data name="PageSettings_GroupBox_About" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="PageSettings_ToggleSwitch_OnContent_Default" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="PageSettings_ToggleSwitch_OffContent_Default" xml:space="preserve">
+    <value>隐藏</value>
+  </data>
+  <data name="PageSettings_TextBlock_UpdateTimeColor" xml:space="preserve">
+    <value>更新时间颜色：</value>
+  </data>
+  <data name="PageSettings_TextBlock_VersionColor" xml:space="preserve">
+    <value>版本颜色：</value>
   </data>
 </root>

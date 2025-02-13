@@ -70,7 +70,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 A search engine 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_Bing_Tip {
             get {
@@ -88,7 +88,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the map interface 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_GenshinMap_Tip {
             get {
@@ -106,7 +106,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the Genshin Impact character interface 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_GenshinRole_Tip {
             get {
@@ -124,7 +124,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Return to the homepage 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_Home_Tip {
             get {
@@ -142,7 +142,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the character interface in Honkai Impact 3rd 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_HonkaiImpact3_Tip {
             get {
@@ -160,7 +160,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Start pushing the boxes 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_MoveChest_Tip {
             get {
@@ -178,7 +178,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Launch the game 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_PlayGames_Tip {
             get {
@@ -196,7 +196,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the query interface 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_SelectUP_Tip {
             get {
@@ -232,7 +232,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the character interface in Honkai: Star Rail 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_StarRail_Tip {
             get {
@@ -250,7 +250,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the StreetPortal website 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_StreePortal_Tip {
             get {
@@ -268,7 +268,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Literal meaning 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_Updata_Tip {
             get {
@@ -286,7 +286,7 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Open the interface for historical version update content 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_Version_Tip {
             get {
@@ -300,6 +300,366 @@ namespace Software.resources.i18n {
         public static string MainWindow_Label_Ts {
             get {
                 return ResourceManager.GetString("MainWindow_Label_Ts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Output Json 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_BuildJson {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_BuildJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Yes 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_City_Address {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_City_Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Delete the folder 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Delete_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Delete_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Delete the Logs folder 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Delete_Logs_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Delete_Logs_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Delete the Log folder 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Open_Log_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Open_Log_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open log panel 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Open_LogDashboard {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Open_LogDashboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open the Logs folder 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Open_Logs_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Open_Logs_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open the Music folder 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Open_Music_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Open_Music_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open the Resources folder 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Open_Resources_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Open_Resources_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open the software root directory 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Open_Root_Directory_Folder {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Open_Root_Directory_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reboot Software 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Reboot_Software {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Reboot_Software", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Reboot Software(Administrator) 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Click_Root_Reboot_Software {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Click_Root_Reboot_Software", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 English 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Luanguage_en_US {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Luanguage_en-US", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Chinese 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_Luanguage_zh_CN {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_Luanguage_zh-CN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Test network connection 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_Button_TestNetworkConnection {
+            get {
+                return ResourceManager.GetString("PageSettings_Button_TestNetworkConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 About 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_About {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Color settings 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_ColorSettings {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_ColorSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 File operation 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_FileOperation {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_FileOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Hidden switch 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_HiddenSwitch {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_HiddenSwitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Launch settings 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_LaunchSettings {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_LaunchSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Network connection test 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_NetworkTest {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_NetworkTest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Path settings 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_PathSettings {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_PathSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Software operation 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_SoftwareOperation {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_SoftwareOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Update address 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_UpdateAddress {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_UpdateAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Weather address 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_GroupBox_WeatherAddress {
+            get {
+                return ResourceManager.GetString("PageSettings_GroupBox_WeatherAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enter address information: 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_CityAddress {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_CityAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Fill in the structured address information: Province + City + District + Town + Village + Street + House Number. Fill in according to the requirements 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_CityAddress_Tip {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_CityAddress_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Automatic update 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_EnableAutoUpdateCheckBox {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_EnableAutoUpdateCheckBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Start counting 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_EnableCountingCheckBox {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_EnableCountingCheckBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Game launch path： 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_GamePath {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_GamePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 New software update address： 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_New_Update_IP_address_TextChanged {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_New_Update_IP_address_TextChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Target address 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_TargetAddress {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_TargetAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Software update address： 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_Update_IP_address_TextChanged {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_Update_IP_address_TextChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Log update address： 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_Update_Log_IP_address_TextChanged {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_Update_Log_IP_address_TextChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 UpdateTimeColor： 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_UpdateTimeColor {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_UpdateTimeColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 VersionColor： 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_TextBlock_VersionColor {
+            get {
+                return ResourceManager.GetString("PageSettings_TextBlock_VersionColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Hide 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_ToggleSwitch_OffContent_Default {
+            get {
+                return ResourceManager.GetString("PageSettings_ToggleSwitch_OffContent_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Display 的本地化字符串。
+        /// </summary>
+        public static string PageSettings_ToggleSwitch_OnContent_Default {
+            get {
+                return ResourceManager.GetString("PageSettings_ToggleSwitch_OnContent_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 About 的本地化字符串。
+        /// </summary>
+        public static string System_MainWindow_Button_About {
+            get {
+                return ResourceManager.GetString("System_MainWindow_Button_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Do&apos;t Click 的本地化字符串。
+        /// </summary>
+        public static string System_MainWindow_Button_DoNotClick {
+            get {
+                return ResourceManager.GetString("System_MainWindow_Button_DoNotClick", resourceCulture);
             }
         }
     }

@@ -25,6 +25,7 @@ using System.Xml.Linq;
 using Software.Models;
 using Microsoft.Data.Sqlite;
 using Windows.Devices.Geolocation;
+using WPFLocalizeExtension.Engine;
 
 namespace Software
 {
@@ -487,6 +488,48 @@ namespace Software
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameStreePortal;
             this.beta_tabel.Visibility = Visibility.Hidden;
+        }
+
+        private void languageToggle_Click(object sender, RoutedEventArgs e)
+        {
+            // 获取当前软件使用的文化信息
+            CultureInfo currentCulture = LocalizeDictionary.Instance.Culture;
+            string newCulture;
+
+            // 判断当前语言并切换到另一种语言
+            if (currentCulture.Name == "zh-CN")
+            {
+                newCulture = "en-US";
+            }
+            else
+            {
+                newCulture = "zh-CN";
+            }
+
+            try
+            {
+                // 创建新的 CultureInfo 对象
+                var cultureInfo = new CultureInfo(newCulture);
+                // 设置当前应用的文化信息
+                LocalizeDictionary.Instance.Culture = cultureInfo;
+                // 记录日志
+                MyLoger.Information($"Language: [{cultureInfo}]");
+
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    connection.Open();
+
+                    string updateQuery = "UPDATE Settings SET Value = @value WHERE Key = 'Culture';";
+                    var updateCommand = new SqliteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@value", newCulture);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("保存 Culture 时发生错误:{error}", ex.ToString());
+                MessageBox.Show("保存 Culture 时发生错误: " + ex.Message);
+            }
         }
     }
 }

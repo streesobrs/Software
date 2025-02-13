@@ -3,6 +3,14 @@
   "version": "0.2.5.0",
   "updates": [
     {
+      "version": "0.2.6.0",
+      "updateTime": "",
+      "updateContent": [
+        "添加了设置页面顶部的跳转功能",
+        "添加了主页面切换语言的功能"
+      ]
+    },
+    {
       "version": "0.2.5.0",
       "updateTime": "2025/01/31",
       "updateContent": [

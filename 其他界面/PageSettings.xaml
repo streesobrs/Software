@@ -8,6 +8,10 @@
       xmlns:resx="clr-namespace:Software.Properties" 
       xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" 
       xmlns:viewModels="clr-namespace:Software.ViewModels"
+        xmlns:lang="clr-namespace:Software.resources.i18n"
+        xmlns:lex="http://wpflocalizeextension.codeplex.com"
+        lex:ResxLocalizationProvider.DefaultAssembly="Software"
+        lex:ResxLocalizationProvider.DefaultDictionary="Lang"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       FontFamily="../resources/Fonts/#得意黑"
@@ -100,11 +104,25 @@
     </Page.Resources>
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
-        <ScrollViewer>
-            <StackPanel Margin="10">
-
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" Height="45" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="0" Height="35" VerticalAlignment="Top">
+                <Button Style="{StaticResource ButtonStyle}" Content="软件状态" Click="NavigateToGroupBox_Click" Tag="SoftwareStatusGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_SoftwareOperation}" Click="NavigateToGroupBox_Click" Tag="SoftwareOperationGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_FileOperation}" Click="NavigateToGroupBox_Click" Tag="FileOperationGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_LaunchSettings}" Click="NavigateToGroupBox_Click" Tag="LaunchSettingsGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_UpdateAddress}" Click="NavigateToGroupBox_Click" Tag="UpdateAddressGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_PathSettings}" Click="NavigateToGroupBox_Click" Tag="PathSettingsGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_HiddenSwitch}" Click="NavigateToGroupBox_Click" Tag="HideSwitchGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_WeatherAddress}" Click="NavigateToGroupBox_Click" Tag="WeatherAddressGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_ColorSettings}" Click="NavigateToGroupBox_Click" Tag="ColorSettingsGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_NetworkTest}" Click="NavigateToGroupBox_Click" Tag="NetworkTestGroupBox"/>
+                <Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_GroupBox_About}" Click="NavigateToGroupBox_Click" Tag="AboutGroupBox" Visibility="Collapsed"/>
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer Margin="0,45,0,0" x:Name="MainScrollViewer">
+            <StackPanel Margin="10 0 10 10">
                 <!-- 软件状态 -->
-                <GroupBox Header="软件状态" Margin="5">
+                <GroupBox Header="软件状态" Margin="5" x:Name="SoftwareStatusGroupBox">
                     <TabControl>
                         <TabItem Header="文字信息">
                             <StackPanel>
@@ -161,37 +179,37 @@
                 </GroupBox>
 
                 <!-- 软件操作 -->
-                <GroupBox Header="软件操作" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_SoftwareOperation}" Margin="5" x:Name="SoftwareOperationGroupBox">
                     <StackPanel>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_LogDashboard" Click="Button_Click_Open_LogDashboard">打开日志面板</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson">输出Json</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software">重启软件</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software">管理员重启软件</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_LogDashboard" Click="Button_Click_Open_LogDashboard" Content="{lex:Loc PageSettings_Button_Click_Open_LogDashboard}"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="BuildJson" Click="Button_Click_BuildJson" Content="{lex:Loc PageSettings_Button_Click_BuildJson}"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Reboot_Software" Click="Button_Click_Reboot_Software" Content="{lex:Loc PageSettings_Button_Click_Reboot_Software}"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Root_Reboot_Software" Click="Button_Click_Root_Reboot_Software" Content="{lex:Loc PageSettings_Button_Click_Root_Reboot_Software}"/>
                         <StackPanel Orientation="Horizontal">
-                            <ui:Button Style="{StaticResource ButtonStyle}" Tag="zh-CN"  Content="中文" Click="ChangeLanguage_Click"/>
-                            <ui:Button Style="{StaticResource ButtonStyle}" Tag="en-US"  Content="英文" Click="ChangeLanguage_Click"/>
+                            <ui:Button Style="{StaticResource ButtonStyle}" Tag="zh-CN"  Content="{lex:Loc PageSettings_Button_Luanguage_zh-CN}" Click="ChangeLanguage_Click"/>
+                            <ui:Button Style="{StaticResource ButtonStyle}" Tag="en-US"  Content="{lex:Loc PageSettings_Button_Luanguage_en-US}" Click="ChangeLanguage_Click"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 文件操作 -->
-                <GroupBox Header="文件操作" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_FileOperation}" Margin="5" x:Name="FileOperationGroupBox">
                     <StackPanel>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Root_Directory_Folder" Click="Button_Click_Open_Root_Directory_Folder">打开软件根目录</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Log_Folder" Click="Button_Click_Open_Log_Folder">打开Log文件夹</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Logs_Folder" Click="Button_Click_Open_Logs_Folder">打开Logs文件夹</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Resources_Folder" Click="Button_Click_Open_Resources_Folder">打开resources文件夹</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Music_Folder" Click="Button_Click_Open_Music_Folder">打开music文件夹</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Logs_Folder" Click="Button_Click_Delete_Logs_Folder">删除Logs文件夹</ui:Button>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Folder" Click="Button_Click_Delete_Folder">删除文件夹</ui:Button>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Root_Directory_Folder" Click="Button_Click_Open_Root_Directory_Folder" Content="{lex:Loc PageSettings_Button_Click_Open_Root_Directory_Folder}"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Log_Folder" Click="Button_Click_Open_Log_Folder" Content="{lex:Loc PageSettings_Button_Click_Open_Log_Folder}"/> 
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Logs_Folder" Click="Button_Click_Open_Logs_Folder" Content="{lex:Loc PageSettings_Button_Click_Open_Logs_Folder}"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Resources_Folder" Click="Button_Click_Open_Resources_Folder" Content="{lex:Loc PageSettings_Button_Click_Open_Resources_Folder}"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Open_Music_Folder" Click="Button_Click_Open_Music_Folder" Content="{lex:Loc PageSettings_Button_Click_Open_Music_Folder}"/> 
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Logs_Folder" Click="Button_Click_Delete_Logs_Folder" Content="{lex:Loc PageSettings_Button_Click_Delete_Logs_Folder}"/> 
+                        <ui:Button Style="{StaticResource ButtonStyle}" Name="Delete_Folder" Click="Button_Click_Delete_Folder" Content="{lex:Loc PageSettings_Button_Click_Delete_Folder}"/>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 启动设置 -->
-                <GroupBox Header="启动设置" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_LaunchSettings}" Margin="5" x:Name="LaunchSettingsGroupBox">
                     <StackPanel>
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="启动计数" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_EnableCountingCheckBox}" /> 
                             <CheckBox DockPanel.Dock="Top" Foreground="Black"
                                 Name="EnableCountingCheckBox" 
                                 Content="" 
@@ -200,7 +218,7 @@
                         </DockPanel>
 
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="自动更新" />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_EnableAutoUpdateCheckBox}" /> 
                             <CheckBox DockPanel.Dock="Top" Foreground="Black"
                                 Name="EnableAutoUpdateCheckBox" 
                                 Content="" 
@@ -211,114 +229,114 @@
                 </GroupBox>
 
                 <!-- 更新地址 -->
-                <GroupBox Header="更新地址" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_UpdateAddress}" Margin="5" x:Name="UpdateAddressGroupBox">
                     <StackPanel>
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="软件更新地址："  />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_Update_IP_address_TextChanged}"  /> 
                             <TextBox Name="Update_IP_address" HorizontalAlignment="Left" TextChanged="Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                         </DockPanel>
 
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="日志更新地址："  />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_Update_Log_IP_address_TextChanged}"  /> 
                             <TextBox Name="Update_Log_IP_address" HorizontalAlignment="Left" TextChanged="Update_Log_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                         </DockPanel>
 
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="新软件更新地址："  />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_New_Update_IP_address_TextChanged}"  /> 
                             <TextBox Name="New_Update_IP_address" HorizontalAlignment="Left" TextChanged="New_Update_IP_address_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 路径设置 -->
-                <GroupBox Header="路径设置" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_PathSettings}" Margin="5" x:Name="PathSettingsGroupBox">
                     <StackPanel>
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏启动路径："  />
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_GamePath}"  /> 
                             <TextBox Name="Text_GamePath" HorizontalAlignment="Left" TextChanged="Text_GamePath_TextChanged" Foreground="Black" Margin="5,0,0,0"/>
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 隐藏开关 -->
-                <GroupBox Header="隐藏开关" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_HiddenSwitch}" Margin="5" x:Name="HideSwitchGroupBox">
                     <StackPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="地图"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinMap_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_GenshinMap}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinMap_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="查询"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_SelectUP_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_SelectUP}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_SelectUP_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="游戏"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_PlayGames_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_PlayGames}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_PlayGames_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="原神角色"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinRole_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_GenshinRole}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_GenshinRole_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏三角色"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_HonkaiImpact3_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_HonkaiImpact3}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_HonkaiImpact3_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="崩坏星穹铁道角色"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StarRail_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_StarRail}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StarRail_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="推箱子"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MoveChest_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_MoveChest}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MoveChest_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="Bing"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_Bing}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_Bing_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                         <DockPanel>
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="StreePortal"  />
-                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="显示" OffContent="隐藏" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_StreePortal}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 天气地址 -->
-                <GroupBox Header="天气地址" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_WeatherAddress}" Margin="5" x:Name="WeatherAddressGroupBox">
                     <StackPanel>
                         <DockPanel Style="{StaticResource DockPanelStyle}">
-                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="输入地址信息：" ToolTip="填写结构化地址信息:省份＋城市＋区县＋城镇＋乡村＋街道＋门牌号码。根据需求填写"/>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_CityAddress}" ToolTip="{lex:Loc PageSettings_TextBlock_CityAddress_Tip}"/>
                             <TextBox Name="Text_CityAddress" HorizontalAlignment="Left" Foreground="Black" Margin="5,0,0,0"/>
-                            <ui:Button Style="{StaticResource ButtonStyle}" Click="Button_Click_City_Address">确定</ui:Button>
+                            <ui:Button Style="{StaticResource ButtonStyle}" Click="Button_Click_City_Address" Content="{lex:Loc PageSettings_Button_Click_City_Address}"/> 
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 颜色设置 -->
-                <GroupBox Header="颜色设置" Margin="5" >
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_ColorSettings}" Margin="5" x:Name="ColorSettingsGroupBox">
                     <StackPanel>
                         <DockPanel>
-                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="VersionColor：" />
+                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_VersionColor}" />
                             <ui:TextBox Name="Text_VersionColor" TextChanged="Text_VersionColor_TextChanged" />
                         </DockPanel>
                         <DockPanel>
-                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="UpdateTimeColor：" />
+                            <ui:TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_UpdateTimeColor}" />
                             <ui:TextBox Name="Text_UpdateTimeColor" TextChanged="Text_UpdateTimeColor_TextChanged" />
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 网络连接测试 -->
-                <GroupBox Header="网络连接测试" Margin="5">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_NetworkTest}" Margin="5" x:Name="NetworkTestGroupBox">
                     <StackPanel>
-                        <TextBlock Style="{StaticResource TextBlockStyle}" Text="目标地址"   />
+                        <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc PageSettings_TextBlock_TargetAddress}"   />
                         <TextBox Name="TargetAddressTextBox" Width="200" Margin="5,0,0,0"/>
-                        <ui:Button Style="{StaticResource ButtonStyle}" Content="测试网络连接" Click="TestNetworkConnectionButton_Click" Margin="10,0,0,0"/>
+                        <ui:Button Style="{StaticResource ButtonStyle}" Content="{lex:Loc PageSettings_Button_TestNetworkConnection}" Click="TestNetworkConnectionButton_Click" Margin="10,0,0,0"/>
                         <TextBlock Name="NetworkTestResultTextBlock" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
                     </StackPanel>
                 </GroupBox>
                 
                 <!-- 关于 -->
-                <GroupBox Header="关于" Margin="5" Visibility="Collapsed">
+                <GroupBox Header="{lex:Loc PageSettings_GroupBox_About}" Margin="5" x:Name="AboutGroupBox" Visibility="Collapsed">
                     <StackPanel>
                         <DockPanel>
                             <ui:Anchor NavigateUri="https://" Content="AngleSharp" ToolTip="" Icon="{ui:SymbolIcon Link24}"/>

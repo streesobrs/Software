@@ -163,39 +163,159 @@
     <value>Set up some functions</value>
   </data>
   <data name="MainWindow_Button_Bing_Tip" xml:space="preserve">
-    <value></value>
+    <value>A search engine</value>
   </data>
   <data name="MainWindow_Button_GenshinMap_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the map interface</value>
   </data>
   <data name="MainWindow_Button_GenshinRole_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the Genshin Impact character interface</value>
   </data>
   <data name="MainWindow_Button_Home_Tip" xml:space="preserve">
-    <value></value>
+    <value>Return to the homepage</value>
   </data>
   <data name="MainWindow_Button_HonkaiImpact3_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the character interface in Honkai Impact 3rd</value>
   </data>
   <data name="MainWindow_Button_MoveChest_Tip" xml:space="preserve">
-    <value></value>
+    <value>Start pushing the boxes</value>
   </data>
   <data name="MainWindow_Button_PlayGames_Tip" xml:space="preserve">
-    <value></value>
+    <value>Launch the game</value>
   </data>
   <data name="MainWindow_Button_SelectUP_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the query interface</value>
   </data>
   <data name="MainWindow_Button_StarRail_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the character interface in Honkai: Star Rail</value>
   </data>
   <data name="MainWindow_Button_StreePortal_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the StreetPortal website</value>
   </data>
   <data name="MainWindow_Button_Updata_Tip" xml:space="preserve">
-    <value></value>
+    <value>Literal meaning</value>
   </data>
   <data name="MainWindow_Button_Version_Tip" xml:space="preserve">
-    <value></value>
+    <value>Open the interface for historical version update content</value>
+  </data>
+  <data name="System_MainWindow_Button_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="System_MainWindow_Button_DoNotClick" xml:space="preserve">
+    <value>Do't Click</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_LogDashboard" xml:space="preserve">
+    <value>Open log panel</value>
+  </data>
+  <data name="PageSettings_Button_Click_BuildJson" xml:space="preserve">
+    <value>Output Json</value>
+  </data>
+  <data name="PageSettings_Button_Click_Reboot_Software" xml:space="preserve">
+    <value>Reboot Software</value>
+  </data>
+  <data name="PageSettings_Button_Click_Root_Reboot_Software" xml:space="preserve">
+    <value>Reboot Software(Administrator)</value>
+  </data>
+  <data name="PageSettings_Button_Luanguage_zh-CN" xml:space="preserve">
+    <value>Chinese</value>
+  </data>
+  <data name="PageSettings_Button_Luanguage_en-US" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="PageSettings_GroupBox_SoftwareOperation" xml:space="preserve">
+    <value>Software operation</value>
+  </data>
+  <data name="PageSettings_GroupBox_FileOperation" xml:space="preserve">
+    <value>File operation</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Root_Directory_Folder" xml:space="preserve">
+    <value>Open the software root directory</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Log_Folder" xml:space="preserve">
+    <value>Delete the Log folder</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Logs_Folder" xml:space="preserve">
+    <value>Open the Logs folder</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Resources_Folder" xml:space="preserve">
+    <value>Open the Resources folder</value>
+  </data>
+  <data name="PageSettings_Button_Click_Open_Music_Folder" xml:space="preserve">
+    <value>Open the Music folder</value>
+  </data>
+  <data name="PageSettings_Button_Click_Delete_Logs_Folder" xml:space="preserve">
+    <value>Delete the Logs folder</value>
+  </data>
+  <data name="PageSettings_Button_Click_Delete_Folder" xml:space="preserve">
+    <value>Delete the folder</value>
+  </data>
+  <data name="PageSettings_GroupBox_LaunchSettings" xml:space="preserve">
+    <value>Launch settings</value>
+  </data>
+  <data name="PageSettings_TextBlock_EnableCountingCheckBox" xml:space="preserve">
+    <value>Start counting</value>
+  </data>
+  <data name="PageSettings_TextBlock_EnableAutoUpdateCheckBox" xml:space="preserve">
+    <value>Automatic update</value>
+  </data>
+  <data name="PageSettings_GroupBox_UpdateAddress" xml:space="preserve">
+    <value>Update address</value>
+  </data>
+  <data name="PageSettings_TextBlock_Update_IP_address_TextChanged" xml:space="preserve">
+    <value>Software update address：</value>
+  </data>
+  <data name="PageSettings_TextBlock_Update_Log_IP_address_TextChanged" xml:space="preserve">
+    <value>Log update address：</value>
+  </data>
+  <data name="PageSettings_TextBlock_New_Update_IP_address_TextChanged" xml:space="preserve">
+    <value>New software update address：</value>
+  </data>
+  <data name="PageSettings_GroupBox_PathSettings" xml:space="preserve">
+    <value>Path settings</value>
+  </data>
+  <data name="PageSettings_TextBlock_GamePath" xml:space="preserve">
+    <value>Game launch path：</value>
+  </data>
+  <data name="PageSettings_GroupBox_HiddenSwitch" xml:space="preserve">
+    <value>Hidden switch</value>
+  </data>
+  <data name="PageSettings_GroupBox_WeatherAddress" xml:space="preserve">
+    <value>Weather address</value>
+  </data>
+  <data name="PageSettings_TextBlock_CityAddress" xml:space="preserve">
+    <value>Enter address information:</value>
+  </data>
+  <data name="PageSettings_TextBlock_CityAddress_Tip" xml:space="preserve">
+    <value>Fill in the structured address information: Province + City + District + Town + Village + Street + House Number. Fill in according to the requirements</value>
+  </data>
+  <data name="PageSettings_Button_Click_City_Address" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="PageSettings_GroupBox_ColorSettings" xml:space="preserve">
+    <value>Color settings</value>
+  </data>
+  <data name="PageSettings_TextBlock_VersionColor" xml:space="preserve">
+    <value>VersionColor：</value>
+  </data>
+  <data name="PageSettings_TextBlock_UpdateTimeColor" xml:space="preserve">
+    <value>UpdateTimeColor：</value>
+  </data>
+  <data name="PageSettings_GroupBox_NetworkTest" xml:space="preserve">
+    <value>Network connection test</value>
+  </data>
+  <data name="PageSettings_TextBlock_TargetAddress" xml:space="preserve">
+    <value>Target address</value>
+  </data>
+  <data name="PageSettings_Button_TestNetworkConnection" xml:space="preserve">
+    <value>Test network connection</value>
+  </data>
+  <data name="PageSettings_GroupBox_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="PageSettings_ToggleSwitch_OnContent_Default" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="PageSettings_ToggleSwitch_OffContent_Default" xml:space="preserve">
+    <value>Hide</value>
   </data>
 </root>
