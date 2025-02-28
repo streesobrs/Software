@@ -1,10 +1,10 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.5.0",
+  "version": "0.2.6.0",
   "updates": [
     {
       "version": "0.2.6.0",
-      "updateTime": "",
+      "updateTime": "2025/02/28",
       "updateContent": [
         "添加了设置页面顶部的跳转功能",
         "添加了主页面切换语言的功能"
