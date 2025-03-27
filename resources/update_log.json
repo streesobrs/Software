@@ -3,6 +3,15 @@
   "version": "0.2.6.0",
   "updates": [
     {
+      "version": "0.2.7.0",
+      "updateTime": "",
+      "updateContent": [
+        "将Updater.exe更新至1.3.2.0",
+        "修复了使用zip更新时解压错误的问题",
+        "修复了使用zip更新时无法重启的问题"
+      ]
+    },
+    {
       "version": "0.2.6.0",
       "updateTime": "2025/02/28",
       "updateContent": [
