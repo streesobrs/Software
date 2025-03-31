@@ -1,14 +1,15 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.6.0",
+  "version": "0.2.7.0",
   "updates": [
     {
       "version": "0.2.7.0",
-      "updateTime": "",
+      "updateTime": "2025/03/31",
       "updateContent": [
         "将Updater.exe更新至1.3.2.0",
         "修复了使用zip更新时解压错误的问题",
-        "修复了使用zip更新时无法重启的问题"
+        "修复了使用zip更新时无法重启的问题",
+        "修复了某个错误使用的文件夹名"
       ]
     },
     {

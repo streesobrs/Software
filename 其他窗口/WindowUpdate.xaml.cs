@@ -306,7 +306,7 @@ namespace Software.其他窗口
                     string updateUrl = selectedDetail.UpdateURL;
                     string fileName = Path.GetFileName(updateUrl);
                     string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-                    string updateFolderPath = Path.Combine(rootPath, "imageUpdate");
+                    string updateFolderPath = Path.Combine(rootPath, "update");
                     string filePath = Path.Combine(updateFolderPath, fileName);
 
                     UpdateStatus("检查文件是否存在...");
@@ -436,7 +436,7 @@ namespace Software.其他窗口
         private async Task<string> DownloadUpdate(string url)
         {
             string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-            string updateFolderPath = Path.Combine(rootPath, "imageUpdate");
+            string updateFolderPath = Path.Combine(rootPath, "update");
 
             if (!Directory.Exists(updateFolderPath))
             {
