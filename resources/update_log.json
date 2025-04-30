@@ -1,7 +1,14 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.7.0",
+  "version": "0.2.8.0",
   "updates": [
+    {
+      "version": "0.2.8.0",
+      "updateTime": "2025/04/30",
+      "updateContent": [
+        "修复一些错误文件"
+      ]
+    },
     {
       "version": "0.2.7.0",
       "updateTime": "2025/03/31",
