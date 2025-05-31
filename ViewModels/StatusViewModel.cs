@@ -1,16 +1,31 @@
-﻿using LiveCharts;
-using LiveCharts.Wpf;
-using LiveCharts.Defaults;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Software.ViewModels
 {
-    // StatusViewModel 类用于管理系统状态相关数据，并实现属性变更通知以更新 UI，与图表展示相关
+    // 资源项类，用于展示资源详细信息
+    public class ResourceItem : INotifyPropertyChanged
+    {
+        public string Type { get; set; }
+        public string Path { get; set; }
+        public double Size { get; set; }
+        public DateTime LastModified { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    // StatusViewModel 类用于管理系统状态相关数据，并实现属性变更通知以更新 UI
     public class StatusViewModel : INotifyPropertyChanged
     {
         // 存储内存使用率
@@ -29,32 +44,58 @@ namespace Software.ViewModels
         private double _usedDiskSpace;
         // 存储网络连接状态
         private string _networkStatus;
-        // 存储图表的数据系列集合
-        private SeriesCollection _seriesCollection;
+        // 存储系统版本
+        private string _systemVersion;
+        // 存储软件版本
+        private string _softwareVersion;
+        // 存储当前用户
+        private string _currentUser;
+        // 存储启动时间
+        private DateTime _startTime;
+        // 存储软件安装大小（MB）
+        private double _applicationSize;
+        // 存储资源文件夹大小（MB）
+        private double _resourcesSize;
+        // 存储浏览器缓存大小（MB）
+        private double _browserCacheSize;
+        // 存储日志文件大小（MB）
+        private double _logsSize;
+        // 存储临时文件大小（MB）
+        private double _tempFilesSize;
+        // 存储用户数据大小（MB）
+        private double _userDataSize;
+        // 存储资源项集合
+        private List<ResourceItem> _resourceItems;
+        // 存储选中的资源项
+        private ResourceItem _selectedResourceItem;
 
-        // 复用的内存使用和 CPU 使用数据点对象
-        private DateTimePoint _memoryUsagePoint;
-        private DateTimePoint _cpuUsagePoint;
+        // 清理缓存命令
+        private ICommand _cleanCacheCommand;
+        // 刷新资源命令
+        private ICommand _refreshResourcesCommand;
+        // 删除资源命令
+        private ICommand _deleteResourceCommand;
 
-        // MemoryUsage 属性，设置时更新图表数据
+        // 计时器，用于定期更新系统状态
+        private System.Timers.Timer _updateTimer;
+
+        // MemoryUsage 属性
         public double MemoryUsage
         {
             get { return _memoryUsage; }
             set
             {
                 SetProperty(ref _memoryUsage, value);
-                UpdateSeriesCollection();
             }
         }
 
-        // CPUUsage 属性，设置时更新图表数据
+        // CPUUsage 属性
         public double CPUUsage
         {
             get { return _cpuUsage; }
             set
             {
                 SetProperty(ref _cpuUsage, value);
-                UpdateSeriesCollection();
             }
         }
 
@@ -62,20 +103,20 @@ namespace Software.ViewModels
         public TimeSpan Uptime
         {
             get { return _uptime; }
-            set { SetProperty(ref _uptime, value); }
-        }
-
-        // 新增用于获取运行时间天数的属性
-        public int Days
-        {
-            get { return (int)_uptime.TotalDays; }
             set
             {
-                if (_days != value)
-                {
-                    _days = value;
-                    OnPropertyChanged(nameof(Days));
-                }
+                SetProperty(ref _uptime, value);
+                Days = (int)value.TotalDays; // 更新天数
+            }
+        }
+
+        // 用于获取运行时间天数的属性
+        public int Days
+        {
+            get { return _days; }
+            set
+            {
+                SetProperty(ref _days, value);
             }
         }
 
@@ -118,70 +159,169 @@ namespace Software.ViewModels
             }
         }
 
-        // SeriesCollection 属性，实现属性变更通知
-        public SeriesCollection SeriesCollection
+        // 系统版本属性
+        public string SystemVersion
         {
-            get { return _seriesCollection; }
-            set { SetProperty(ref _seriesCollection, value); }
+            get => _systemVersion;
+            set => SetProperty(ref _systemVersion, value);
         }
 
-        // 用于格式化图表坐标轴数值显示的委托属性
-        public Func<double, string> Formatter { get; set; }
+        // 软件版本属性
+        public string SoftwareVersion
+        {
+            get => _softwareVersion;
+            set => SetProperty(ref _softwareVersion, value);
+        }
 
-        // 构造函数，初始化系统状态数据和图表相关内容
+        // 当前用户属性
+        public string CurrentUser
+        {
+            get => _currentUser;
+            set => SetProperty(ref _currentUser, value);
+        }
+
+        // 启动时间属性
+        public DateTime StartTime
+        {
+            get => _startTime;
+            set => SetProperty(ref _startTime, value);
+        }
+
+        // 软件安装大小属性
+        public double ApplicationSize
+        {
+            get => _applicationSize;
+            set => SetProperty(ref _applicationSize, value);
+        }
+
+        // 资源文件夹大小属性
+        public double ResourcesSize
+        {
+            get => _resourcesSize;
+            set => SetProperty(ref _resourcesSize, value);
+        }
+
+        // 浏览器缓存大小属性
+        public double BrowserCacheSize
+        {
+            get => _browserCacheSize;
+            set => SetProperty(ref _browserCacheSize, value);
+        }
+
+        // 日志文件大小属性
+        public double LogsSize
+        {
+            get => _logsSize;
+            set => SetProperty(ref _logsSize, value);
+        }
+
+        // 临时文件大小属性
+        public double TempFilesSize
+        {
+            get => _tempFilesSize;
+            set => SetProperty(ref _tempFilesSize, value);
+        }
+
+        // 用户数据大小属性
+        public double UserDataSize
+        {
+            get => _userDataSize;
+            set => SetProperty(ref _userDataSize, value);
+        }
+
+        // 资源项集合属性
+        public List<ResourceItem> ResourceItems
+        {
+            get => _resourceItems;
+            set => SetProperty(ref _resourceItems, value);
+        }
+
+        // 选中的资源项属性
+        public ResourceItem SelectedResourceItem
+        {
+            get => _selectedResourceItem;
+            set => SetProperty(ref _selectedResourceItem, value);
+        }
+
+        // 清理缓存命令属性
+        public ICommand CleanCacheCommand
+        {
+            get
+            {
+                if (_cleanCacheCommand == null)
+                {
+                    _cleanCacheCommand = new RelayCommand(
+                        param => CleanCache(),
+                        param => true
+                    );
+                }
+                return _cleanCacheCommand;
+            }
+        }
+
+        // 刷新资源命令属性
+        public ICommand RefreshResourcesCommand
+        {
+            get
+            {
+                if (_refreshResourcesCommand == null)
+                {
+                    _refreshResourcesCommand = new RelayCommand(
+                        param => RefreshResources(),
+                        param => true
+                    );
+                }
+                return _refreshResourcesCommand;
+            }
+        }
+
+        // 删除资源命令属性
+        public ICommand DeleteResourceCommand
+        {
+            get
+            {
+                if (_deleteResourceCommand == null)
+                {
+                    _deleteResourceCommand = new RelayCommand(
+                        param => DeleteResource(param),
+                        param => param is ResourceItem
+                    );
+                }
+                return _deleteResourceCommand;
+            }
+        }
+
+        // 构造函数，初始化系统状态数据
         public StatusViewModel()
         {
-            SeriesCollection = new SeriesCollection
-            {
-                new LineSeries { Title = "内存使用（MB）", Values = new ChartValues<DateTimePoint>() },
-                new LineSeries { Title = "CPU 使用率（%）", Values = new ChartValues<DateTimePoint>() }
-            };
-
-            _memoryUsagePoint = new DateTimePoint(DateTime.Now, 0);
-            _cpuUsagePoint = new DateTimePoint(DateTime.Now, 0);
-
-            Formatter = value => new DateTime((long)value).ToString("HH:mm:ss");
-
             UpdateDiskSpace();
             NetworkStatus = GetNetworkStatus();
-            AddInitialDataPoints();
-            UpdateSeriesCollection();
+
+            // 初始化其他系统信息
+            SystemVersion = Environment.OSVersion.ToString();
+            SoftwareVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            CurrentUser = Environment.UserName;
+            StartTime = DateTime.Now; // 记录启动时间
+
+            // 初始化资源信息
+            RefreshResources();
+
+            // 启动计时器，定期更新系统状态
+            _updateTimer = new System.Timers.Timer(1000); // 每秒更新一次
+            _updateTimer.Elapsed += (sender, e) => UpdateSystemStatus();
+            _updateTimer.Start();
         }
 
-        // 更新图表数据系列集合，控制数据点数量，复用数据点对象并在 UI 线程更新
-        private async void UpdateSeriesCollection()
+        // 更新系统状态
+        private void UpdateSystemStatus()
         {
-            await Task.Run(() =>
+            // 模拟更新内存和CPU使用情况
+            Random random = new Random();
+            App.Current.Dispatcher.Invoke(() =>
             {
-                var memorySeries = SeriesCollection[0];
-                var cpuSeries = SeriesCollection[1];
-
-                if (memorySeries.Values.Count > 30)
-                {
-                    if (memorySeries.Values.Count > 0)
-                    {
-                        memorySeries.Values.RemoveAt(0);
-                    }
-                }
-
-                if (cpuSeries.Values.Count > 30)
-                {
-                    if (cpuSeries.Values.Count > 0)
-                    {
-                        cpuSeries.Values.RemoveAt(0);
-                    }
-                }
-
-                _memoryUsagePoint.DateTime = DateTime.Now;
-                _memoryUsagePoint.Value = Math.Round(MemoryUsage, 2);
-                _cpuUsagePoint.DateTime = DateTime.Now;
-                _cpuUsagePoint.Value = Math.Round(CPUUsage, 2);
-
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    memorySeries.Values.Add(_memoryUsagePoint);
-                    cpuSeries.Values.Add(_cpuUsagePoint);
-                });
+                MemoryUsage = Math.Round(512 + random.NextDouble() * 1024, 2);
+                CPUUsage = Math.Round(random.NextDouble() * 100, 2);
+                Uptime = DateTime.Now - StartTime;
             });
         }
 
@@ -228,16 +368,222 @@ namespace Software.ViewModels
             }
         }
 
-        // 给图表数据系列添加初始数据点
-        private void AddInitialDataPoints()
+        // 刷新资源信息
+        private void RefreshResources()
         {
-            var memorySeries = SeriesCollection[0];
-            memorySeries.Values.Add(new DateTimePoint(DateTime.Now, 0));
-            memorySeries.Values.Add(new DateTimePoint(DateTime.Now, 0));
+            try
+            {
+                // 获取应用程序目录
+                string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            var cpuSeries = SeriesCollection[1];
-            cpuSeries.Values.Add(new DateTimePoint(DateTime.Now, 0));
-            cpuSeries.Values.Add(new DateTimePoint(DateTime.Now, 0));
+                // 计算应用程序大小
+                ApplicationSize = CalculateDirectorySize(appDirectory) / (1024.0);
+
+                // 计算资源文件夹大小
+                string resourcesPath = Path.Combine(appDirectory, "Resources");
+                ResourcesSize = Directory.Exists(resourcesPath) ? CalculateDirectorySize(resourcesPath) / (1024.0) : 0;
+
+                // 计算浏览器缓存大小
+                string browserCachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "BrowserCache");
+                BrowserCacheSize = Directory.Exists(browserCachePath) ? CalculateDirectorySize(browserCachePath) / (1024.0) : 0;
+
+                // 计算日志文件大小
+                string logsPath = Path.Combine(appDirectory, "Logs");
+                LogsSize = Directory.Exists(logsPath) ? CalculateDirectorySize(logsPath) / (1024.0) : 0;
+
+                // 计算临时文件大小
+                string tempPath = Path.GetTempPath();
+                TempFilesSize = CalculateDirectorySize(tempPath) / (1024.0);
+
+                // 计算用户数据大小
+                string userDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MyApp");
+                UserDataSize = Directory.Exists(userDataPath) ? CalculateDirectorySize(userDataPath) / (1024.0) : 0;
+
+                // 收集详细资源项
+                List<ResourceItem> items = new List<ResourceItem>();
+
+                // 添加日志文件
+                if (Directory.Exists(logsPath))
+                {
+                    items.AddRange(Directory.GetFiles(logsPath)
+                        .Select(file => new ResourceItem
+                        {
+                            Type = "日志文件",
+                            Path = file,
+                            Size = new FileInfo(file).Length / (1024.0),
+                            LastModified = File.GetLastWriteTime(file)
+                        }));
+                }
+
+                // 添加临时文件（限制显示数量）
+                if (Directory.Exists(tempPath))
+                {
+                    items.AddRange(Directory.GetFiles(tempPath)
+                        .Select(file => new ResourceItem
+                        {
+                            Type = "临时文件",
+                            Path = file,
+                            Size = new FileInfo(file).Length / (1024.0),
+                            LastModified = File.GetLastWriteTime(file)
+                        })
+                        .Take(20)); // 限制显示20个临时文件
+                }
+
+                // 添加浏览器缓存文件（限制显示数量）
+                if (Directory.Exists(browserCachePath))
+                {
+                    items.AddRange(Directory.GetFiles(browserCachePath)
+                        .Select(file => new ResourceItem
+                        {
+                            Type = "浏览器缓存",
+                            Path = file,
+                            Size = new FileInfo(file).Length / (1024.0),
+                            LastModified = File.GetLastWriteTime(file)
+                        })
+                        .Take(20)); // 限制显示20个缓存文件
+                }
+
+                ResourceItems = items.OrderByDescending(item => item.Size).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"刷新资源信息时出错: {ex.Message}");
+            }
+        }
+
+        // 计算目录大小
+        private long CalculateDirectorySize(string directoryPath)
+        {
+            try
+            {
+                if (!Directory.Exists(directoryPath))
+                    return 0;
+
+                long size = 0;
+
+                // 计算文件大小
+                foreach (string file in Directory.GetFiles(directoryPath))
+                {
+                    try
+                    {
+                        size += new FileInfo(file).Length;
+                    }
+                    catch (Exception)
+                    {
+                        // 忽略无法访问的文件
+                    }
+                }
+
+                // 递归计算子目录大小
+                foreach (string subDirectory in Directory.GetDirectories(directoryPath))
+                {
+                    try
+                    {
+                        size += CalculateDirectorySize(subDirectory);
+                    }
+                    catch (Exception)
+                    {
+                        // 忽略无法访问的目录
+                    }
+                }
+
+                return size;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        // 清理缓存
+        private void CleanCache()
+        {
+            try
+            {
+                // 清理浏览器缓存
+                string browserCachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "BrowserCache");
+                DeleteDirectoryContent(browserCachePath);
+
+                // 清理临时文件
+                string tempPath = Path.GetTempPath();
+                DeleteDirectoryContent(tempPath);
+
+                // 刷新资源信息
+                RefreshResources();
+
+                Console.WriteLine("缓存清理完成");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"清理缓存时出错: {ex.Message}");
+            }
+        }
+
+        // 删除目录内容
+        private void DeleteDirectoryContent(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+                return;
+
+            try
+            {
+                foreach (string file in Directory.GetFiles(directoryPath))
+                {
+                    try
+                    {
+                        File.SetAttributes(file, FileAttributes.Normal);
+                        File.Delete(file);
+                    }
+                    catch (Exception)
+                    {
+                        // 忽略无法删除的文件
+                    }
+                }
+
+                foreach (string subDirectory in Directory.GetDirectories(directoryPath))
+                {
+                    try
+                    {
+                        DeleteDirectoryContent(subDirectory);
+                        Directory.Delete(subDirectory, true);
+                    }
+                    catch (Exception)
+                    {
+                        // 忽略无法删除的目录
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // 忽略异常
+            }
+        }
+
+        // 删除单个资源
+        private void DeleteResource(object parameter)
+        {
+            if (parameter is ResourceItem resourceItem)
+            {
+                try
+                {
+                    if (File.Exists(resourceItem.Path))
+                    {
+                        File.SetAttributes(resourceItem.Path, FileAttributes.Normal);
+                        File.Delete(resourceItem.Path);
+
+                        // 从列表中移除
+                        ResourceItems.Remove(resourceItem);
+                        ResourceItems = new List<ResourceItem>(ResourceItems); // 触发属性变更通知
+
+                        // 刷新资源大小
+                        RefreshResources();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"删除资源时出错: {ex.Message}");
+                }
+            }
         }
 
         // 处理磁盘空间属性变更，重新计算并通知 UsedDiskSpace 变化
@@ -264,6 +610,35 @@ namespace Software.ViewModels
                 field = value;
                 OnPropertyChanged(propertyName);
             }
+        }
+    }
+
+    // 简单的命令实现类
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute(parameter);
         }
     }
 }

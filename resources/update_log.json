@@ -1,7 +1,15 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.8.0",
+  "version": "0.2.9.0",
   "updates": [
+    {
+      "version": "0.2.9.0",
+      "updateTime": "2025/05/31",
+      "updateContent": [
+        "添加了资源管理分页",
+        "移除了图表分页"
+      ]
+    },
     {
       "version": "0.2.8.0",
       "updateTime": "2025/04/30",

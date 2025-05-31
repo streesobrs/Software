@@ -125,55 +125,178 @@
                 <GroupBox Header="软件状态" Margin="5" x:Name="SoftwareStatusGroupBox">
                     <TabControl>
                         <TabItem Header="文字信息">
-                            <StackPanel>
-                                <DockPanel>
-                                    <TextBlock Text="内存使用：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
+                            <Grid Height="auto">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                                <DockPanel>
-                                    <TextBlock Text="CPU 使用率：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding CPUUsage, StringFormat={}{0:F2}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
-                                
-                                <DockPanel>
-                                    <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding Days}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                    <TextBlock Text="{Binding Uptime, StringFormat={}{0:hh\\:mm\\:ss}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
+                                <!-- 使用UniformGrid优化布局 -->
+                                <UniformGrid Grid.Column="0" Rows="7" Columns="1" Margin="0">
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="内存使用：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
 
-                                <!-- 新增信息 -->
-                                <DockPanel>
-                                    <TextBlock Text="可用磁盘空间：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding DiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
-                                <DockPanel>
-                                    <TextBlock Text="总磁盘空间：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding TotalDiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
-                                <DockPanel>
-                                    <TextBlock Text="已用磁盘空间：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding UsedDiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="CPU 使用率：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding CPUUsage, StringFormat={}{0:F2}%}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
 
-                                <DockPanel>
-                                    <TextBlock Text="网络状态：" Style="{StaticResource TextBlockStyle}" />
-                                    <TextBlock Text="{Binding NetworkStatus}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
-                                </DockPanel>
-                            </StackPanel>
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="运行时间：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding Days, StringFormat={}{0}天 }" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Uptime, StringFormat={}{0:hh\\:mm\\:ss}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="可用磁盘空间：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding DiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="总磁盘空间：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding TotalDiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="已用磁盘空间：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding UsedDiskSpace, StringFormat={}{0:F2} GB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="网络状态：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding NetworkStatus}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+                                </UniformGrid>
+
+                                <!-- 右侧信息区域优化 -->
+                                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0" VerticalAlignment="Top">
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="系统版本：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding SystemVersion}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <!-- 新增系统信息 -->
+                                    <DockPanel LastChildFill="False" Margin="0,10,0,0">
+                                        <TextBlock Text="软件版本：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding SoftwareVersion}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="当前用户：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding CurrentUser}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock Text="启动时间：" Style="{StaticResource TextBlockStyle}" />
+                                        <TextBlock Text="{Binding StartTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
                         </TabItem>
-                        <TabItem Header="图表" IsEnabled="False" ToolTip="有问题，退休了">
-                            <lvc:CartesianChart Series="{Binding SeriesCollection}" Height="180">
-                                <lvc:CartesianChart.DataTooltip>
-                                    <lvc:DefaultTooltip Background="White" Foreground="Black" />
-                                </lvc:CartesianChart.DataTooltip>
-                                <lvc:CartesianChart.AxisX>
-                                    <lvc:Axis Title="时间" LabelFormatter="{Binding Formatter}" />
-                                </lvc:CartesianChart.AxisX>
-                                <lvc:CartesianChart.AxisY>
-                                    <lvc:Axis Title="值" />
-                                </lvc:CartesianChart.AxisY>
-                            </lvc:CartesianChart>
+
+                        <!-- 资源管理 -->
+                        <TabItem Header="资源管理">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- 资源摘要信息 -->
+                                <StackPanel Grid.Row="0" Margin="5">
+                                    <TextBlock Text="资源使用摘要" Style="{StaticResource HeaderTextBlockStyle}" Margin="0,0,0,5"/>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                            <DockPanel LastChildFill="False">
+                                                <TextBlock Text="软件安装大小：" Style="{StaticResource TextBlockStyle}" />
+                                                <TextBlock Text="{Binding ApplicationSize, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                            </DockPanel>
+
+                                            <DockPanel LastChildFill="False" Margin="5,0,0,0">
+                                                <TextBlock Text="资源文件夹大小：" Style="{StaticResource TextBlockStyle}" />
+                                                <TextBlock Text="{Binding ResourcesSize, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                            </DockPanel>
+
+                                            <DockPanel LastChildFill="False" Margin="5,0,0,0">
+                                                <TextBlock Text="浏览器缓存大小：" Style="{StaticResource TextBlockStyle}" />
+                                                <TextBlock Text="{Binding BrowserCacheSize, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                            </DockPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Margin="0,0,20,0">
+                                            <DockPanel LastChildFill="False">
+                                                <TextBlock Text="日志文件大小：" Style="{StaticResource TextBlockStyle}" />
+                                                <TextBlock Text="{Binding LogsSize, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                            </DockPanel>
+
+                                            <DockPanel LastChildFill="False" Margin="5,0,0,0">
+                                                <TextBlock Text="临时文件大小：" Style="{StaticResource TextBlockStyle}" />
+                                                <TextBlock Text="{Binding TempFilesSize, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                            </DockPanel>
+
+                                            <DockPanel LastChildFill="False" Margin="5,0,0,0">
+                                                <TextBlock Text="用户数据大小：" Style="{StaticResource TextBlockStyle}" />
+                                                <TextBlock Text="{Binding UserDataSize, StringFormat={}{0:F2} MB}" Style="{StaticResource TextBlockStyle}" Margin="5,0,0,0"/>
+                                            </DockPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                                            <Button Content="清理缓存" Command="{Binding CleanCacheCommand}" Margin="0,0,0,5"
+                                    Width="100" Height="30" Style="{StaticResource AccentButtonStyle}"/>
+                                            <Button Content="刷新" Command="{Binding RefreshResourcesCommand}"
+                                    Width="100" Height="30" Style="{StaticResource NormalButtonStyle}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- 资源详细信息 -->
+                                <Grid Grid.Row="1" Margin="5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Text="资源详细信息" Style="{StaticResource HeaderTextBlockStyle}" Margin="0,0,0,5"/>
+
+                                    <ScrollViewer Grid.Row="1"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto"
+                                        IsHitTestVisible="False"
+                                        ScrollViewer.CanContentScroll="True">
+                                        <ListView ItemsSource="{Binding ResourceItems}"
+                  SelectedItem="{Binding SelectedResourceItem}"
+                                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                            <ListView.View>
+                                                <GridView>
+                                                    <GridViewColumn Header="资源类型" DisplayMemberBinding="{Binding Type}" Width="120"/>
+                                                    <GridViewColumn Header="位置" DisplayMemberBinding="{Binding Path}" Width="300"/>
+                                                    <GridViewColumn Header="大小" DisplayMemberBinding="{Binding Size, StringFormat={}{0:F2} MB}" Width="80"/>
+                                                    <GridViewColumn Header="最后修改时间" DisplayMemberBinding="{Binding LastModified, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="150"/>
+                                                    <GridViewColumn Header="操作">
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Button Content="删除" Command="{Binding DataContext.DeleteResourceCommand, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                      CommandParameter="{Binding}" Width="60" Height="22"
+                      Style="{StaticResource DangerButtonStyle}"/>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                </GridView>
+                                            </ListView.View>
+                                        </ListView>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                 </GroupBox>

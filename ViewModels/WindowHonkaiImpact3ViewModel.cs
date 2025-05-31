@@ -29,7 +29,7 @@ public class WindowHonkaiImpact3ViewModel : ObservableObject
     public WindowHonkaiImpact3ViewModel()
     {
         LoadedCommand = new(LoadAllAsync);
-        HideSidePanelCommand = new(() => IsSidePanelVisible = false);
+        HideSidePanelCommand = new RelayCommand(_ => IsSidePanelVisible = false);
         SelectionChangedCommand = new(SelectionChanged);
     }
 
@@ -38,9 +38,9 @@ public class WindowHonkaiImpact3ViewModel : ObservableObject
     public AsyncRelayCommand<Valkyrie> SelectionChangedCommand { get; }
     
     public AsyncRelayCommand LoadedCommand { get; }
-    
+
     public RelayCommand HideSidePanelCommand { get; }
-    
+
     #endregion
 
     async Task LoadAllAsync()
