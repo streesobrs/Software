@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-	<version>0.2.8.0</version><!--最新版本-->
-	<url>https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.8.0%20-%20installer.exe</url><!--更新链接-->
-	<checksum algorithm="MD5">94493b71391395adbab12aa1fe7be84b</checksum>
+	<version>0.2.9.0</version><!--最新版本-->
+	<url>https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.9.0%20-%20installer.exe</url><!--更新链接-->
+	<checksum algorithm="MD5">37bf27c6eb79af9f9563a415a7adbb89</checksum>
 	<mandatory>false</mandatory>
 </item>

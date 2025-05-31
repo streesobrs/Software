@@ -1,15 +1,15 @@
 {
-  "version": "0.2.8.0",
-  "date": "2025/04/30",
+  "version": "0.2.9.0",
+  "date": "2025/05/31",
   "details": [
     {
       "updateSource": "gitee",
       "updateMode": "zip",
-      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/v0.2.8.0/update.zip",
-      "fileSize": "38,108 KB",
+      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/v0.2.9.0/update.zip",
+      "fileSize": "38,111 KB",
       "checksum": [
         {
-          "MD5": "57c14734ebc149812eb2dd9c28d6dd1f"
+          "MD5": "0cb3ed0a33736cb62e1df7ae85d4a731"
         }
       ],
       "mandatoryUpdate": false
@@ -17,11 +17,11 @@
     {
       "updateSource": "gitee",
       "updateMode": "installer",
-      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.8.0%20-%20installer.exe",
-      "fileSize": "39,368 KB",
+      "updateURL": "https://gitee.com/nibadianbanxiaban/software/releases/download/resources/Software%200.2.9.0%20-%20installer.exe",
+      "fileSize": "39,364 KB",
       "checksum": [
         {
-          "MD5": "94493b71391395adbab12aa1fe7be84b"
+          "MD5": "37bf27c6eb79af9f9563a415a7adbb89"
         }
       ],
       "mandatoryUpdate": false
@@ -30,10 +30,10 @@
       "updateSource": "github",
       "updateMode": "zip",
       "updateURL": "https://github.com/streesobrs/Software/releases/download/resources/update.zip",
-      "fileSize": "38,108 KB",
+      "fileSize": "38,111 KB",
       "checksum": [
         {
-          "MD5": "57c14734ebc149812eb2dd9c28d6dd1f"
+          "MD5": "0cb3ed0a33736cb62e1df7ae85d4a731"
         }
       ],
       "mandatoryUpdate": false
