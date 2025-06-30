@@ -1,10 +1,10 @@
 {
   "jsonVersion": "1.0.0",
-  "version": "0.2.9.0",
+  "version": "0.2.10.0",
   "updates": [
     {
       "version": "0.2.10.0",
-      "updateTime": "2025//",
+      "updateTime": "2025/6/30",
       "updateContent": [
         "修复了选中「资源管理」时，无法正常跳转到正确位置",
         "修复了「文字信息」的数据刷新错误",
