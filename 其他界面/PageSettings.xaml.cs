@@ -54,9 +54,6 @@ namespace Software.其他界面
 
         private StatusViewModel _viewModel;
 
-        private System.Timers.Timer _timer;
-        private PerformanceCounter cpuCounter;
-
         private Dictionary<string, double> groupBoxPositions = new Dictionary<string, double>();
 
         private ILogger logger;
@@ -84,15 +81,6 @@ namespace Software.其他界面
                 _viewModel = new StatusViewModel();
                 this.DataContext = _viewModel;
 
-                // 初始化 PerformanceCounter
-                cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-
-                // 定时更新状态
-                _timer = new System.Timers.Timer(1000); // 每秒更新一次
-                _timer.Elapsed += UpdateStatus;
-                _timer.AutoReset = true;
-                _timer.Enabled = true;
-
                 MyLoger.Information("PageSettings初始化完成");
             }
             catch(Exception ex)
@@ -100,36 +88,7 @@ namespace Software.其他界面
                 MessageBox.Show(ex.ToString());
             }
         }
-
-        private void UpdateStatus(object sender, ElapsedEventArgs e)
-        {
-            try
-            {
-                var process = Process.GetCurrentProcess();
-                var memoryUsage = process.WorkingSet64 / (1024.0 * 1024.0); // 将内存使用转换为MB
-                var cpuUsage = GetCpuUsage();
-                var uptime = DateTime.Now - process.StartTime;
-
-                // 使用 Dispatcher 确保数据更新在UI线程上执行
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    _viewModel.MemoryUsage = memoryUsage;
-                    _viewModel.CPUUsage = cpuUsage;
-                    _viewModel.Uptime = uptime;
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"发生了一个意外错误: {ex.Message}");
-            }
-        }
-
-        private double GetCpuUsage()
-        {
-            // 获取 CPU 使用率
-            return cpuCounter.NextValue() / Environment.ProcessorCount;
-        }
-
+        
         /// <summary>
         /// 从数据库中读取配置值
         /// </summary>
@@ -1287,21 +1246,76 @@ namespace Software.其他界面
             if (sender is System.Windows.Controls.Button button)
             {
                 string groupBoxName = button.Tag.ToString();
-                if (groupBoxPositions.ContainsKey(groupBoxName))
+
+                // 查找目标GroupBox
+                GroupBox targetGroupBox = FindGroupBoxByName(groupBoxName);
+
+                if (targetGroupBox != null)
                 {
-                    double offset = groupBoxPositions[groupBoxName];
-                    // 确保偏移量不小于 0
-                    offset = Math.Max(offset, 0);
-                    MainScrollViewer.ScrollToVerticalOffset(offset);
+                    // 1. 先滚动到顶部（确保计算起点一致）
+                    MainScrollViewer.ScrollToVerticalOffset(0);
+
+                    // 2. 等待布局更新完成
+                    Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+                    {
+                        // 3. 计算相对于滚动容器的位置
+                        GeneralTransform transform = targetGroupBox.TransformToAncestor(MainScrollViewer);
+                        Point position = transform.Transform(new Point(0, 0));
+
+                        // 4. 滚动到目标位置
+                        MainScrollViewer.ScrollToVerticalOffset(position.Y);
+                    }));
                 }
                 else
                 {
-                    MessageBox.Show($"未找到名为 {groupBoxName} 的 GroupBox 的位置信息。");
+                    MessageBox.Show($"未找到名为 {groupBoxName} 的 GroupBox。");
                 }
             }
             else
             {
                 MessageBox.Show("触发事件的对象不是按钮。");
+            }
+        }
+
+        // 查找指定名称的GroupBox
+        private GroupBox FindGroupBoxByName(string name)
+        {
+            // 先在主窗口中查找
+            GroupBox groupBox = MainGrid.FindName(name) as GroupBox;
+            if (groupBox != null) return groupBox;
+
+            // 如果没找到，在当前选中的选项卡中查找
+            TabItem selectedTab = SettingsTabControl.SelectedItem as TabItem;
+            if (selectedTab != null && selectedTab.Content is Grid tabGrid)
+            {
+                groupBox = tabGrid.FindName(name) as GroupBox;
+                if (groupBox != null) return groupBox;
+            }
+
+            // 如果还没找到，在所有选项卡中查找（处理可能需要切换选项卡的情况）
+            foreach (TabItem tabItem in SettingsTabControl.Items)
+            {
+                if (tabItem.Content is Grid tabContentGrid)
+                {
+                    groupBox = tabContentGrid.FindName(name) as GroupBox;
+                    if (groupBox != null) return groupBox;
+                }
+            }
+
+            return null;
+        }
+
+        // 确保包含目标GroupBox的选项卡被选中
+        private void EnsureTabIsSelected(GroupBox groupBox)
+        {
+            // 如果GroupBox在选项卡内，找到对应的选项卡并选中
+            foreach (TabItem tabItem in SettingsTabControl.Items)
+            {
+                if (tabItem.Content is Grid tabContentGrid && tabContentGrid.Children.Contains(groupBox))
+                {
+                    SettingsTabControl.SelectedItem = tabItem;
+                    break;
+                }
             }
         }
 
