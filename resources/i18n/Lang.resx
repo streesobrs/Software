@@ -318,4 +318,10 @@
   <data name="PageSettings_ToggleSwitch_OffContent_Default" xml:space="preserve">
     <value>Hide</value>
   </data>
+  <data name="MainWindow_Button_MusicPlayer" xml:space="preserve">
+    <value>MusicPlayer</value>
+  </data>
+  <data name="MainWindow_Button_MusicPlayer_Tip" xml:space="preserve">
+    <value>open MusicPlayer</value>
+  </data>
 </root>

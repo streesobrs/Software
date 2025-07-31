@@ -34,15 +34,15 @@ namespace Software
     /// </summary>
     public partial class MainWindow : Window
     {
-        Frame frameHome = new Frame() { Content = new 其他界面.PageHome() };
-        Frame frameMap = new Frame() { Content = new 其他界面.PageGenshinMap() };
-        Frame frameVersion = new Frame() { Content = new 其他界面.PageVersion() };
-        Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };
-        Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };
-        Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };
-        Frame frameImage = new Frame() { Content = new 其他界面.PageImage() };
-        Frame frameLog = new Frame() { Content = new 其他界面.PageLog() };
-        Frame frameStreePortal = new Frame() { Content = new 其他界面.PageStreePortal() };
+        Frame frameHome = new Frame() { Content = new 其他界面.PageHome() };//主页
+        Frame frameMap = new Frame() { Content = new 其他界面.PageGenshinMap() };//地图
+        Frame frameVersion = new Frame() { Content = new 其他界面.PageVersion() };//版本
+        Frame frameBing = new Frame() { Content = new 其他界面.PageBing() };//bing
+        Frame frameMoveChest = new Frame() { Content = new 其他界面.PageMoveChest() };//推箱子
+        Frame frameSettings = new Frame() { Content = new 其他界面.PageSettings() };//设置
+        Frame frameImage = new Frame() { Content = new 其他界面.PageImage() };//图片
+        Frame frameLog = new Frame() { Content = new 其他界面.PageLog() };//日志
+        Frame frameStreePortal = new Frame() { Content = new 其他界面.PageStreePortal() };//streeportal
 
         private 其他界面.PageSettings pageSettings;
 
@@ -86,6 +86,7 @@ namespace Software
             pageSettings = new 其他界面.PageSettings(); // 创建PageSettings的实例
             LoadSettings(); // 在窗口加载时读取设置
 
+            //设置软件启动时显示的页面
             contentcon.Content = frameHome;
         }
 
@@ -488,6 +489,14 @@ namespace Software
             MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
             contentcon.Content = frameStreePortal;
             this.beta_tabel.Visibility = Visibility.Hidden;
+        }
+
+        private void Button_Click_MusicPlayer(object sender, RoutedEventArgs e)
+        {
+            MyLoger.Information("Button clicked: {ButtonName}", ((Button)sender).Name);
+            其他窗口.WindowMusicPlayer nextwindow = new();
+            nextwindow.Show();
+            //this.beta_tabel.Visibility = Visibility.Hidden;
         }
 
         private void languageToggle_Click(object sender, RoutedEventArgs e)

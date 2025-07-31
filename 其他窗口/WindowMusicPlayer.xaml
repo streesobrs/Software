@@ -1,0 +1,283 @@
+﻿<Window x:Class="Software.其他窗口.WindowMusicPlayer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="音乐播放器" Height="620" Width="800"
+        Background="#2C2C2C" Foreground="White">
+    <Window.Resources>
+        <!-- 开关样式的 CheckBox -->
+        <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid>
+                            <!-- 开关背景 -->
+                            <Border x:Name="Background" 
+                                    CornerRadius="12" 
+                                    Background="#E0E0E0" 
+                                    BorderBrush="#CCCCCC" 
+                                    BorderThickness="1"/>
+
+                            <!-- 开关滑块 -->
+                            <Ellipse x:Name="Slider" 
+                                     Width="20" 
+                                     Height="20" 
+                                     Margin="2,2,0,2" 
+                                     HorizontalAlignment="Left" 
+                                     Fill="White"/>
+
+                            <!-- 开关文本 -->
+                            <ContentPresenter x:Name="Content" 
+                                              Margin="30,0,0,0" 
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!-- 选中状态 -->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Background" Property="Background" Value="#0078D7"/>
+                                <Setter TargetName="Slider" Property="HorizontalAlignment" Value="Right"/>
+                            </Trigger>
+
+                            <!-- 鼠标悬停状态 -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Background" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 按钮样式 -->
+        <Style x:Key="MediaButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="#3C3C3C"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="20"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#4A4A4A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#5A5A5A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 进度条样式 -->
+        <Style x:Key="MusicProgressStyle" TargetType="ProgressBar">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="Background" Value="#4A4A4A"/>
+            <Setter Property="Foreground" Value="#0078D7"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid>
+                            <Rectangle x:Name="PART_Track" 
+                                       Fill="{TemplateBinding Background}" 
+                                       RadiusX="3" RadiusY="3"/>
+                            <Rectangle x:Name="PART_Indicator" 
+                                       Fill="{TemplateBinding Foreground}" 
+                                       HorizontalAlignment="Left" 
+                                       RadiusX="3" RadiusY="3"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <MediaElement x:Name="mediaElement" 
+                  LoadedBehavior="Manual" 
+                  UnloadedBehavior="Manual"
+                  Visibility="Collapsed"/>
+
+        <!-- 左侧：专辑封面和控制按钮 -->
+        <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+            <!-- 专辑封面 -->
+            <Border Width="240" Height="240" CornerRadius="10" Background="#3C3C3C" Margin="0,20,0,0">
+                <Image x:Name="AlbumCover" Stretch="UniformToFill" Source="pack://application:,,,/Resources/image/default_album.png"/>
+            </Border>
+
+            <!-- 歌曲信息 -->
+            <TextBlock x:Name="musicNameTextBlock" 
+                       Text="未播放歌曲"
+                       Background="Transparent" 
+                       FontSize="16" 
+                       HorizontalAlignment="Center"
+                       Margin="0,20,0,0"
+                       Width="240"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"/>
+
+            <!-- 进度条容器 -->
+            <Grid Width="240" Margin="0,10,0,0">
+                <!-- 进度显示 -->
+                <ProgressBar x:Name="MusicProgress" 
+                             Style="{StaticResource MusicProgressStyle}"
+                             Minimum="0" Maximum="100"/>
+
+                <!-- 透明滑块用于拖动控制 (只在拖动结束时更新位置) -->
+                <Slider x:Name="ProgressSlider" 
+                         Minimum="0" Maximum="100"
+                         Background="Transparent"
+                         Opacity="0"
+                         Thumb.DragStarted="ProgressSlider_DragStarted"
+                         Thumb.DragCompleted="ProgressSlider_DragCompleted"/>
+            </Grid>
+
+            <!-- 时间显示 -->
+            <Grid Width="240" Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="CurrentTimeText" Text="00:00" FontSize="12" Foreground="#AAAAAA"/>
+                <TextBlock x:Name="TotalTimeText" Text="00:00" FontSize="12" Foreground="#AAAAAA" 
+                           Grid.Column="1" HorizontalAlignment="Right"/>
+            </Grid>
+
+            <!-- 播放控制按钮 -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        Margin="0,20,0,0">
+                <Button x:Name="prevButton" Content="&#x23EA;" 
+                        Style="{StaticResource MediaButtonStyle}" 
+                        Margin="0,0,15,0"
+                        Click="PrevButton_Click"/>
+                <Button x:Name="playPauseButton" Content="播放" 
+                        Style="{StaticResource MediaButtonStyle}" 
+                        Width="50" Height="50"
+                        Click="PlayPauseButton_Click"/>
+                <Button x:Name="nextButton" Content="&#x23E9;" 
+                        Style="{StaticResource MediaButtonStyle}" 
+                        Margin="15,0,0,0"
+                        Click="NextButton_Click"/>
+            </StackPanel>
+
+            <!-- 音量控制 (使用默认滑块) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="30" Margin="5,0,5,0">
+                    <TextBlock Text="音量" VerticalAlignment="Center" Margin="1" Foreground="#AAAAAA"/>
+                    <Slider x:Name="VolumeSlider" 
+                            HorizontalAlignment="Center"
+                            Orientation="Vertical"
+                            Minimum="0" Maximum="1"
+                            Value="{Binding MusicPlayer.Volume, Mode=TwoWay}"
+                            ToolTip="调整音量"
+                            SmallChange="0.05"
+                            LargeChange="0.1"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <!-- 播放模式按钮 -->
+                    <Button x:Name="playModeButton" Content="随机模式" 
+                        Margin="0,10,0,0"
+                        Background="#3C3C3C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="30"
+                        Width="120"
+                        Click="PlayModeButton_Click"/>
+
+                    <!-- 循环模式按钮 (合并单曲循环和列表循环) -->
+                    <Button x:Name="loopModeButton" Content="循环模式: 无" 
+                        Margin="0,10,0,0"
+                        Background="#3C3C3C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="30"
+                        Width="120"
+                        Click="LoopModeButton_Click"/>
+
+                    <!-- 手动刷新按钮 -->
+                    <Button x:Name="refreshButton" Content="刷新列表" 
+                        Margin="0,10,0,0"
+                        Background="#3C3C3C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="30"
+                        Width="120"
+                        Click="RefreshButton_Click"/>
+                </StackPanel>
+                
+            </StackPanel>
+
+            
+        </StackPanel>
+
+        <!-- 右侧：播放列表和模式设置 -->
+        <StackPanel Grid.Column="1" Margin="20,0,0,0">
+            <!-- 列表标题 -->
+            <TextBlock Text="播放列表" FontSize="18" Margin="0,20,0,10"/>
+
+            <!-- 播放列表 -->
+            <ListView x:Name="MusicList" 
+                      Background="#3C3C3C" 
+                      BorderThickness="0"
+                      Height="300"
+                      Margin="0,0,0,20"
+                      SelectionChanged="MusicList_SelectionChanged">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Margin" Value="0,2"/>
+                        <Setter Property="Padding" Value="10"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#4A4A4A"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#0078D7"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="#" Width="auto" DisplayMemberBinding="{Binding Index}"/>
+                        <GridViewColumn Header="歌曲" Width="auto" DisplayMemberBinding="{Binding DisplayName}"/>
+                        <GridViewColumn Header="时长" Width="80" DisplayMemberBinding="{Binding Duration, StringFormat=mm\\:ss}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <!-- 添加音乐按钮 -->
+            <Button Content="添加音乐" 
+                    Margin="0,20,0,0"
+                    Background="#0078D7"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Height="35"
+                    Click="AddMusicButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

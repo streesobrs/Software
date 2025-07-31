@@ -442,6 +442,10 @@
                             <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_StreePortal}"  />
                             <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_StreePortal_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
                         </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource TextBlockStyle}" Text="{lex:Loc MainWindow_Button_MusicPlayer}"  />
+                            <ui:ToggleSwitch Width="100" Height="30" Name="ToggleSwitch_Button_MusicPlayer_Display" OnContent="{lex:Loc PageSettings_ToggleSwitch_OnContent_Default}" OffContent="{lex:Loc PageSettings_ToggleSwitch_OffContent_Default}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked"/>
+                        </DockPanel>
                     </StackPanel>
                 </GroupBox>
 

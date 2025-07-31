@@ -171,6 +171,12 @@
                             ToolTip="{lex:Loc MainWindow_Button_StreePortal_Tip}"/>
 
                             <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
+                            Name="Button_MusicPlayer"
+                            Click="Button_Click_MusicPlayer"
+                            Content="{lex:Loc MainWindow_Button_MusicPlayer}"
+                            ToolTip="{lex:Loc MainWindow_Button_MusicPlayer_Tip}"/>
+
+                            <ui:Button Width="100" Height="30" BorderBrush="Transparent" Foreground="#ff363232"
                             Name="Button_Updata"
                             Click="Button_Click_Updata"
                             Content="{lex:Loc MainWindow_Button_Updata}"

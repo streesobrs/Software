@@ -169,6 +169,24 @@ namespace Software.resources.i18n {
         }
         
         /// <summary>
+        ///   查找类似 MusicPlayer 的本地化字符串。
+        /// </summary>
+        public static string MainWindow_Button_MusicPlayer {
+            get {
+                return ResourceManager.GetString("MainWindow_Button_MusicPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 open MusicPlayer 的本地化字符串。
+        /// </summary>
+        public static string MainWindow_Button_MusicPlayer_Tip {
+            get {
+                return ResourceManager.GetString("MainWindow_Button_MusicPlayer_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 PlayGames 的本地化字符串。
         /// </summary>
         public static string MainWindow_Button_PlayGames {

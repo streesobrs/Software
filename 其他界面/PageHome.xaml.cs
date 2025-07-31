@@ -60,7 +60,7 @@ namespace Software.其他界面
             Instance = this;
 
             // 创建 MusicPlayer 实例，并将控件的引用传递给它
-            musicPlayer = new MusicPlayer(mediaElement, music_name, playPauseButton, playModeButton, playModeToggleSwitch, loopModeToggleSwitch);
+            //musicPlayer = new MusicPlayer(mediaElement, music_name, playPauseButton, playModeButton, playModeToggleSwitch, loopModeToggleSwitch);
 
             txtGamePath = new TextBox();
             weather = new Weather();
@@ -105,52 +105,52 @@ namespace Software.其他界面
         private DispatcherTimer timer;
         private bool isHandlingSliderValueChanged = false;
 
-        private void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            // 定时器将每隔 100 毫秒更新媒体播放位置
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(100);
-            timer.Tick += (s, args) =>
-            {
-                if (!isHandlingSliderValueChanged && mediaElement.Source != null && mediaElement.NaturalDuration.HasTimeSpan)
-                {
-                    // 计算总时间和当前时间的比率，并更新 mediaPositionSlider 的值。
-                    double ratio = mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds;
-                    mediaPositionSlider.Value = ratio * mediaPositionSlider.Maximum;
+        //private void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
+        //{
+        //    // 定时器将每隔 100 毫秒更新媒体播放位置
+        //    timer = new DispatcherTimer();
+        //    timer.Interval = TimeSpan.FromMilliseconds(100);
+        //    timer.Tick += (s, args) =>
+        //    {
+        //        if (!isHandlingSliderValueChanged && mediaElement.Source != null && mediaElement.NaturalDuration.HasTimeSpan)
+        //        {
+        //            // 计算总时间和当前时间的比率，并更新 mediaPositionSlider 的值。
+        //            double ratio = mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds;
+        //            mediaPositionSlider.Value = ratio * mediaPositionSlider.Maximum;
 
-                    // 更新当前播放时长和总时长的显示。
-                    music_TextBlock.Width = new GridLength(80);
-                    currentPositionText.Visibility = Visibility.Visible;
-                    fenjieText.Visibility = Visibility.Visible;
-                    totalDurationText.Visibility = Visibility.Visible;
-                    currentPositionText.Text = mediaElement.Position.ToString(@"mm\:ss");
-                    fenjieText.Text = "/";
-                    totalDurationText.Text = mediaElement.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
-                }
-            };
-            timer.Start();
-        }
+        //            // 更新当前播放时长和总时长的显示。
+        //            music_TextBlock.Width = new GridLength(80);
+        //            currentPositionText.Visibility = Visibility.Visible;
+        //            fenjieText.Visibility = Visibility.Visible;
+        //            totalDurationText.Visibility = Visibility.Visible;
+        //            currentPositionText.Text = mediaElement.Position.ToString(@"mm\:ss");
+        //            fenjieText.Text = "/";
+        //            totalDurationText.Text = mediaElement.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
+        //        }
+        //    };
+        //    timer.Start();
+        //}
 
-        private void MediaPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (mediaElement.IsLoaded && e.NewValue != e.OldValue)
-            {
-                timer.Stop();  // 暂停定时器
+        //private void MediaPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    if (mediaElement.IsLoaded && e.NewValue != e.OldValue)
+        //    {
+        //        timer.Stop();  // 暂停定时器
 
-                isHandlingSliderValueChanged = true;  // 设置标志
+        //        isHandlingSliderValueChanged = true;  // 设置标志
 
-                // 计算当前滑块位置的时间。
-                double ratio = e.NewValue / mediaPositionSlider.Maximum;
-                TimeSpan position = TimeSpan.FromSeconds(mediaElement.NaturalDuration.TimeSpan.TotalSeconds * ratio);
+        //        // 计算当前滑块位置的时间。
+        //        double ratio = e.NewValue / mediaPositionSlider.Maximum;
+        //        TimeSpan position = TimeSpan.FromSeconds(mediaElement.NaturalDuration.TimeSpan.TotalSeconds * ratio);
 
-                // 跳转媒体播放位置到所选位置。
-                mediaElement.Position = position;
+        //        // 跳转媒体播放位置到所选位置。
+        //        mediaElement.Position = position;
 
-                isHandlingSliderValueChanged = false;  // 清除标志
+        //        isHandlingSliderValueChanged = false;  // 清除标志
 
-                timer.Start();  // 重新启动定时器
-            }
-        }
+        //        timer.Start();  // 重新启动定时器
+        //    }
+        //}
 
         private void ContentTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -185,46 +185,46 @@ namespace Software.其他界面
             MessageBox.Show("刷新成功");
         }
 
-        private void Button_Click_MusicPlay_MusicPause(object sender, RoutedEventArgs e)
-        {
-            musicPlayer.PlayPause();
-        }
+        //private void Button_Click_MusicPlay_MusicPause(object sender, RoutedEventArgs e)
+        //{
+        //    musicPlayer.PlayPause();
+        //}
 
-        private void Button_Click_MusicStop(object sender, RoutedEventArgs e)
-        {
-            musicPlayer.Stop();
-        }
+        //private void Button_Click_MusicStop(object sender, RoutedEventArgs e)
+        //{
+        //    musicPlayer.Stop();
+        //}
 
-        private void Button_Click_MusicHandOff(object sender, RoutedEventArgs e)
-        {
+        //private void Button_Click_MusicHandOff(object sender, RoutedEventArgs e)
+        //{
 
-            musicPlayer.PlayRandomMusic();
-        }
+        //    musicPlayer.PlayRandomMusic();
+        //}
 
-        private void Button_Click_RefreshMusicPath(object sender, RoutedEventArgs e)
-        {
-            musicPlayer.RefreshMusicFiles();
-        }
+        //private void Button_Click_RefreshMusicPath(object sender, RoutedEventArgs e)
+        //{
+        //    musicPlayer.RefreshMusicFiles();
+        //}
 
-        private void Button_Click_RandomOrSequential(object sender, RoutedEventArgs e)
-        {
-            musicPlayer.ToggleRandomOrSequential();
-        }
+        //private void Button_Click_RandomOrSequential(object sender, RoutedEventArgs e)
+        //{
+        //    musicPlayer.ToggleRandomOrSequential();
+        //}
 
-        private void ToggleSwitch_Checked_Loop(object sender, RoutedEventArgs e)
-        {
-            musicPlayer.ToggleLoopMode();
-        }
+        //private void ToggleSwitch_Checked_Loop(object sender, RoutedEventArgs e)
+        //{
+        //    musicPlayer.ToggleLoopMode();
+        //}
 
-        private void ToggleSwitch_Unchecked_Loop(object sender, RoutedEventArgs e)
-        {
-            musicPlayer.ToggleLoopMode();
-        }
+        //private void ToggleSwitch_Unchecked_Loop(object sender, RoutedEventArgs e)
+        //{
+        //    musicPlayer.ToggleLoopMode();
+        //}
 
-        private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            mediaElement.Volume = volumeSlider.Value;
-        }
+        //private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    mediaElement.Volume = volumeSlider.Value;
+        //}
 
         private async Task<string> ComputeHashAsync(string filename, Func<HashAlgorithm> createHashAlgorithm)
         {

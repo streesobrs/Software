@@ -75,7 +75,7 @@ namespace Software.其他界面
             try
             {
                 InitializeComponent();
-                musicPlayer = new MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton);
+                //musicPlayer = new MusicPlayer(PageHome.Instance.mediaElement, PageHome.Instance.music_name, PageHome.Instance.playPauseButton);
 
                 // 确保所有对象都已初始化
                 _viewModel = new StatusViewModel();
@@ -221,6 +221,8 @@ namespace Software.其他界面
             ToggleSwitch_Button_Bing_Display.Unchecked -= ToggleSwitch_Unchecked;
             ToggleSwitch_Button_StreePortal_Display.Checked -= ToggleSwitch_Checked;
             ToggleSwitch_Button_StreePortal_Display.Unchecked -= ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_MusicPlayer_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_MusicPlayer_Display.Unchecked -= ToggleSwitch_Unchecked;
 
             try
             {
@@ -267,6 +269,9 @@ namespace Software.其他界面
                                 case "Button_StreePortal":
                                     ToggleSwitch_Button_StreePortal_Display.IsChecked = isVisible;
                                     break;
+                                case "Button_MusicPlayer":
+                                    ToggleSwitch_Button_MusicPlayer_Display.IsChecked = isVisible;
+                                    break;
                             }
                         }
                     }
@@ -297,6 +302,8 @@ namespace Software.其他界面
             ToggleSwitch_Button_Bing_Display.Unchecked += ToggleSwitch_Unchecked;
             ToggleSwitch_Button_StreePortal_Display.Checked += ToggleSwitch_Checked;
             ToggleSwitch_Button_StreePortal_Display.Unchecked += ToggleSwitch_Unchecked;
+            ToggleSwitch_Button_MusicPlayer_Display.Checked -= ToggleSwitch_Checked;
+            ToggleSwitch_Button_MusicPlayer_Display.Unchecked -= ToggleSwitch_Unchecked;
         }
 
         public void RebootSoftware()
@@ -996,6 +1003,10 @@ namespace Software.其他界面
                         mainWindow.Button_StreePortal.Visibility = Visibility.Visible;
                         MyLoger.Information("ToggleSwitch {name} checked, setting Button_StreePortal to Visible.", name);
                         break;
+                    case "ToggleSwitch_Button_MusicPlayer_Display":
+                        mainWindow.Button_MusicPlayer.Visibility = Visibility.Visible;
+                        MyLoger.Information("ToggleSwitch {name} checked, setting Button_MusicPlayer to Visible.", name);
+                        break;
                     default:
                         MyLoger.Warning("Unknown ToggleSwitch {name} checked.", name);
                         break;
@@ -1049,6 +1060,10 @@ namespace Software.其他界面
                         mainWindow.Button_StreePortal.Visibility = Visibility.Collapsed;
                         MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_StreePortal to Collapsed.", name);
                         break;
+                    case "ToggleSwitch_Button_MusicPlayer_Display":
+                        mainWindow.Button_MusicPlayer.Visibility = Visibility.Collapsed;
+                        MyLoger.Information("ToggleSwitch {name} unchecked, setting Button_MusicPlayer to Collapsed.", name);
+                        break;
                     default:
                         MyLoger.Warning("Unknown ToggleSwitch {name} unchecked.", name);
                         break;
@@ -1095,6 +1110,7 @@ namespace Software.其他界面
                     UpdateButtonVisibility("Button_MoveChest", ToggleSwitch_Button_MoveChest_Display.IsChecked == true);
                     UpdateButtonVisibility("Button_Bing", ToggleSwitch_Button_Bing_Display.IsChecked == true);
                     UpdateButtonVisibility("Button_StreePortal", ToggleSwitch_Button_StreePortal_Display.IsChecked == true);
+                    UpdateButtonVisibility("Button_MusicPlayer", ToggleSwitch_Button_MusicPlayer_Display.IsChecked == true);
                 }
             }
             catch (Exception ex)

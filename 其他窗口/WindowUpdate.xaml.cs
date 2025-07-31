@@ -5,6 +5,7 @@ using Software.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,6 +13,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Software.其他窗口
 {
@@ -89,6 +91,25 @@ namespace Software.其他窗口
         }
     }
 
+    // 转换器实现
+    public class ProgressBarWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double width && parameter is string ratioString &&
+                double.TryParse(ratioString, out double ratio))
+            {
+                return width * ratio;
+            }
+            return 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public partial class WindowUpdate : Window
     {
         private Stopwatch stopwatch = new Stopwatch();
@@ -114,6 +135,31 @@ namespace Software.其他窗口
 
         string databasePath = DatabaseHelper.GetDatabasePath();
 
+        // 定义更新阶段
+        public enum UpdateStage
+        {
+            CheckingUpdates,      // 检查更新
+            PreparingUpdate,      // 准备更新
+            Downloading,          // 下载文件
+            Validating,           // 校验文件
+            Installing            // 安装更新
+        }
+
+        // 各阶段权重（总和为100）
+        private readonly Dictionary<UpdateStage, int> stageWeights = new Dictionary<UpdateStage, int>
+        {
+            { UpdateStage.CheckingUpdates, 5 },   // 检查更新占5%
+            { UpdateStage.PreparingUpdate, 5 },  // 准备更新占5%
+            { UpdateStage.Downloading, 80 },      // 下载占80%（最耗时）
+            { UpdateStage.Validating, 5 },       // 校验占5%
+            { UpdateStage.Installing, 5 }        // 安装占5%
+        };
+
+        // 当前阶段
+        private UpdateStage currentStage = UpdateStage.CheckingUpdates;
+        // 当前阶段的完成度（0-100）
+        private double currentStageProgress = 0;
+
         public WindowUpdate()
         {
             InitializeComponent();
@@ -122,7 +168,29 @@ namespace Software.其他窗口
             newUpdatePath = GetConfigValueFromDatabase(databasePath, "NewUpdatePath");
             JsonUrl = GetConfigValueFromDatabase(databasePath, "UpdateLogUrl");
 
+            // 初始化进度条
+            InitializeProgressBars();
+
             LoadUpdateInfo();
+        }
+
+        // 初始化进度条
+        private void InitializeProgressBars()
+        {
+            MainProgressBar.Minimum = 0;
+            MainProgressBar.Maximum = 100;
+            MainProgressBar.Value = 0;
+
+            SubProgressBar.Minimum = 0;
+            SubProgressBar.Maximum = 100;
+            SubProgressBar.Value = 0;
+
+            MainProgressPercentage.Text = "0%";
+            SubProgressPercentage.Text = "0%";
+            DownloadProgress.Text = "0 MB / 0 MB";
+            DownloadSpeed.Text = "下载速度: 0 MB/s";
+            StatusTextBlock.Text = "状态: 等待中...";
+            StageDescriptionText.Text = "当前阶段: 检查更新";
         }
 
         // 从数据库中根据键获取对应的值
@@ -147,24 +215,97 @@ namespace Software.其他窗口
             }
         }
 
-        // 加载更新信息并展示在界面上
+        // 计算主进度条的总百分比
+        private double CalculateTotalProgress()
+        {
+            double totalProgress = 0;
+
+            // 累加前面所有阶段的权重
+            foreach (var stage in Enum.GetValues(typeof(UpdateStage)).Cast<UpdateStage>())
+            {
+                if (stage < currentStage)
+                {
+                    totalProgress += stageWeights[stage];
+                }
+                else if (stage == currentStage)
+                {
+                    // 加上当前阶段的完成度
+                    totalProgress += stageWeights[stage] * (currentStageProgress / 100);
+                    break;
+                }
+            }
+
+            return totalProgress;
+        }
+
+        // 更新主进度条
+        private void UpdateMainProgress(double stageProgress, string status)
+        {
+            currentStageProgress = stageProgress;
+            double totalProgress = CalculateTotalProgress();
+
+            Dispatcher.Invoke(() =>
+            {
+                MainProgressBar.Value = totalProgress;
+                MainProgressPercentage.Text = $"{totalProgress:F0}%";
+                StatusTextBlock.Text = status;
+
+                // 更新阶段描述文本
+                string stageDescription = GetStageDescription(currentStage);
+                StageDescriptionText.Text = $"当前阶段: {stageDescription}";
+            });
+        }
+
+        // 获取阶段描述文本
+        private string GetStageDescription(UpdateStage stage)
+        {
+            switch (stage)
+            {
+                case UpdateStage.CheckingUpdates:
+                    return "检查更新";
+                case UpdateStage.PreparingUpdate:
+                    return "准备更新";
+                case UpdateStage.Downloading:
+                    return "下载文件";
+                case UpdateStage.Validating:
+                    return "校验文件";
+                case UpdateStage.Installing:
+                    return "安装更新";
+                default:
+                    return "未知阶段";
+            }
+        }
+
+        // 更新子进度条（当前阶段的详细进度）
+        private void UpdateSubProgress(double value, string status)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                SubProgressBar.Value = value;
+                SubProgressPercentage.Text = $"{value:F0}%";
+                StatusTextBlock.Text = status;
+            });
+        }
+
+        // 加载更新信息（检查更新阶段）
         private async void LoadUpdateInfo()
         {
             try
             {
-                UpdateModeComboBox.IsEnabled = false;
-                string configUrl = newUpdatePath;
-                Uri updateUri = new Uri(configUrl);
-                config = await ConfigManager.LoadConfigFromUrlAsync(updateUri.ToString());
+                currentStage = UpdateStage.CheckingUpdates;
+                UpdateMainProgress(0, "正在获取更新信息...");
+
+                // 从网络获取更新配置
+                UpdateMainProgress(10, "正在连接更新服务器...");
+                config = await ConfigManager.LoadConfigFromUrlAsync(newUpdatePath);
+                UpdateMainProgress(30, "更新信息获取完成");
+
                 if (config != null)
                 {
-                    VersionInfo.Text = config.Version;
-                    DownloadSize.Text = config.DownloadSize;
-                    CurrentVersion.Text = config.CurrentVersion;
-                    LastUpdate.Text = config.LastUpdate;
-                    ReleaseNotes.Text = config.ReleaseNotes;
+                    // 解析更新内容
+                    UpdateMainProgress(40, "正在解析更新内容...");
 
-                    // 遍历更新详细信息列表，添加组合字符串到UpdateModeComboBox并存储到UpdateDetail对象中
+                    // 填充更新模式下拉框
                     foreach (UpdateDetail detail in config.Details)
                     {
                         string item = $"{detail.UpdateSource} - {detail.UpdateMode}";
@@ -174,47 +315,32 @@ namespace Software.其他窗口
 
                     UpdateModeComboBox.IsEnabled = true;
 
-                    // 获取当前程序集的版本信息并展示在界面上
+                    // 获取当前版本
                     System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                     System.Version version = assembly.GetName().Version;
-                    string versionString = version.ToString();
-                    CurrentVersion.Text = versionString;
+                    CurrentVersion.Text = version.ToString();
+
+                    // 显示更新版本信息
+                    VersionInfo.Text = config.Version;
 
                     // 从数据库读取并展示上次更新时间
                     LastUpdate.Text = LastUpdateTime();
 
-                    // 保存当前时间为上次更新时间到数据库
-                    SaveLastUpdateTime(databasePath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-
                     // 加载更新日志
+                    UpdateMainProgress(60, "正在加载更新日志...");
                     await LoadUpdateLog();
+
+                    // 完成检查更新阶段
+                    UpdateMainProgress(100, "更新准备就绪");
+                    currentStage = UpdateStage.PreparingUpdate;
+                    UpdateMainProgress(0, "请选择更新方式");
                 }
             }
             catch (Exception ex)
             {
                 MyLoger.Error("发生错误:{error}", ex.ToString());
                 MessageBox.Show("发生错误: " + ex.Message);
-            }
-        }
-
-        // 保存上次更新时间到数据库
-        private void SaveLastUpdateTime(string dbPath, string lastUpdateTime)
-        {
-            try
-            {
-                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
-                {
-                    connection.Open();
-                    string query = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('LastUpdateTime', @LastUpdateTime);";
-                    var command = new SqliteCommand(query, connection);
-                    command.Parameters.AddWithValue("@LastUpdateTime", lastUpdateTime);
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MyLoger.Error("保存LastUpdateTime时发生错误:{error}", ex.ToString());
-                MessageBox.Show("保存LastUpdateTime时发生错误: " + ex.Message);
+                UpdateMainProgress(100, "更新检查失败");
             }
         }
 
@@ -244,7 +370,6 @@ namespace Software.其他窗口
         {
             try
             {
-                UpdateStatus("加载更新日志...");
                 string updateLogUrl = JsonUrl;
                 UpdateLog updateLog = await UpdateLogManager.LoadUpdateLogFromUrlAsync(updateLogUrl);
 
@@ -261,18 +386,15 @@ namespace Software.其他窗口
                        .ToList();
 
                     ReleaseNotes.Text = string.Join("\n\n", updatesToShow.Select(update => $"版本 {update.Version} ({update.UpdateTime}):\n{string.Join("\n", update.UpdateContent)}"));
-                    UpdateStatus("更新日志加载完成。");
                 }
                 else
                 {
                     ReleaseNotes.Text = "没有可用的更新日志。";
-                    UpdateStatus("没有可用的更新日志。");
                 }
             }
             catch (Exception ex)
             {
                 ReleaseNotes.Text = "加载更新日志时出错，请检查网络连接或联系支持。";
-                UpdateStatus($"加载更新日志时出错: " + ex.Message);
             }
         }
 
@@ -292,113 +414,176 @@ namespace Software.其他窗口
             }
         }
 
-        // 点击开始更新按钮触发的操作
         private async void StartUpdate_Click(object sender, RoutedEventArgs e)
         {
+            bool isValid = false; // 在方法合适的外层作用域先定义
             if (config != null && UpdateModeComboBox.SelectedItem != null)
             {
-                string selectedItemString = UpdateModeComboBox.SelectedItem.ToString();
-
-                // 根据组合字符串查找对应的UpdateDetail对象
-                var selectedDetail = config.Details.FirstOrDefault(detail => detail.UpdateSourceAndMode == selectedItemString);
-                if (selectedDetail != null)
+                try
                 {
+                    // 准备更新阶段
+                    currentStage = UpdateStage.PreparingUpdate;
+                    UpdateMainProgress(0, "正在准备更新...");
+
+                    string selectedItemString = UpdateModeComboBox.SelectedItem.ToString();
+                    var selectedDetail = config.Details.FirstOrDefault(d => d.UpdateSourceAndMode == selectedItemString);
+                    if (selectedDetail == null)
+                    {
+                        UpdateMainProgress(100, "未找到匹配的更新方式");
+                        return;
+                    }
+
                     string updateUrl = selectedDetail.UpdateURL;
                     string fileName = Path.GetFileName(updateUrl);
-                    string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-                    string updateFolderPath = Path.Combine(rootPath, "update");
+                    string updateFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "update");
                     string filePath = Path.Combine(updateFolderPath, fileName);
 
-                    UpdateStatus("检查文件是否存在...");
-                    if (File.Exists(filePath))
+                    if (!Directory.Exists(updateFolderPath))
                     {
-                        if (ValidateFileChecksum(filePath, selectedDetail.Checksum))
-                        {
-                            UpdateStatus("文件校验成功，开始更新...");
-                            InstallUpdate(filePath, selectedDetail.UpdateMode);
-                        }
-                        else
-                        {
-                            UpdateStatus("文件校验失败，重新下载...");
-                            filePath = await DownloadUpdate(updateUrl);
-                            if (ValidateFileChecksum(filePath, selectedDetail.Checksum))
-                            {
-                                UpdateStatus("文件校验成功，开始更新...");
-                                InstallUpdate(filePath, selectedDetail.UpdateMode);
-                            }
-                            else
-                            {
-                                UpdateStatus("文件校验失败，请检查网络连接或联系支持。");
-                            }
-                        }
+                        Directory.CreateDirectory(updateFolderPath);
+                    }
+
+                    UpdateMainProgress(30, "检查文件是否存在...");
+                    bool fileExists = File.Exists(filePath);
+
+                    // 下载阶段
+                    currentStage = UpdateStage.Downloading;
+                    if (!fileExists)
+                    {
+                        UpdateMainProgress(0, "文件不存在，开始下载...");
+                        filePath = await DownloadUpdate(updateUrl, selectedDetail.FileSize);
                     }
                     else
                     {
-                        UpdateStatus("文件不存在，开始下载...");
-                        filePath = await DownloadUpdate(updateUrl);
-                        if (ValidateFileChecksum(filePath, selectedDetail.Checksum))
+                        UpdateMainProgress(0, "文件已存在，验证完整性...");
+                        isValid = ValidateFileChecksum(filePath, selectedDetail.Checksum); // 复用之前定义的变量
+
+                        if (isValid)
                         {
-                            UpdateStatus("文件校验成功，开始更新...");
-                            InstallUpdate(filePath, selectedDetail.UpdateMode);
+                            UpdateMainProgress(100, "文件校验通过，跳过下载");
                         }
                         else
                         {
-                            UpdateStatus("文件校验失败，请检查网络连接或联系支持。");
+                            UpdateMainProgress(0, "文件已损坏，重新下载...");
+                            filePath = await DownloadUpdate(updateUrl, selectedDetail.FileSize);
                         }
                     }
+
+                    // 校验阶段
+                    currentStage = UpdateStage.Validating;
+                    UpdateMainProgress(0, "正在验证文件完整性...");
+                    isValid = ValidateFileChecksum(filePath, selectedDetail.Checksum); // 继续复用
+                    UpdateMainProgress(isValid ? 100 : 0, isValid ? "文件校验成功" : "文件校验失败");
+
+                    if (!isValid)
+                    {
+                        UpdateMainProgress(0, "文件校验失败，重新下载...");
+                        filePath = await DownloadUpdate(updateUrl, selectedDetail.FileSize);
+
+                        UpdateMainProgress(0, "重新验证文件完整性...");
+                        isValid = ValidateFileChecksum(filePath, selectedDetail.Checksum); // 还是复用
+                        UpdateMainProgress(isValid ? 100 : 0, isValid ? "文件校验成功" : "文件校验失败");
+
+                        if (!isValid)
+                        {
+                            UpdateMainProgress(100, "文件校验失败，请检查网络连接或联系支持。");
+                            return;
+                        }
+                    }
+
+                    // 安装阶段
+                    currentStage = UpdateStage.Installing;
+                    UpdateMainProgress(0, "开始安装更新...");
+                    InstallUpdate(filePath, selectedDetail.UpdateMode);
+                    UpdateMainProgress(100, "更新完成，请重启应用");
+                }
+                catch (Exception ex)
+                {
+                    MyLoger.Error("更新过程中发生错误:{error}", ex.ToString());
+                    UpdateMainProgress(100, "更新过程中发生错误: " + ex.Message);
                 }
             }
         }
-        // 启动更新程序的相关操作，包括解压、启动辅助程序等
-        private Task StartUpdater(string filePath, string updateMode)
+
+        // 根据更新模式进行实际更新操作的方法
+        private void InstallUpdate(string filePath, string updateMode)
         {
-            string tempExtractPath = GetPendingUpdatePath(databasePath);
-            if (string.IsNullOrEmpty(tempExtractPath))
+            UpdateMainProgress(0, "准备启动更新程序...");
+            try
             {
-                tempExtractPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_update");
-                Directory.CreateDirectory(tempExtractPath);
-            }
+                // 1. 配置更新参数（保持不变）
+                string mainAppExe = "Software.exe";
+                string packagePath = filePath;
+                string targetDir = AppDomain.CurrentDomain.BaseDirectory;
+                bool deleteAfterUpdate = DeletePackageAfterUpdate.IsChecked ?? true;
+                string updateType = updateMode.Contains("zip") ? "zip" : "installer";
 
-            using (ZipArchive archive = ZipFile.OpenRead(filePath))
-            {
-                foreach (ZipArchiveEntry entry in archive.Entries)
+                // 2. 定位Updater.exe（保持不变）
+                string updaterPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "StreeDB", "update", "Updater.exe"
+                );
+
+                // 3. 验证必要文件（保持不变）
+                if (!File.Exists(updaterPath))
                 {
-                    string destinationPath = Path.Combine(tempExtractPath, entry.FullName);
-
-                    // 确保目标目录存在
-                    string destinationDir = Path.GetDirectoryName(destinationPath);
-                    if (!Directory.Exists(destinationDir))
-                    {
-                        Directory.CreateDirectory(destinationDir);
-                    }
-
-                    // 删除已存在的文件
-                    if (File.Exists(destinationPath))
-                    {
-                        File.Delete(destinationPath);
-                    }
-
-                    // 解压并覆盖现有文件
-                    entry.ExtractToFile(destinationPath, true);
+                    throw new FileNotFoundException("更新程序（Updater.exe）不存在", updaterPath);
                 }
+                if (!File.Exists(packagePath))
+                {
+                    throw new FileNotFoundException("安装包文件不存在", packagePath);
+                }
+
+                // 4. 关键修改：使用ArgumentList传递参数（替代字符串拼接）
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = updaterPath,
+                    UseShellExecute = true,
+                    WorkingDirectory = Path.GetDirectoryName(updaterPath)
+                };
+                // 按顺序添加参数（自动处理空格和引号）
+                startInfo.ArgumentList.Add(mainAppExe);       // 1. 主程序文件名
+                startInfo.ArgumentList.Add(packagePath);      // 2. 安装包路径
+                startInfo.ArgumentList.Add(targetDir);        // 3. 目标目录
+                startInfo.ArgumentList.Add(deleteAfterUpdate.ToString()); // 4. 是否删除
+                startInfo.ArgumentList.Add(updateType);       // 5. 更新类型
+
+                // 5. 记录调试信息（优化参数日志格式）
+                MyLoger.Information($"启动更新器：{updaterPath}");
+                MyLoger.Information($"传递的参数列表：");
+                MyLoger.Information($"  1. 主程序文件名：{mainAppExe}");
+                MyLoger.Information($"  2. 安装包路径：{packagePath}");
+                MyLoger.Information($"  3. 目标目录：{targetDir}");
+                MyLoger.Information($"  4. 是否删除：{deleteAfterUpdate}");
+                MyLoger.Information($"  5. 更新类型：{updateType}");
+
+                // 6. 启动更新器
+                Process.Start(startInfo);
+
+                // 后续代码保持不变...
+                UpdateMainProgress(0, $"更新程序已启动，正在处理{updateType}更新...");
+
+                Task.Delay(1000).ContinueWith(_ =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Application.Current.Shutdown();
+                    });
+                });
             }
-
-            UpdateStatus($"解压完成！临时解压路径: {tempExtractPath}");
-
-            // 启动辅助程序进行更新
-            string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater.exe");
-            Process.Start(new ProcessStartInfo
+            catch (Exception ex)
             {
-                FileName = updaterPath,
-                Arguments = $"\"{tempExtractPath}\" \"{AppDomain.CurrentDomain.BaseDirectory}\"",
-                UseShellExecute = true
-            });
-
-            // 关闭主程序
-            Application.Current.Shutdown();
-
-            // 返回已完成的任务
-            return Task.CompletedTask;
+                // 异常处理保持不变...
+                string errorMsg = $"启动更新程序失败：{ex.Message}";
+                UpdateMainProgress(0, errorMsg);
+                MyLoger.Error(errorMsg + "\n" + ex.StackTrace);
+                MessageBox.Show(
+                    errorMsg + "\n请检查更新程序是否存在或权限是否足够",
+                    "更新错误",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
         }
 
         // 从数据库读取临时更新路径
@@ -422,68 +607,102 @@ namespace Software.其他窗口
             }
         }
 
-        // 更新界面上的状态信息，如进度条、状态文本等
-        private void UpdateStatus(string status)
+        // 下载更新文件（带详细进度）
+        private async Task<string> DownloadUpdate(string url, string fileSizeText)
         {
-            Dispatcher.Invoke(() =>
+            try
             {
-                ProgressBar.Value += 10; // 根据需要调整进度条的增量
-                StatusTextBlock.Text = status;
-            });
-        }
+                // 明确标记当前阶段为下载
+                currentStage = UpdateStage.Downloading;
+                UpdateMainProgress(0, "初始化下载...");
 
-        // 下载更新文件的操作
-        private async Task<string> DownloadUpdate(string url)
-        {
-            string rootPath = AppDomain.CurrentDomain.BaseDirectory;
-            string updateFolderPath = Path.Combine(rootPath, "update");
+                string updateFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "update");
+                string filePath = Path.Combine(updateFolderPath, Path.GetFileName(url));
 
-            if (!Directory.Exists(updateFolderPath))
-            {
-                Directory.CreateDirectory(updateFolderPath);
-            }
-
-            string filePath = Path.Combine(updateFolderPath, Path.GetFileName(url));
-            using (HttpClient client = new HttpClient())
-            {
-                client.Timeout = TimeSpan.FromMinutes(30);
-                HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                response.EnsureSuccessStatusCode();
-
-                long totalBytes = response.Content.Headers.ContentLength ?? 0;
-                using (var contentStream = await response.Content.ReadAsStreamAsync())
-                using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (HttpClient client = new HttpClient())
                 {
-                    var buffer = new byte[8192];
-                    long totalReadBytes = 0;
-                    int readBytes;
+                    client.Timeout = TimeSpan.FromMinutes(30);
+                    HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                    response.EnsureSuccessStatusCode();
 
-                    stopwatch.Start();
-                    while ((readBytes = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    long totalBytes = response.Content.Headers.ContentLength ?? 0;
+                    double totalMB = totalBytes / (1024.0 * 1024.0);
+
+                    using (var contentStream = await response.Content.ReadAsStreamAsync())
+                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
-                        totalReadBytes += readBytes;
-                        await fs.WriteAsync(buffer, 0, readBytes);
-                        double progress = (double)totalReadBytes / totalBytes * 100;
-                        UpdateProgressBar((int)progress, totalReadBytes, totalBytes);
+                        var buffer = new byte[8192];
+                        long totalReadBytes = 0;
+                        int readBytes;
+                        int lastProgress = -1;
+                        stopwatch.Restart();
+
+                        while ((readBytes = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            totalReadBytes += readBytes;
+                            await fs.WriteAsync(buffer, 0, readBytes);
+
+                            // 计算当前阶段的进度（下载阶段）
+                            double stageProgress = totalBytes > 0 ? (double)totalReadBytes / totalBytes * 100 : 0;
+                            int progressInt = (int)stageProgress;
+
+                            // 每1%更新一次进度，减少UI更新频率
+                            if (progressInt != lastProgress)
+                            {
+                                lastProgress = progressInt;
+
+                                // 更新主进度条（基于阶段权重）
+                                UpdateMainProgress(stageProgress, "正在下载更新文件...");
+
+                                // 更新子进度条（详细下载进度）
+                                double downloadedMB = totalReadBytes / (1024.0 * 1024.0);
+                                string progressText = $"正在下载: {downloadedMB:F2} MB / {totalMB:F2} MB";
+                                UpdateSubProgress(stageProgress, progressText);
+
+                                // 更新下载速度
+                                Dispatcher.Invoke(() =>
+                                {
+                                    double elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
+                                    double downloadSpeed = elapsedSeconds > 0 ? downloadedMB / elapsedSeconds : 0;
+                                    DownloadSpeed.Text = $"下载速度: {downloadSpeed:F2} MB/s";
+                                    DownloadProgress.Text = $"{downloadedMB:F2} MB / {totalMB:F2} MB";
+                                });
+                            }
+                        }
+                        stopwatch.Stop();
                     }
-                    stopwatch.Stop();
                 }
+
+                return filePath;
             }
-            await Task.Delay(1000); // 添加延迟
-            return filePath;
+            catch (Exception ex)
+            {
+                MyLoger.Error("下载时出错:{error}", ex.ToString());
+                throw;
+            }
         }
 
         // 验证文件校验和的操作
         private bool ValidateFileChecksum(string filePath, List<Checksum> checksums)
         {
-            using (var md5 = System.Security.Cryptography.MD5.Create())
+            try
             {
-                using (var stream = File.OpenRead(filePath))
+                using (var md5 = System.Security.Cryptography.MD5.Create())
                 {
-                    var hash = md5.ComputeHash(stream);
-                    var fileChecksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                    return checksums.Any(c => c.MD5.ToLowerInvariant() == fileChecksum);
+                    using (var stream = File.OpenRead(filePath))
+                    {
+                        var hash = md5.ComputeHash(stream);
+                        var fileChecksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+
+                        bool isValid = checksums.Any(c => c.MD5.ToLowerInvariant() == fileChecksum);
+                        return isValid;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MyLoger.Error("验证文件完整性时出错:{error}", ex.ToString());
+                return false;
             }
         }
 
@@ -519,8 +738,6 @@ namespace Software.其他窗口
                     }
                 }
 
-                UpdateStatus($"解压完成！临时解压路径: {tempExtractPath}");
-
                 // 标记需要在下次启动时进行文件替换
                 SaveTempExtractPath(databasePath, tempExtractPath);
 
@@ -528,7 +745,7 @@ namespace Software.其他窗口
             }
             catch (Exception ex)
             {
-                UpdateStatus($"解压时出错: {ex.Message}");
+                MyLoger.Error("解压时出错:{error}", ex.ToString());
                 return false; // 解压失败
             }
         }
@@ -569,47 +786,8 @@ namespace Software.其他窗口
             }
             catch (Exception ex)
             {
-                UpdateStatus($"安装时出错: {ex.Message}");
+                MyLoger.Error("安装时出错:{error}", ex.ToString());
                 return false; // 安装失败
-            }
-        }
-
-        // 根据更新模式进行实际更新操作的方法
-        private void InstallUpdate(string filePath, string updateMode)
-        {
-            bool updateSuccessful = false;
-
-            if (updateMode.Contains("zip"))
-            {
-                UpdateStatus("开始解压...");
-                // 获取用户文档文件夹路径
-                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                // 构建Updater.exe的相对路径
-                string updaterPath = Path.Combine(documentsPath, "StreeDB", "update", "Updater.exe");
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = updaterPath,
-                    Arguments = $"\"{filePath}\" \"{AppDomain.CurrentDomain.BaseDirectory}\"",
-                    UseShellExecute = true
-                });
-
-                // 关闭主程序
-                Application.Current.Shutdown();
-            }
-            else if (updateMode.Contains("installer"))
-            {
-                UpdateStatus("开始安装...");
-                updateSuccessful = InstallPackage(filePath);
-            }
-            else
-            {
-                UpdateStatus("未知的更新模式。");
-            }
-
-            // 只有在更新成功完成时才删除更新文件
-            if (updateSuccessful)
-            {
-                DeleteUpdateFile(filePath);
             }
         }
 
@@ -621,31 +799,12 @@ namespace Software.其他窗口
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
-                    UpdateStatus("更新文件已删除。");
                 }
             }
             catch (Exception ex)
             {
-                UpdateStatus($"删除更新文件时出错: {ex.Message}");
+                MyLoger.Error("删除更新文件时出错:{error}", ex.ToString());
             }
-        }
-
-        // 更新进度条及相关下载信息展示的操作
-        private void UpdateProgressBar(int value, long downloadedBytes, long totalBytes)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                ProgressBar.Value = value;
-                ProgressPercentage.Text = $"{value}%";
-                double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
-                double totalMB = totalBytes / (1024.0 * 1024.0);
-                DownloadProgress.Text = $"{downloadedMB:F2} MB / {totalMB:F2} MB";
-
-                // 计算下载速度
-                double elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-                double downloadSpeed = downloadedMB / elapsedSeconds;
-                DownloadSpeed.Text = $"下载速度: {downloadSpeed:F2} MB/s";
-            });
         }
 
         // 关闭窗口的操作

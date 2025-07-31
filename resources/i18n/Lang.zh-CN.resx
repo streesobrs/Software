@@ -318,4 +318,10 @@
   <data name="PageSettings_TextBlock_VersionColor" xml:space="preserve">
     <value>版本颜色：</value>
   </data>
+  <data name="MainWindow_Button_MusicPlayer" xml:space="preserve">
+    <value>音乐播放器</value>
+  </data>
+  <data name="MainWindow_Button_MusicPlayer_Tip" xml:space="preserve">
+    <value>打开播放界面</value>
+  </data>
 </root>
