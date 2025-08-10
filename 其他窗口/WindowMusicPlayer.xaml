@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="音乐播放器" Height="620" Width="800"
+        Title="音乐播放器" Height="700" Width="1000"  
         Background="#2C2C2C" Foreground="White">
     <Window.Resources>
         <!-- 开关样式的 CheckBox -->
@@ -106,6 +106,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- 歌词文本样式 -->
+        <Style x:Key="LyricTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="5,2"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10">
@@ -119,55 +130,73 @@
                   UnloadedBehavior="Manual"
                   Visibility="Collapsed"/>
 
-        <!-- 左侧：专辑封面和控制按钮 -->
+        <!-- 左侧：专辑封面、歌词和控制按钮 -->
         <StackPanel Grid.Column="0" HorizontalAlignment="Center">
             <!-- 专辑封面 -->
-            <Border Width="240" Height="240" CornerRadius="10" Background="#3C3C3C" Margin="0,20,0,0">
+            <Border Width="240" Height="240" CornerRadius="10" Background="#3C3C3C" Margin="0,10,0,0">
                 <Image x:Name="AlbumCover" Stretch="UniformToFill" Source="pack://application:,,,/Resources/image/default_album.png"/>
             </Border>
 
             <!-- 歌曲信息 -->
             <TextBlock x:Name="musicNameTextBlock" 
                        Text="未播放歌曲"
-                       Background="Transparent" 
                        FontSize="16" 
                        HorizontalAlignment="Center"
-                       Margin="0,20,0,0"
+                       Margin="0,15,0,0"
                        Width="240"
                        TextAlignment="Center"
-                       TextWrapping="Wrap"/>
+                       TextWrapping="Wrap"
+                       Foreground="White"/>
+
+            <!-- 歌词显示区域（新增） -->
+            <Border Margin="0,10,0,0" 
+                    Width="240" 
+                    Height="120" 
+                    Background="#3C3C3C" 
+                    CornerRadius="5">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="LyricsPanel">
+                        <!-- 歌词将通过代码动态添加 -->
+                        <TextBlock Text="歌词加载中..." 
+                                   Style="{StaticResource LyricTextStyle}"
+                                   Foreground="#AAAAAA"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
 
             <!-- 进度条容器 -->
-            <Grid Width="240" Margin="0,10,0,0">
-                <!-- 进度显示 -->
-                <ProgressBar x:Name="MusicProgress" 
-                             Style="{StaticResource MusicProgressStyle}"
-                             Minimum="0" Maximum="100"/>
+            <StackPanel Width="240" Margin="0,10,0,0">
+                <Grid>
+                    <!-- 进度显示 -->
+                    <ProgressBar x:Name="MusicProgress" 
+                                 Style="{StaticResource MusicProgressStyle}"
+                                 Minimum="0" Maximum="100"/>
 
-                <!-- 透明滑块用于拖动控制 (只在拖动结束时更新位置) -->
-                <Slider x:Name="ProgressSlider" 
-                         Minimum="0" Maximum="100"
-                         Background="Transparent"
-                         Opacity="0"
-                         Thumb.DragStarted="ProgressSlider_DragStarted"
-                         Thumb.DragCompleted="ProgressSlider_DragCompleted"/>
-            </Grid>
+                    <!-- 透明滑块用于拖动控制 -->
+                    <Slider x:Name="ProgressSlider" 
+                             Minimum="0" Maximum="100"
+                             Background="Transparent"
+                             Opacity="0"
+                             Thumb.DragStarted="ProgressSlider_DragStarted"
+                             Thumb.DragCompleted="ProgressSlider_DragCompleted"/>
+                </Grid>
 
-            <!-- 时间显示 -->
-            <Grid Width="240" Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock x:Name="CurrentTimeText" Text="00:00" FontSize="12" Foreground="#AAAAAA"/>
-                <TextBlock x:Name="TotalTimeText" Text="00:00" FontSize="12" Foreground="#AAAAAA" 
-                           Grid.Column="1" HorizontalAlignment="Right"/>
-            </Grid>
+                <!-- 时间显示 -->
+                <Grid Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="CurrentTimeText" Text="00:00" FontSize="12" Foreground="#AAAAAA" HorizontalAlignment="Left"/>
+                    <TextBlock x:Name="TotalTimeText" Text="00:00" FontSize="12" Foreground="#AAAAAA" 
+                               Grid.Column="1" HorizontalAlignment="Right"/>
+                </Grid>
+            </StackPanel>
 
             <!-- 播放控制按钮 -->
             <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Center" 
-                        Margin="0,20,0,0">
+                        Margin="0,15,0,10">
                 <Button x:Name="prevButton" Content="&#x23EA;" 
                         Style="{StaticResource MediaButtonStyle}" 
                         Margin="0,0,15,0"
@@ -181,69 +210,29 @@
                         Margin="15,0,0,0"
                         Click="NextButton_Click"/>
             </StackPanel>
-
-            <!-- 音量控制 (使用默认滑块) -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="30" Margin="5,0,5,0">
-                    <TextBlock Text="音量" VerticalAlignment="Center" Margin="1" Foreground="#AAAAAA"/>
-                    <Slider x:Name="VolumeSlider" 
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical"
-                            Minimum="0" Maximum="1"
-                            Value="{Binding MusicPlayer.Volume, Mode=TwoWay}"
-                            ToolTip="调整音量"
-                            SmallChange="0.05"
-                            LargeChange="0.1"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                    <!-- 播放模式按钮 -->
-                    <Button x:Name="playModeButton" Content="随机模式" 
-                        Margin="0,10,0,0"
-                        Background="#3C3C3C"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Height="30"
-                        Width="120"
-                        Click="PlayModeButton_Click"/>
-
-                    <!-- 循环模式按钮 (合并单曲循环和列表循环) -->
-                    <Button x:Name="loopModeButton" Content="循环模式: 无" 
-                        Margin="0,10,0,0"
-                        Background="#3C3C3C"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Height="30"
-                        Width="120"
-                        Click="LoopModeButton_Click"/>
-
-                    <!-- 手动刷新按钮 -->
-                    <Button x:Name="refreshButton" Content="刷新列表" 
-                        Margin="0,10,0,0"
-                        Background="#3C3C3C"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Height="30"
-                        Width="120"
-                        Click="RefreshButton_Click"/>
-                </StackPanel>
-                
-            </StackPanel>
-
-            
         </StackPanel>
 
-        <!-- 右侧：播放列表和模式设置 -->
-        <StackPanel Grid.Column="1" Margin="20,0,0,0">
-            <!-- 列表标题 -->
-            <TextBlock Text="播放列表" FontSize="18" Margin="0,20,0,10"/>
+        <!-- 右侧：播放列表和模式设置（为卡片形式预留空间） -->
+        <Grid Grid.Column="1" Margin="20,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <!-- 播放列表 -->
+            <!-- 列表标题 -->
+            <TextBlock Text="播放列表"
+                       FontSize="18" 
+                       Margin="0"
+                       Grid.Row="0"/>
+
+            <!-- 播放列表（为未来卡片形式预留） -->
             <ListView x:Name="MusicList" 
+                      Grid.Row="1"
                       Background="#3C3C3C" 
                       BorderThickness="0"
-                      Height="300"
-                      Margin="0,0,0,20"
+                      Margin="0,5,0,10"
                       SelectionChanged="MusicList_SelectionChanged">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -270,14 +259,69 @@
                 </ListView.View>
             </ListView>
 
-            <!-- 添加音乐按钮 -->
-            <Button Content="添加音乐" 
-                    Margin="0,20,0,0"
-                    Background="#0078D7"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Height="35"
-                    Click="AddMusicButton_Click"/>
-        </StackPanel>
+            <!-- 控制面板 -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                <!-- 音量控制 -->
+                <StackPanel Orientation="Vertical" Margin="0,0,20,0">
+                    <TextBlock Text="音量" VerticalAlignment="Center" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                    <Slider x:Name="VolumeSlider" 
+                            Width="100"
+                            Orientation="Horizontal"
+                            Minimum="0" Maximum="1"
+                            Value="{Binding MusicPlayer.Volume, Mode=TwoWay}"
+                            ToolTip="调整音量"
+                            SmallChange="0.05"
+                            LargeChange="0.1"/>
+                </StackPanel>
+
+                <!-- 播放模式按钮 -->
+                <Button x:Name="playModeButton" Content="随机模式" 
+                        Margin="0,0,10,0"
+                        Background="#3C3C3C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="30"
+                        Width="100"
+                        Click="PlayModeButton_Click"/>
+
+                <!-- 循环模式按钮 -->
+                <Button x:Name="loopModeButton" Content="循环模式: 无" 
+                        Margin="0,0,10,0"
+                        Background="#3C3C3C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="30"
+                        Width="110"
+                        Click="LoopModeButton_Click"/>
+
+                <!-- 手动刷新按钮 -->
+                <Button x:Name="refreshButton" Content="刷新列表" 
+                        Background="#3C3C3C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="30"
+                        Width="90"
+                        Click="RefreshButton_Click"/>
+            </StackPanel>
+
+            <!-- 底部按钮组 -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,15,0,0">
+                <Button Content="添加音乐" 
+                        Background="#0078D7"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="35"
+                        Width="100"
+                        Click="AddMusicButton_Click"/>
+
+                <Button Content="打开音乐文件夹"
+                        Margin="10,0,0,0"
+                        Background="#0078D7"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Height="35"
+                        Width="120"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
