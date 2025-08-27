@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media; // 添加 Brushes 支持
 using System.Windows.Threading;
 using Microsoft.Win32;
-using Software.ViewModels;
+using Software.ViewModels; // 添加 LyricManager 支持
 
 namespace Software.其他窗口
 {
@@ -12,6 +14,8 @@ namespace Software.其他窗口
     {
         public MusicPlayer MusicPlayer { get; private set; }
         private DispatcherTimer _updateTimer;
+
+        private int _lastLyricIndex = -1;
 
         // 添加标志位，用于区分是用户拖动还是程序更新
         private bool _isUserDragging = false;
@@ -46,6 +50,7 @@ namespace Software.其他窗口
                 MusicPlayer.OnMusicChanged += MusicPlayer_OnMusicChanged;
                 MusicPlayer.OnPlaybackError += MusicPlayer_OnPlaybackError;
                 MusicPlayer.OnPlaybackMessage += MusicPlayer_OnPlaybackMessage;
+                MusicPlayer.OnLyricsLoaded += MusicPlayer_OnLyricsLoaded;
 
                 // 启动定时器更新进度
                 _updateTimer = new DispatcherTimer
@@ -76,10 +81,71 @@ namespace Software.其他窗口
                 MusicProgress.Value = MusicPlayer.Progress;
                 ProgressSlider.Value = MusicPlayer.Progress;
 
+                // 更新歌词位置
+                if (MusicPlayer != null && !_isUserDragging)
+                {
+                    // 获取当前歌词索引
+                    int? lyricIndex = MusicPlayer.CurrentLyricIndex;
+
+                    if (lyricIndex.HasValue && lyricIndex != _lastLyricIndex)
+                    {
+                        _lastLyricIndex = lyricIndex.Value;
+                        UpdateLyricsDisplay(MusicPlayer.CurrentLyrics, lyricIndex);
+                    }
+                }
+
                 // 更新时间显示
                 CurrentTimeText.Text = MusicPlayer.CurrentTime.ToString(@"mm\:ss");
                 TotalTimeText.Text = MusicPlayer.TotalTime.ToString(@"mm\:ss");
             }
+        }
+
+        // 添加新方法：更新歌词显示
+        private void UpdateLyricsDisplay(List<LyricManager.LyricLine> lyrics, int? currentIndex = null)
+        {
+            // 创建歌词项集合
+            var lyricItems = new List<dynamic>();
+
+            for (int i = 0; i < lyrics.Count; i++)
+            {
+                bool isCurrent = (currentIndex.HasValue && i == currentIndex.Value);
+
+                lyricItems.Add(new
+                {
+                    Text = lyrics[i].Text,
+                    Color = isCurrent ? Brushes.White : Brushes.Gray
+                });
+            }
+
+            // 设置数据源
+            LyricsPanel.ItemsSource = lyricItems;
+
+            // 滚动到当前歌词
+            if (currentIndex.HasValue && currentIndex.Value >= 0)
+            {
+                Dispatcher.BeginInvoke(new Action(() => {
+                    if (LyricsPanel.ItemContainerGenerator.ContainerFromIndex(currentIndex.Value) is FrameworkElement container)
+                    {
+                        container.BringIntoView();
+                    }
+                }), DispatcherPriority.Render);
+            }
+        }
+
+        // 歌词加载完成事件处理
+        private void MusicPlayer_OnLyricsLoaded(object sender, List<LyricManager.LyricLine> e)
+        {
+            Dispatcher.Invoke(() => {
+                if (e == null || e.Count == 0)
+                {
+                    // 没有歌词时显示提示
+                    LyricsPanel.ItemsSource = new[] { new { Text = "未找到歌词", Color = Brushes.Gray } };
+                }
+                else
+                {
+                    UpdateLyricsDisplay(e);
+                }
+            });
         }
 
         private void MusicPlayer_OnMusicChanged(object sender, MusicInfo e)

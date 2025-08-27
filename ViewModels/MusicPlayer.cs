@@ -25,6 +25,7 @@ namespace Software.ViewModels
         private bool _isDisposed = false;
         private readonly Random _random = new Random();
         private DispatcherTimer _progressTimer;
+        private LyricManager _lyricManager;
 
         // 循环模式枚举
         public enum LoopMode
@@ -56,6 +57,10 @@ namespace Software.ViewModels
 
         // 当前循环模式
         public LoopMode CurrentLoopMode => _currentLoopMode;
+
+        // 使用公共属性访问歌词
+        public List<LyricManager.LyricLine> CurrentLyrics => _lyricManager?.CurrentLyrics;
+        public int? CurrentLyricIndex => _lyricManager?.CurrentLyricIndex;
 
         // 播放进度
         private double _progress;
@@ -136,6 +141,10 @@ namespace Software.ViewModels
             _defaultMusicFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources", "sound", "music");
             _lastPlayedMusicFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources", "LastPlayedMusic.ini");
 
+            // 初始化歌词管理器
+            _lyricManager = new LyricManager(Application.Current.Dispatcher);
+            _lyricManager.OnLyricsLoaded += LyricManager_OnLyricsLoaded;
+
             Initialize();
         }
 
@@ -209,6 +218,12 @@ namespace Software.ViewModels
             }
         }
 
+        // 添加歌词加载事件处理
+        private void LyricManager_OnLyricsLoaded(object sender, List<LyricManager.LyricLine> e)
+        {
+            OnLyricsLoaded?.Invoke(this, e);
+        }
+
         private void MediaElement_MediaEnded(object sender, RoutedEventArgs e)
         {
             HandleMediaEnded();
@@ -226,6 +241,9 @@ namespace Software.ViewModels
                 errorMessage += "\n- 文件已损坏";
                 errorMessage += "\n- 缺少必要的解码器";
             }
+
+            // 清除歌词
+            _lyricManager?.ClearLyrics();
 
             Debug.WriteLine(errorMessage);
             OnPlaybackError?.Invoke(this, errorMessage);
@@ -249,6 +267,12 @@ namespace Software.ViewModels
                     OnPropertyChanged(nameof(Progress));
                     OnPropertyChanged(nameof(CurrentTime));
                 }
+            }
+
+            // 更新歌词位置
+            if (_mediaElement != null && _mediaElement.NaturalDuration.HasTimeSpan)
+            {
+                _lyricManager.UpdateLyricsPosition(_mediaElement.Position);
             }
         }
         #endregion
@@ -562,6 +586,16 @@ namespace Software.ViewModels
                 _currentMusicIndex = index;
                 var selectedMusic = MusicFiles[index];
 
+                // 加载歌词
+                if (selectedMusic != null)
+                {
+                    _ = _lyricManager.LoadLyricsAsync(
+                        selectedMusic.FilePath,
+                        selectedMusic.DisplayName,
+                        selectedMusic.Artist
+                    );
+                }
+
                 // 设置源并播放
                 _mediaElement.Source = new Uri(selectedMusic.FilePath);
                 _mediaElement.Play();
@@ -823,6 +857,7 @@ namespace Software.ViewModels
         public event EventHandler<string> OnPlaybackError;
         public event EventHandler<string> OnPlaybackMessage;
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<List<LyricManager.LyricLine>> OnLyricsLoaded;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

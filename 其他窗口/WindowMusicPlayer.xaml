@@ -2,7 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:viewmodels="clr-namespace:Software.ViewModels" 
+        d:DataContext="{d:DesignInstance Type=viewmodels:MusicPlayer}"
         mc:Ignorable="d"
         Title="音乐播放器" Height="700" Width="1000"  
         Background="#2C2C2C" Foreground="White">
@@ -150,17 +152,22 @@
 
             <!-- 歌词显示区域（新增） -->
             <Border Margin="0,10,0,0" 
-                    Width="240" 
-                    Height="120" 
-                    Background="#3C3C3C" 
-                    CornerRadius="5">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel x:Name="LyricsPanel">
-                        <!-- 歌词将通过代码动态添加 -->
-                        <TextBlock Text="歌词加载中..." 
-                                   Style="{StaticResource LyricTextStyle}"
-                                   Foreground="#AAAAAA"/>
-                    </StackPanel>
+        Width="240" 
+        Height="120" 
+        Background="#3C3C3C" 
+        CornerRadius="5">
+                <ScrollViewer x:Name="LyricsScrollViewer"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalContentAlignment="Center">
+                    <ItemsControl x:Name="LyricsPanel">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Text}" 
+                               Style="{StaticResource LyricTextStyle}"
+                               Foreground="{Binding Color}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </ScrollViewer>
             </Border>
 
