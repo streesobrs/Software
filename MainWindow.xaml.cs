@@ -172,6 +172,12 @@ namespace Software
                     string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
                     string targetPath = Path.Combine(targetDir, fileName);
 
+                    if (!File.Exists(sourcePath))
+                    {
+                        MyLoger.Warning("未找到文件: {sourcePath}，跳过移动操作", sourcePath);
+                        continue; // 跳过不存在的文件
+                    }
+
                     // 复制文件到目标路径并覆盖
                     File.Copy(sourcePath, targetPath, true);
                     MyLoger.Information("{fileName} 已复制到: {targetPath}", fileName, targetPath);
