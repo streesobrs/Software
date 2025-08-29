@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Data;
 using System.Reflection;
@@ -21,189 +22,23 @@ using System.Globalization;
 using System.Threading;
 using System.Text.RegularExpressions;
 using WPFLocalizeExtension.Engine;
+using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Software
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
-        string databasePath = DatabaseHelper.GetDatabasePath();
+        private static readonly string _databasePath;
+        private static readonly string _logDirectory;
+        private Task _setCultureTask;
+        private IHost _webHost;
 
-        // 全局变量：存储更新相关参数
         public static bool IsUpdated { get; private set; } = false;
         public static string UpdateTime { get; private set; } = "";
         public static string UpdateVersion { get; private set; } = "";
 
-        private string GetConfigValueFromDatabase(string dbPath, string key)
-        {
-            try
-            {
-                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
-                {
-                    connection.Open();
-                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
-                    var command = new SqliteCommand(query, connection);
-                    command.Parameters.AddWithValue("@Key", key);
-                    return command.ExecuteScalar()?.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("读取配置值时发生错误: " + ex.Message);
-                return null;
-            }
-        }
-
-        public App()
-        {
-            var culture = GetConfigValueFromDatabase(databasePath, "Culture");
-            CultureInfo cultureInfo;
-
-            if (!string.IsNullOrEmpty(culture))
-            {
-                try
-                {
-                    cultureInfo = new CultureInfo(culture);
-                }
-                catch (CultureNotFoundException)
-                {
-                    MessageBox.Show($"未找到指定的区域设置: {culture}，将使用默认区域设置。");
-                    cultureInfo = CultureInfo.CurrentCulture;
-                }
-            }
-            else
-            {
-                cultureInfo = CultureInfo.CurrentCulture;
-            }
-            LocalizeDictionary.Instance.Culture = cultureInfo;
-        }
-
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            try
-            {
-                // 1. 处理启动参数（优先执行，确保更新时间尽早保存）
-                HandleStartupArguments(e.Args);
-
-                base.OnStartup(e);
-
-                // 2. 初始化数据库
-                InitializeDatabase();
-
-                #region Serilog配置
-                string logOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} || {Level} || {SourceContext:l} || {Message} || {Exception} ||end {NewLine}";
-                Log.Logger = new LoggerConfiguration()
-                  .MinimumLevel.Override("Default", LogEventLevel.Information)
-                  .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
-                  .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-                  .Enrich.FromLogContext()
-                  .WriteTo.File($"{AppContext.BaseDirectory}logs/log.log", rollingInterval: RollingInterval.Day, outputTemplate: logOutputTemplate)
-                  .CreateLogger();
-                #endregion
-
-                #region 启动ASP.NET Core主机
-                var host = Host.CreateDefaultBuilder(e.Args)
-                    .UseSerilog()
-                    .ConfigureWebHostDefaults(webBuilder => {
-                        webBuilder.UseStartup<Startup>();
-                    }).Build();
-
-                host.RunAsync();
-                #endregion
-            }
-            catch (Exception ex)
-            {
-                // 异常处理
-                File.WriteAllText("error.log", ex.ToString());
-                Log.Logger.Error(ex.ToString());
-                MessageBox.Show("应用程序在启动时遇到了一个错误。请查看 error.log 文件以获取更多信息。");
-                this.Shutdown();
-            }
-        }
-
-        /// <summary>
-        /// 处理启动参数，区分正常启动和更新后启动
-        /// </summary>
-        private void HandleStartupArguments(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                Debug.WriteLine("正常启动：无参数");
-                return;
-            }
-
-            try
-            {
-                // 只校验第一个参数是否为"updated"，并提取时间
-                if (args[0] == "updated")
-                {
-                    IsUpdated = true;
-                    // 只处理第二个参数（更新时间）
-                    UpdateTime = args.Length > 1 ? args[1] : "未知时间";
-                    Debug.WriteLine($"更新后启动：时间={UpdateTime}");
-
-                    // 保存更新时间到数据库（逻辑不变）
-                    if (!string.IsNullOrEmpty(UpdateTime) && UpdateTime != "未知时间")
-                    {
-                        SaveLastUpdateTime(databasePath, UpdateTime);
-                    }
-                }
-                else
-                {
-                    Debug.WriteLine("参数格式不匹配，按正常启动处理");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"参数解析错误：{ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// 保存上次更新时间到数据库
-        /// </summary>
-        private void SaveLastUpdateTime(string dbPath, string lastUpdateTime)
-        {
-            try
-            {
-                // 验证数据库路径
-                if (!File.Exists(dbPath))
-                {
-                    Debug.WriteLine($"数据库文件不存在：{dbPath}");
-                    return;
-                }
-
-                using (var connection = new SqliteConnection($"Data Source={dbPath}"))
-                {
-                    connection.Open();
-                    // 使用INSERT OR REPLACE确保存在则更新，不存在则插入
-                    string query = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('LastUpdateTime', @LastUpdateTime);";
-                    var command = new SqliteCommand(query, connection);
-                    command.Parameters.AddWithValue("@LastUpdateTime", lastUpdateTime);
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        Debug.WriteLine($"成功保存更新时间到数据库：{lastUpdateTime}");
-                        Log.Logger.Information($"更新时间已保存：{lastUpdateTime}");
-                    }
-                    else
-                    {
-                        Debug.WriteLine("保存更新时间到数据库，但未影响任何行");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error("保存LastUpdateTime时发生错误: {error}", ex.ToString());
-                MessageBox.Show("保存更新时间时发生错误: " + ex.Message);
-            }
-        }
-
-        // 获取数据库路径的方法
-        private string GetDatabasePath()
+        static App()
         {
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string folderPath = Path.Combine(documentsPath, "StreeDB");
@@ -214,67 +49,326 @@ namespace Software
             }
 
 #if DEBUG
-            return Path.Combine(folderPath, "debug_SoftwareDatabase.db");
+            _databasePath = Path.Combine(folderPath, "debug_SoftwareDatabase.db");
 #else
-                return Path.Combine(folderPath, "SoftwareDatabase.db");
+            _databasePath = Path.Combine(folderPath, "SoftwareDatabase.db");
 #endif
+
+            _logDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
         }
 
-        // 初始化数据库的方法
-        private void InitializeDatabase()
+        public App()
         {
-            string databasePath = GetDatabasePath();
-            bool isNewDatabase = !File.Exists(databasePath);
+            // 添加全局异常处理
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
-            using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+            InitializeSerilog();
+            _setCultureTask = SetCultureAsync();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Logger.Fatal(e.ExceptionObject as Exception, "未处理的应用程序域异常");
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            Log.Logger.Fatal(e.Exception, "未处理的UI线程异常");
+            e.Handled = true;
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Log.Logger.Fatal(e.Exception, "未观察的任务异常");
+            e.SetObserved();
+        }
+
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            var startupStopwatch = Stopwatch.StartNew();
+
+            try
             {
-                connection.Open();
+                // 等待文化设置完成
+                await _setCultureTask;
 
-                try
+                // 并行执行初始化任务
+                var tasks = new List<Task>
                 {
-                    if (isNewDatabase)
-                    {
-                        CreateSettingsTable(connection);
-                        CreateButtonVisibilityTable(connection);
-                        InsertInitialData(connection);
-                    }
-                    else
-                    {
-                        if (ColumnExists(connection, "Settings", "MigrationVersion"))
-                        {
-                            DeleteColumn(connection, "Settings", "MigrationVersion");
-                        }
+                    HandleStartupArgumentsAsync(e.Args),
+                    InitializeDatabaseAsync()
+                };
 
-                        CreateSettingsTable(connection);
-                        CreateButtonVisibilityTable(connection);
-                        CheckSettingsKeys(connection);
-                        CheckButtonVisibilityKeys(connection);
-                        PerformOriginalMigration(connection);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Database initialization failed: " + ex.Message);
-                    Log.Logger.Error("数据库初始化失败: {error}", ex.ToString());
-                }
+                await Task.WhenAll(tasks);
+
+                // 启动Web主机（但不等待它完成）
+                _ = StartWebHostAsync(e.Args);
+
+                base.OnStartup(e);
+
+                //var mainWindow = new MainWindow();
+                //mainWindow.Show();
+
+                startupStopwatch.Stop();
+                Log.Logger.Information($"应用程序启动完成，总耗时: {startupStopwatch.ElapsedMilliseconds}ms");
+            }
+            catch (Exception ex)
+            {
+                startupStopwatch.Stop();
+                Log.Logger.Fatal(ex, $"应用程序启动失败，耗时: {startupStopwatch.ElapsedMilliseconds}ms");
+                File.WriteAllText("error.log", ex.ToString());
+                MessageBox.Show("应用程序在启动时遇到了一个错误。请查看 error.log 文件以获取更多信息。");
+                this.Shutdown();
             }
         }
 
-        private void CreateSettingsTable(SqliteConnection connection)
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            // 确保Web主机正确关闭
+            if (_webHost != null)
+            {
+                try
+                {
+                    await _webHost.StopAsync(TimeSpan.FromSeconds(5));
+                    _webHost.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error(ex, "停止Web主机时发生错误");
+                }
+            }
+
+            base.OnExit(e);
+        }
+
+        private void InitializeSerilog()
+        {
+            try
+            {
+                if (!Directory.Exists(_logDirectory))
+                {
+                    Directory.CreateDirectory(_logDirectory);
+                }
+
+                string logPath = Path.Combine(_logDirectory, "log.log");
+
+                Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.Override("Default", LogEventLevel.Information)
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+                    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                    .Enrich.FromLogContext()
+                    .WriteTo.File(
+                        path: logPath,
+                        rollingInterval: RollingInterval.Day,
+                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} || {Level} || {SourceContext:l} || {Message} || {Exception} ||end {NewLine}",
+                        buffered: false,
+                        shared: true
+                    )
+                    .CreateLogger();
+
+                Log.Logger.Information("日志系统初始化完成");
+            }
+            catch (Exception ex)
+            {
+                // 如果日志初始化失败，至少记录到事件查看器或控制台
+                EventLog.WriteEntry("Application", $"日志初始化失败: {ex.Message}", EventLogEntryType.Error);
+                Console.WriteLine($"日志初始化失败: {ex.Message}");
+            }
+        }
+
+        private async Task SetCultureAsync()
+        {
+            try
+            {
+                string culture = await GetConfigValueFromDatabaseAsync("Culture");
+                CultureInfo cultureInfo;
+
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    try
+                    {
+                        cultureInfo = new CultureInfo(culture);
+                    }
+                    catch (CultureNotFoundException ex)
+                    {
+                        Log.Logger.Warning(ex, $"未找到指定的区域设置: {culture}，将使用默认区域设置");
+                        cultureInfo = CultureInfo.CurrentCulture;
+                    }
+                }
+                else
+                {
+                    cultureInfo = CultureInfo.CurrentCulture;
+                }
+
+                // 添加空检查
+                if (LocalizeDictionary.Instance != null)
+                {
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        LocalizeDictionary.Instance.Culture = cultureInfo;
+                    });
+                }
+                else
+                {
+                    Log.Logger.Warning("LocalizeDictionary.Instance 为 null，无法设置文化");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "设置区域文化时发生错误");
+            }
+        }
+
+        private async Task<string> GetConfigValueFromDatabaseAsync(string key)
+        {
+            try
+            {
+                if (!File.Exists(_databasePath))
+                {
+                    Log.Logger.Warning($"数据库文件不存在：{_databasePath}");
+                    return null;
+                }
+
+                using (var connection = new SqliteConnection($"Data Source={_databasePath};Cache=Shared"))
+                {
+                    await connection.OpenAsync();
+                    string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Key", key);
+                        var result = await command.ExecuteScalarAsync();
+                        return result?.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"读取配置值时发生错误 (Key: {key})");
+                return null;
+            }
+        }
+
+        private async Task HandleStartupArgumentsAsync(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Log.Logger.Information("正常启动：无参数");
+                return;
+            }
+
+            try
+            {
+                if (args[0] == "updated")
+                {
+                    IsUpdated = true;
+                    UpdateTime = args.Length > 1 ? args[1] : "未知时间";
+                    Log.Logger.Information($"更新后启动：时间={UpdateTime}");
+
+                    if (!string.IsNullOrEmpty(UpdateTime) && UpdateTime != "未知时间")
+                    {
+                        await SaveLastUpdateTimeAsync(UpdateTime);
+                    }
+                }
+                else
+                {
+                    Log.Logger.Information("参数格式不匹配，按正常启动处理");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "参数解析错误");
+            }
+        }
+
+        private async Task SaveLastUpdateTimeAsync(string lastUpdateTime)
+        {
+            try
+            {
+                if (!File.Exists(_databasePath))
+                {
+                    Log.Logger.Warning($"数据库文件不存在：{_databasePath}");
+                    return;
+                }
+
+                using (var connection = new SqliteConnection($"Data Source={_databasePath};Cache=Shared"))
+                {
+                    await connection.OpenAsync();
+                    string query = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('LastUpdateTime', @LastUpdateTime);";
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@LastUpdateTime", lastUpdateTime);
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                        if (rowsAffected > 0)
+                        {
+                            Log.Logger.Information($"成功保存更新时间到数据库：{lastUpdateTime}");
+                        }
+                        else
+                        {
+                            Log.Logger.Warning("保存更新时间到数据库，但未影响任何行");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "保存LastUpdateTime时发生错误");
+            }
+        }
+
+        private async Task InitializeDatabaseAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                bool isNewDatabase = !File.Exists(_databasePath);
+
+                using (var connection = new SqliteConnection($"Data Source={_databasePath};Cache=Shared"))
+                {
+                    await connection.OpenAsync();
+
+                    if (isNewDatabase)
+                    {
+                        Log.Logger.Information("检测到新数据库，开始初始化");
+                        await CreateSettingsTableAsync(connection);
+                        await InsertInitialSettingsDataAsync(connection);
+                    }
+                    else
+                    {
+                        Log.Logger.Information("检测到现有数据库，开始验证和更新");
+                        if (await ColumnExistsAsync(connection, "Settings", "MigrationVersion"))
+                        {
+                            await DeleteColumnAsync(connection, "Settings", "MigrationVersion");
+                        }
+
+                        await CreateSettingsTableAsync(connection);
+                        await CheckSettingsKeysAsync(connection);
+                        await PerformOriginalMigrationAsync(connection);
+                    }
+                }
+
+                stopwatch.Stop();
+                Log.Logger.Information($"数据库初始化完成，耗时: {stopwatch.ElapsedMilliseconds}ms");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                Log.Logger.Error(ex, $"数据库初始化失败，耗时: {stopwatch.ElapsedMilliseconds}ms");
+            }
+        }
+
+        private async Task CreateSettingsTableAsync(SqliteConnection connection)
         {
             string createTableQuery = "CREATE TABLE IF NOT EXISTS Settings (Key TEXT NOT NULL UNIQUE, Value TEXT NOT NULL, MigrationVersion INTEGER DEFAULT 0);";
-            var command = new SqliteCommand(createTableQuery, connection);
-            command.ExecuteNonQuery();
+            using (var command = new SqliteCommand(createTableQuery, connection))
+            {
+                await command.ExecuteNonQueryAsync();
+            }
         }
 
-        private void CreateButtonVisibilityTable(SqliteConnection connection)
-        {
-            string createButtonVisibilityTableQuery = "CREATE TABLE IF NOT EXISTS ButtonVisibility (ButtonName TEXT NOT NULL UNIQUE, IsVisible INTEGER NOT NULL);";
-            var buttonVisibilityCommand = new SqliteCommand(createButtonVisibilityTableQuery, connection);
-            buttonVisibilityCommand.ExecuteNonQuery();
-        }
-
-        private void InsertInitialData(SqliteConnection connection)
+        private async Task InsertInitialSettingsDataAsync(SqliteConnection connection)
         {
             string insertInitialDataQuery = @"
             INSERT INTO Settings (Key, Value) VALUES 
@@ -292,29 +386,16 @@ namespace Software
             ('Culture', 'zh-CN'),
             ('EnableAutoUpdate', 'true'),
             ('NewUpdatePath', 'https://gitee.com/nibadianbanxiaban/software/raw/main/updata/new_update.json'),
-            ('LastUpdateTime', '');";
+            ('LastUpdateTime', ''),
+            ('MigrationVersion', '1');";
 
-            var insertCommand = new SqliteCommand(insertInitialDataQuery, connection);
-            insertCommand.ExecuteNonQuery();
-
-            string insertButtonVisibilityDataQuery = @"
-            INSERT INTO ButtonVisibility (ButtonName, IsVisible) VALUES 
-            ('Button_GenshinMap', 0),
-            ('Button_SelectUP', 0),
-            ('Button_PlayGames', 0),
-            ('Button_GenshinRole', 0),
-            ('Button_HonkaiImpact3', 0),
-            ('Button_StarRail', 0),
-            ('Button_MoveChest', 0),
-            ('Button_Bing', 1),
-            ('Button_StreePortal', 1),
-            ('Button_MusicPlayer', 1);";
-
-            var insertButtonVisibilityCommand = new SqliteCommand(insertButtonVisibilityDataQuery, connection);
-            insertButtonVisibilityCommand.ExecuteNonQuery();
+            using (var insertCommand = new SqliteCommand(insertInitialDataQuery, connection))
+            {
+                await insertCommand.ExecuteNonQueryAsync();
+            }
         }
 
-        private void CheckSettingsKeys(SqliteConnection connection)
+        private async Task CheckSettingsKeysAsync(SqliteConnection connection)
         {
             var requiredKeys = new Dictionary<string, string>
             {
@@ -332,189 +413,132 @@ namespace Software
                 { "Culture", "zh-CN" },
                 { "EnableAutoUpdate", "true" },
                 { "NewUpdatePath", "https://gitee.com/nibadianbanxiaban/software/raw/main/updata/new_update.json" },
-                { "LastUpdateTime", "" }
+                { "LastUpdateTime", "" },
+                { "MigrationVersion", "1" }
             };
 
             string selectKeysQuery = "SELECT Key FROM Settings;";
-            var selectCommand = new SqliteCommand(selectKeysQuery, connection);
-            var existingKeys = new HashSet<string>();
-
-            using (var reader = selectCommand.ExecuteReader())
+            using (var selectCommand = new SqliteCommand(selectKeysQuery, connection))
             {
-                while (reader.Read())
+                var existingKeys = new HashSet<string>();
+                using (var reader = await selectCommand.ExecuteReaderAsync())
                 {
-                    existingKeys.Add(reader.GetString(0));
+                    while (await reader.ReadAsync())
+                    {
+                        existingKeys.Add(reader.GetString(0));
+                    }
                 }
-            }
 
-            foreach (var key in requiredKeys)
-            {
-                if (!existingKeys.Contains(key.Key))
+                foreach (var key in requiredKeys)
                 {
-                    string insertKeyQuery = "INSERT INTO Settings (Key, Value) VALUES (@key, @value);";
-                    var insertCommand = new SqliteCommand(insertKeyQuery, connection);
-                    insertCommand.Parameters.AddWithValue("@key", key.Key);
-                    insertCommand.Parameters.AddWithValue("@value", key.Value);
-                    insertCommand.ExecuteNonQuery();
-                }
-            }
-        }
-
-        private void CheckButtonVisibilityKeys(SqliteConnection connection)
-        {
-            var requiredButtons = new Dictionary<string, int>
-            {
-                { "Button_GenshinMap", 0 },
-                { "Button_SelectUP", 0 },
-                { "Button_PlayGames", 0 },
-                { "Button_GenshinRole", 0 },
-                { "Button_HonkaiImpact3", 0 },
-                { "Button_StarRail", 0 },
-                { "Button_MoveChest", 0 },
-                { "Button_Bing", 1 },
-                { "Button_StreePortal", 1 },
-                { "Button_MusicPlayer", 1 }
-            };
-
-            string selectButtonsQuery = "SELECT ButtonName FROM ButtonVisibility;";
-            var selectCommand = new SqliteCommand(selectButtonsQuery, connection);
-            var existingButtons = new HashSet<string>();
-
-            using (var reader = selectCommand.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    existingButtons.Add(reader.GetString(0));
-                }
-            }
-
-            foreach (var button in requiredButtons)
-            {
-                if (!existingButtons.Contains(button.Key))
-                {
-                    string insertButtonQuery = "INSERT INTO ButtonVisibility (ButtonName, IsVisible) VALUES (@buttonName, @isVisible);";
-                    var insertCommand = new SqliteCommand(insertButtonQuery, connection);
-                    insertCommand.Parameters.AddWithValue("@buttonName", button.Key);
-                    insertCommand.Parameters.AddWithValue("@isVisible", button.Value);
-                    insertCommand.ExecuteNonQuery();
+                    if (!existingKeys.Contains(key.Key))
+                    {
+                        string insertKeyQuery = "INSERT INTO Settings (Key, Value) VALUES (@key, @value);";
+                        using (var insertCommand = new SqliteCommand(insertKeyQuery, connection))
+                        {
+                            insertCommand.Parameters.AddWithValue("@key", key.Key);
+                            insertCommand.Parameters.AddWithValue("@value", key.Value);
+                            await insertCommand.ExecuteNonQueryAsync();
+                            Log.Logger.Information($"添加缺失的设置键: {key.Key}");
+                        }
+                    }
                 }
             }
         }
 
-        private bool ColumnExists(SqliteConnection connection, string tableName, string columnName)
+        private async Task<bool> ColumnExistsAsync(SqliteConnection connection, string tableName, string columnName)
         {
-            bool columnExists = false;
             string sql = $"PRAGMA table_info({tableName});";
-
             using (var command = new SqliteCommand(sql, connection))
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReaderAsync())
             {
-                while (reader.Read())
+                while (await reader.ReadAsync())
                 {
                     string columnNameInTable = reader.GetString(1);
                     if (columnNameInTable == columnName)
                     {
-                        columnExists = true;
-                        break;
+                        return true;
                     }
                 }
             }
-
-            return columnExists;
+            return false;
         }
 
-        private void DeleteColumn(SqliteConnection connection, string tableName, string columnName)
+        private async Task DeleteColumnAsync(SqliteConnection connection, string tableName, string columnName)
         {
             string deleteColumnSql = $"ALTER TABLE {tableName} DROP COLUMN {columnName};";
             using (var command = new SqliteCommand(deleteColumnSql, connection))
             {
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
+                Log.Logger.Information($"从表 {tableName} 中删除列 {columnName}");
             }
         }
 
-        private void MigrateDataFromConfig(SqliteConnection connection)
+        private async Task PerformOriginalMigrationAsync(SqliteConnection connection)
         {
             try
             {
-                string getVersionQuery = "SELECT Value FROM Settings WHERE Key = 'MigrationVersion';";
-                var getVersionCommand = new SqliteCommand(getVersionQuery, connection);
-                int currentVersion = Convert.ToInt32(getVersionCommand.ExecuteScalar());
-                int latestVersion = 1;
-
-                for (int version = currentVersion + 1; version <= latestVersion; version++)
+                string migrationVersion = await GetConfigValueFromDatabaseAsync(connection, "MigrationVersion") ?? "0";
+                if (migrationVersion == "1")
                 {
-                    switch (version)
-                    {
-                        case 2:
-                            MigrateToVersion2(connection);
-                            break;
-                    }
-
-                    string updateVersionQuery = "UPDATE Settings SET Value = @version WHERE Key = 'MigrationVersion';";
-                    var updateVersionCommand = new SqliteCommand(updateVersionQuery, connection);
-                    updateVersionCommand.Parameters.AddWithValue("@version", version);
-                    updateVersionCommand.ExecuteNonQuery();
+                    Log.Logger.Information("数据迁移已完成，无需重复执行");
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"数据迁移失败: {ex.Message}");
-            }
-        }
 
-        private void MigrateToVersion2(SqliteConnection connection)
-        {
-            // 版本2的迁移逻辑
-        }
-
-        private void PerformOriginalMigration(SqliteConnection connection)
-        {
-            try
-            {
-                string checkMigrationQuery = "SELECT COUNT(*) FROM Settings WHERE Key = 'MigrationCompleted';";
-                using (var checkCommand = new SqliteCommand(checkMigrationQuery, connection))
+                Log.Logger.Information("开始执行数据迁移");
+                var appSettings = ConfigurationManager.AppSettings;
+                foreach (var key in appSettings.AllKeys)
                 {
-                    int migrationCount = Convert.ToInt32(checkCommand.ExecuteScalar());
-
-                    if (migrationCount == 0)
-                    {
-                        var appSettings = ConfigurationManager.AppSettings;
-                        foreach (var key in appSettings.AllKeys)
-                        {
-                            string value = appSettings[key];
-                            string upsertKeyQuery = @"  
+                    string value = appSettings[key];
+                    string upsertKeyQuery = @"  
 INSERT INTO Settings (Key, Value) VALUES (@key, @value)  
 ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
-                            using (var upsertCommand = new SqliteCommand(upsertKeyQuery, connection))
-                            {
-                                upsertCommand.Parameters.AddWithValue("@key", key);
-                                upsertCommand.Parameters.AddWithValue("@value", value);
-                                upsertCommand.ExecuteNonQuery();
-                            }
-                        }
+                    using (var upsertCommand = new SqliteCommand(upsertKeyQuery, connection))
+                    {
+                        upsertCommand.Parameters.AddWithValue("@key", key);
+                        upsertCommand.Parameters.AddWithValue("@value", value);
+                        await upsertCommand.ExecuteNonQueryAsync();
+                    }
+                }
 
-                        var settingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Software");
-                        var softwareUrlDirectories = Directory.GetDirectories(settingsDirectory)
-                            .Where(dir => Path.GetFileName(dir).StartsWith("Software_Url_"));
+                var settingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Software");
+                if (Directory.Exists(settingsDirectory))
+                {
+                    var softwareUrlDirectories = Directory.GetDirectories(settingsDirectory)
+                        .Where(dir => Path.GetFileName(dir).StartsWith("Software_Url_"));
 
-                        var firstSoftwareUrlDirectory = softwareUrlDirectories.FirstOrDefault();
-                        if (firstSoftwareUrlDirectory != null)
+                    var firstSoftwareUrlDirectory = softwareUrlDirectories.FirstOrDefault();
+                    if (firstSoftwareUrlDirectory != null)
+                    {
+                        var firstSubDirectory = Directory.GetDirectories(firstSoftwareUrlDirectory).FirstOrDefault();
+                        if (firstSubDirectory != null)
                         {
-                            var firstSubDirectory = Directory.GetDirectories(firstSoftwareUrlDirectory).FirstOrDefault();
-                            if (firstSubDirectory != null)
+                            var userConfigPath = Path.Combine(firstSubDirectory, "user.config");
+                            if (File.Exists(userConfigPath))
                             {
-                                var userConfigPath = Path.Combine(firstSubDirectory, "user.config");
-                                XDocument doc = XDocument.Load(userConfigPath);
-                                var settingsElement = doc.Root.Element("userSettings").Element("Software.Properties.Settings");
+                                XDocument doc;
+                                using (var stream = new FileStream(userConfigPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+                                {
+                                    doc = await XDocument.LoadAsync(stream, LoadOptions.None, CancellationToken.None);
+                                }
+
+                                var settingsElement = doc.Root?.Element("userSettings")?.Element("Software.Properties.Settings");
                                 if (settingsElement != null)
                                 {
+                                    await CreateButtonVisibilityTableAsync(connection);
+
                                     foreach (var setting in settingsElement.Elements("setting"))
                                     {
-                                        string rawKey = setting.Attribute("name").Value;
-                                        string key = rawKey.EndsWith("_Display") ? rawKey.Substring(0, rawKey.Length - "_Display".Length) : rawKey;
-                                        string value = setting.Element("value").Value;
+                                        var nameAttr = setting.Attribute("name");
+                                        if (nameAttr == null) continue;
 
-                                        if (key != "LastUpdateTime")
+                                        string rawKey = nameAttr.Value;
+                                        var valueElement = setting.Element("value");
+                                        if (valueElement == null) continue;
+
+                                        string value = valueElement.Value;
+
+                                        if (rawKey != "LastUpdateTime")
                                         {
                                             if (bool.TryParse(value, out bool isVisible))
                                             {
@@ -526,14 +550,14 @@ ON CONFLICT(ButtonName) DO UPDATE SET IsVisible = excluded.IsVisible;";
                                                 using (var upsertCommand = new SqliteCommand(upsertButtonVisibilityQuery, connection))
                                                 {
                                                     int isVisibleInt = isVisible ? 1 : 0;
-                                                    upsertCommand.Parameters.AddWithValue("@ButtonName", key);
+                                                    upsertCommand.Parameters.AddWithValue("@ButtonName", rawKey);
                                                     upsertCommand.Parameters.AddWithValue("@IsVisible", isVisibleInt);
-                                                    upsertCommand.ExecuteNonQuery();
+                                                    await upsertCommand.ExecuteNonQueryAsync();
                                                 }
                                             }
                                             else
                                             {
-                                                MessageBox.Show($"警告: 无法解析键 '{key}' 的布尔值: {value}");
+                                                Log.Logger.Warning($"无法解析键 '{rawKey}' 的布尔值: {value}");
                                             }
                                         }
                                         else
@@ -546,25 +570,78 @@ ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
                                             {
                                                 upsertCommand.Parameters.AddWithValue("@key", rawKey);
                                                 upsertCommand.Parameters.AddWithValue("@value", value);
-                                                upsertCommand.ExecuteNonQuery();
+                                                await upsertCommand.ExecuteNonQueryAsync();
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-
-                        string markMigrationQuery = "INSERT INTO Settings (Key, Value) VALUES ('MigrationCompleted', 'true');";
-                        using (var markCommand = new SqliteCommand(markMigrationQuery, connection))
-                        {
-                            markCommand.ExecuteNonQuery();
-                        }
                     }
+                }
+
+                string markMigrationQuery = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES ('MigrationVersion', '1');";
+                using (var markCommand = new SqliteCommand(markMigrationQuery, connection))
+                {
+                    await markCommand.ExecuteNonQueryAsync();
+                }
+
+                Log.Logger.Information("数据迁移完成");
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "数据迁移失败");
+            }
+        }
+
+        private async Task CreateButtonVisibilityTableAsync(SqliteConnection connection)
+        {
+            string createButtonVisibilityTableQuery = "CREATE TABLE IF NOT EXISTS ButtonVisibility (ButtonName TEXT NOT NULL UNIQUE, IsVisible INTEGER NOT NULL);";
+            using (var buttonVisibilityCommand = new SqliteCommand(createButtonVisibilityTableQuery, connection))
+            {
+                await buttonVisibilityCommand.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task<string> GetConfigValueFromDatabaseAsync(SqliteConnection connection, string key)
+        {
+            try
+            {
+                string query = "SELECT Value FROM Settings WHERE Key = @Key;";
+                using (var command = new SqliteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Key", key);
+                    var result = await command.ExecuteScalarAsync();
+                    return result?.ToString();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"数据迁移失败: {ex.Message}");
+                Log.Logger.Error(ex, $"读取配置值时发生错误 (Key: {key})");
+                return null;
+            }
+        }
+
+        private async Task StartWebHostAsync(string[] args)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                _webHost = Host.CreateDefaultBuilder(args)
+                    .UseSerilog()
+                    .ConfigureWebHostDefaults(webBuilder =>
+                    {
+                        webBuilder.UseStartup<Startup>()
+                                  .UseUrls("http://localhost:5000");
+                    }).Build();
+
+                Log.Logger.Information("开始启动Web主机");
+                await _webHost.StartAsync(); // 使用StartAsync而不是RunAsync，这样不会阻塞
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                Log.Logger.Error(ex, $"Web主机启动失败，耗时: {stopwatch.ElapsedMilliseconds}ms");
             }
         }
     }

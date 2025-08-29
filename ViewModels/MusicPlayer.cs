@@ -10,11 +10,26 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TagLib;
+using Serilog;
 
 namespace Software.ViewModels
 {
     public class MusicPlayer : INotifyPropertyChanged, IDisposable
     {
+        private ILogger _logger;
+
+        public ILogger Logger
+        {
+            get
+            {
+                if (_logger == null)
+                {
+                    _logger = Log.ForContext<MusicPlayer>();
+                }
+                return _logger;
+            }
+        }
+
         #region 私有字段
         private readonly MediaElement _mediaElement;
         private readonly TextBlock _musicNameTextBox;
@@ -132,6 +147,8 @@ namespace Software.ViewModels
         public MusicPlayer(MediaElement mediaElement, TextBlock musicNameTextBox, Button playPauseButton,
                           Button playModeButton, Button loopModeButton)
         {
+            Logger.Information("MusicPlayer 初始化开始");
+
             _mediaElement = mediaElement ?? throw new ArgumentNullException(nameof(mediaElement));
             _musicNameTextBox = musicNameTextBox;
             _playPauseButton = playPauseButton ?? throw new ArgumentNullException(nameof(playPauseButton));
@@ -146,6 +163,8 @@ namespace Software.ViewModels
             _lyricManager.OnLyricsLoaded += LyricManager_OnLyricsLoaded;
 
             Initialize();
+
+            Logger.Information("MusicPlayer 初始化完成");
         }
 
         public MusicPlayer(MediaElement mediaElement, TextBlock musicNameTextBox, Button playPauseButton)
@@ -156,8 +175,11 @@ namespace Software.ViewModels
         #region 初始化
         private void Initialize()
         {
+            Logger.Debug("开始初始化 MusicPlayer");
+
             if (!Directory.Exists(_defaultMusicFolder))
             {
+                Logger.Information("创建默认音乐文件夹: {MusicFolder}", _defaultMusicFolder);
                 Directory.CreateDirectory(_defaultMusicFolder);
             }
 
@@ -181,12 +203,16 @@ namespace Software.ViewModels
 
             // 初始化循环模式按钮文本
             UpdateLoopModeButtonText();
+
+            Logger.Debug("MusicPlayer 初始化完成");
         }
         #endregion
 
         #region 事件处理
         private void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
         {
+            Logger.Debug("媒体文件已打开: {MediaSource}", _mediaElement.Source);
+
             _progressTimer.Start();
             OnPropertyChanged(nameof(TotalTime));
 
@@ -196,6 +222,8 @@ namespace Software.ViewModels
                 TimeSpan duration = _mediaElement.NaturalDuration.TimeSpan;
                 CurrentMusic.Duration = duration;
                 OnPropertyChanged(nameof(CurrentMusic)); // 通知UI更新
+
+                Logger.Debug("媒体时长: {Duration}", duration);
 
                 // 更新列表中的时长显示
                 var index = MusicFiles.IndexOf(CurrentMusic);
@@ -221,17 +249,20 @@ namespace Software.ViewModels
         // 添加歌词加载事件处理
         private void LyricManager_OnLyricsLoaded(object sender, List<LyricManager.LyricLine> e)
         {
+            Logger.Debug("歌词加载完成，共 {LyricCount} 行", e?.Count ?? 0);
             OnLyricsLoaded?.Invoke(this, e);
         }
 
         private void MediaElement_MediaEnded(object sender, RoutedEventArgs e)
         {
+            Logger.Debug("媒体播放结束");
             HandleMediaEnded();
         }
 
         private void MediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             string errorMessage = $"播放失败: {e.ErrorException.Message}";
+            Logger.Error(e.ErrorException, "媒体播放失败: {ErrorMessage}", e.ErrorException.Message);
 
             // 添加额外错误诊断信息
             if (e.ErrorException is InvalidOperationException)
@@ -240,6 +271,8 @@ namespace Software.ViewModels
                 errorMessage += "\n- 文件格式不受支持";
                 errorMessage += "\n- 文件已损坏";
                 errorMessage += "\n- 缺少必要的解码器";
+
+                Logger.Warning("媒体播放失败可能原因: 文件格式不受支持/文件已损坏/缺少必要的解码器");
             }
 
             // 清除歌词
@@ -250,6 +283,7 @@ namespace Software.ViewModels
 
             if (MusicFiles.Count > 0)
             {
+                Logger.Debug("尝试播放下一首音乐");
                 PlayNextMusic();
             }
         }
@@ -290,6 +324,8 @@ namespace Software.ViewModels
 
         public void RefreshMusicFiles()
         {
+            Logger.Debug("开始刷新音乐文件列表");
+
             try
             {
                 MusicFiles.Clear();
@@ -299,6 +335,8 @@ namespace Software.ViewModels
                 var supportedExtensions = new[] { ".mp3", ".wav", ".wma", ".flac", ".ogg", ".m4a" };
                 var files = Directory.GetFiles(_defaultMusicFolder, "*.*", SearchOption.AllDirectories)
                     .Where(f => supportedExtensions.Contains(Path.GetExtension(f).ToLower()));
+
+                Logger.Debug("找到 {FileCount} 个支持的音乐文件", files.Count());
 
                 int index = 1;
                 foreach (var file in files)
@@ -318,10 +356,12 @@ namespace Software.ViewModels
                     MusicFiles.Add(musicInfo);
                 }
 
+                Logger.Information("刷新音乐文件完成，共 {MusicCount} 首音乐", MusicFiles.Count);
                 OnMusicListUpdated?.Invoke(this, MusicFiles.Count);
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "刷新音乐文件失败: {ErrorMessage}", ex.Message);
                 Debug.WriteLine($"刷新音乐文件失败: {ex.Message}");
                 OnPlaybackError?.Invoke(this, $"刷新音乐列表失败: {ex.Message}");
             }
@@ -332,24 +372,29 @@ namespace Software.ViewModels
         {
             try
             {
+                Logger.Debug("开始加载音乐元数据: {FilePath}", musicInfo.FilePath);
+
                 using (var file = TagLib.File.Create(musicInfo.FilePath))
                 {
                     // 读取艺术家信息
                     if (!string.IsNullOrWhiteSpace(file.Tag.FirstPerformer))
                     {
                         musicInfo.Artist = file.Tag.FirstPerformer;
+                        Logger.Debug("读取艺术家信息: {Artist}", musicInfo.Artist);
                     }
 
                     // 读取专辑信息
                     if (!string.IsNullOrWhiteSpace(file.Tag.Album))
                     {
                         musicInfo.Album = file.Tag.Album;
+                        Logger.Debug("读取专辑信息: {Album}", musicInfo.Album);
                     }
 
                     // 读取时长
                     if (file.Properties != null && file.Properties.Duration.TotalSeconds > 0)
                     {
                         musicInfo.Duration = file.Properties.Duration;
+                        Logger.Debug("读取时长信息: {Duration}", musicInfo.Duration);
                     }
                     else
                     {
@@ -357,6 +402,7 @@ namespace Software.ViewModels
                         var fileInfo = new FileInfo(musicInfo.FilePath);
                         double sizeMB = fileInfo.Length / (1024.0 * 1024.0);
                         musicInfo.Duration = TimeSpan.FromMinutes(sizeMB * 0.1); // 估算：1MB ≈ 0.1分钟
+                        Logger.Debug("估算时长: {Duration}", musicInfo.Duration);
                     }
 
                     // 读取专辑封面
@@ -374,11 +420,19 @@ namespace Software.ViewModels
                             bitmap.Freeze();  // 使其可在其他线程使用
                             musicInfo.AlbumCover = bitmap;
                         }
+                        Logger.Debug("成功加载专辑封面");
+                    }
+                    else
+                    {
+                        Logger.Debug("未找到专辑封面");
                     }
                 }
+
+                Logger.Debug("音乐元数据加载完成: {FilePath}", musicInfo.FilePath);
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "读取音乐元数据失败: {FilePath} - {ErrorMessage}", musicInfo.FilePath, ex.Message);
                 Debug.WriteLine($"读取音乐元数据失败: {musicInfo.FilePath} - {ex.Message}");
 
                 // 使用默认封面
@@ -392,6 +446,7 @@ namespace Software.ViewModels
             if (musicInfo.AlbumCover == null)
             {
                 musicInfo.AlbumCover = LoadDefaultAlbumCover();
+                Logger.Debug("使用默认专辑封面");
             }
         }
 
@@ -400,35 +455,42 @@ namespace Software.ViewModels
         {
             try
             {
-                var uri = new Uri("pack://application:,,,/Resources/default_album.png");
+                var uri = new Uri("pack://application:,,,/resources/image/default_album.png");
                 return new BitmapImage(uri);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex, "加载默认专辑封面失败: {ErrorMessage}", ex.Message);
                 return null;
             }
         }
 
         public void PlayPause()
         {
+            Logger.Debug("播放/暂停操作");
+
             if (MusicFiles.Count == 0)
             {
+                Logger.Warning("尝试播放但未找到音乐文件");
                 OnPlaybackError?.Invoke(this, "没有找到音乐文件");
                 return;
             }
 
             if (_mediaElement.Source == null)
             {
+                Logger.Debug("媒体源为空，开始播放第一首音乐");
                 PlayMusicAtIndex(0);
                 return;
             }
 
             if (_isPlaying)
             {
+                Logger.Debug("暂停播放");
                 _mediaElement.Pause();
             }
             else
             {
+                Logger.Debug("继续播放");
                 _mediaElement.Play();
             }
 
@@ -438,6 +500,8 @@ namespace Software.ViewModels
 
         public void Stop()
         {
+            Logger.Debug("停止播放");
+
             _mediaElement.Stop();
             _isPlaying = false;
             UpdatePlayPauseButtonText();
@@ -448,14 +512,18 @@ namespace Software.ViewModels
 
         public void PlayRandomMusic()
         {
+            Logger.Debug("随机播放音乐");
+
             if (MusicFiles.Count == 0)
             {
+                Logger.Warning("尝试随机播放但未找到音乐文件");
                 OnPlaybackError?.Invoke(this, "没有找到音乐文件");
                 return;
             }
 
             if (MusicFiles.Count == 1)
             {
+                Logger.Debug("只有一首音乐，直接播放");
                 PlayMusicAtIndex(0);
                 return;
             }
@@ -466,13 +534,17 @@ namespace Software.ViewModels
                 newIndex = _random.Next(MusicFiles.Count);
             } while (newIndex == _currentMusicIndex && MusicFiles.Count > 1);
 
+            Logger.Debug("随机选择音乐索引: {Index}", newIndex);
             PlayMusicAtIndex(newIndex);
         }
 
         public void PlayNextMusic()
         {
+            Logger.Debug("播放下一首音乐");
+
             if (MusicFiles.Count == 0)
             {
+                Logger.Warning("尝试播放下一首但未找到音乐文件");
                 OnPlaybackError?.Invoke(this, "没有找到音乐文件");
                 return;
             }
@@ -480,6 +552,8 @@ namespace Software.ViewModels
             // 随机模式且存在"未来"记录
             if (_isRandomPlay && _playbackFuture.Count > 0)
             {
+                Logger.Debug("从未来记录中获取下一首音乐");
+
                 // 当前歌曲存入历史
                 if (CurrentMusic != null)
                 {
@@ -499,6 +573,7 @@ namespace Software.ViewModels
             {
                 if (_isRandomPlay)
                 {
+                    Logger.Debug("随机模式下播放下一首");
                     PlayRandomMusic();
                 }
                 else
@@ -508,6 +583,7 @@ namespace Software.ViewModels
                     {
                         nextIndex = _currentLoopMode == LoopMode.List ? 0 : MusicFiles.Count - 1;
                     }
+                    Logger.Debug("顺序模式下播放下一首，索引: {Index}", nextIndex);
                     PlayMusicAtIndex(nextIndex);
                 }
             }
@@ -515,8 +591,11 @@ namespace Software.ViewModels
 
         public void PlayPreviousMusic()
         {
+            Logger.Debug("播放上一首音乐");
+
             if (MusicFiles.Count == 0)
             {
+                Logger.Warning("尝试播放上一首但未找到音乐文件");
                 OnPlaybackError?.Invoke(this, "没有找到音乐文件");
                 return;
             }
@@ -524,6 +603,8 @@ namespace Software.ViewModels
             // 随机模式：使用历史记录回溯
             if (_isRandomPlay && _playbackHistory.Count > 0)
             {
+                Logger.Debug("从历史记录中获取上一首音乐");
+
                 // 当前歌曲存入"未来"栈
                 if (CurrentMusic != null)
                 {
@@ -551,14 +632,20 @@ namespace Software.ViewModels
                     prevIndex = _currentMusicIndex - 1;
                 }
 
+                Logger.Debug("顺序模式下播放上一首，索引: {Index}", prevIndex);
                 PlayMusicAtIndex(prevIndex);
             }
         }
 
         public void PlayMusicAtIndex(int index, bool isFromHistoryOrFuture = false)
         {
+            Logger.Debug("开始播放音乐，索引: {Index}, 来自历史/未来: {IsFromHistory}", index, isFromHistoryOrFuture);
+
             if (index < 0 || index >= MusicFiles.Count)
+            {
+                Logger.Warning("无效的音乐索引: {Index}", index);
                 return;
+            }
 
             try
             {
@@ -572,6 +659,7 @@ namespace Software.ViewModels
                     if (_isRandomPlay)
                     {
                         _playbackHistory.Push(CurrentMusic);
+                        Logger.Debug("将当前音乐添加到历史记录");
                     }
                     // 顺序模式只记录当前歌曲
                     else
@@ -579,6 +667,7 @@ namespace Software.ViewModels
                         // 清空历史只保留最新记录
                         _playbackHistory.Clear();
                         _playbackHistory.Push(CurrentMusic);
+                        Logger.Debug("清空历史记录并添加当前音乐");
                     }
                     _playbackFuture.Clear();
                 }
@@ -586,9 +675,12 @@ namespace Software.ViewModels
                 _currentMusicIndex = index;
                 var selectedMusic = MusicFiles[index];
 
+                Logger.Information("播放音乐: {MusicName} - {Artist}", selectedMusic.DisplayName, selectedMusic.Artist);
+
                 // 加载歌词
                 if (selectedMusic != null)
                 {
+                    Logger.Debug("开始加载歌词");
                     _ = _lyricManager.LoadLyricsAsync(
                         selectedMusic.FilePath,
                         selectedMusic.DisplayName,
@@ -606,9 +698,12 @@ namespace Software.ViewModels
 
                 SaveLastPlayedMusic(selectedMusic.FilePath);
                 OnMusicChanged?.Invoke(this, selectedMusic);
+
+                Logger.Debug("音乐播放开始");
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "播放音乐失败: {ErrorMessage}", ex.Message);
                 Debug.WriteLine($"播放音乐失败: {ex.Message}");
                 OnPlaybackError?.Invoke(this, $"播放失败: {ex.Message}");
             }
@@ -629,10 +724,12 @@ namespace Software.ViewModels
         public void ToggleRandomOrSequential()
         {
             _isRandomPlay = !_isRandomPlay;
+            Logger.Information("切换播放模式: {Mode}", _isRandomPlay ? "随机模式" : "顺序模式");
 
             // 切换模式时清空历史记录
             _playbackHistory.Clear();
             _playbackFuture.Clear();
+            Logger.Debug("清空播放历史记录");
 
             if (_playModeButton != null)
             {
@@ -652,6 +749,8 @@ namespace Software.ViewModels
                 LoopMode.Single => LoopMode.List,
                 _ => LoopMode.None
             };
+
+            Logger.Information("切换循环模式: {LoopMode}", _currentLoopMode);
 
             UpdateLoopModeButtonText();
 
@@ -675,8 +774,13 @@ namespace Software.ViewModels
 
         public void SetProgress(double value)
         {
+            Logger.Debug("设置播放进度: {Progress}%", value);
+
             if (_mediaElement == null || !_mediaElement.NaturalDuration.HasTimeSpan)
+            {
+                Logger.Warning("无法设置进度，媒体未加载");
                 return;
+            }
 
             // 确保媒体已加载
             if (_mediaElement.NaturalDuration.HasTimeSpan)
@@ -692,13 +796,20 @@ namespace Software.ViewModels
                 _progress = value;
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CurrentTime));
+
+                Logger.Debug("播放进度已更新: {NewPosition}", TimeSpan.FromSeconds(newPositionSeconds));
             }
         }
 
         public void AddMusicFiles(string[] filePaths)
         {
+            Logger.Debug("开始添加音乐文件，数量: {FileCount}", filePaths?.Length ?? 0);
+
             if (filePaths == null || filePaths.Length == 0)
+            {
+                Logger.Warning("未提供有效的文件路径");
                 return;
+            }
 
             int addedCount = 0;
             var supportedExtensions = new[] { ".mp3", ".wav", ".wma", ".flac", ".ogg", ".m4a" };
@@ -710,18 +821,21 @@ namespace Software.ViewModels
                     var extension = Path.GetExtension(filePath).ToLower();
                     if (!supportedExtensions.Contains(extension))
                     {
+                        Logger.Debug("跳过不支持的文件格式: {FilePath}", filePath);
                         Debug.WriteLine($"跳过不支持的文件格式: {filePath}");
                         continue;
                     }
 
                     if (!System.IO.File.Exists(filePath))
                     {
+                        Logger.Warning("文件不存在: {FilePath}", filePath);
                         Debug.WriteLine($"文件不存在: {filePath}");
                         continue;
                     }
 
                     if (MusicFiles.Any(m => m.FilePath.Equals(filePath, StringComparison.OrdinalIgnoreCase)))
                     {
+                        Logger.Debug("文件已存在，跳过: {FilePath}", filePath);
                         continue;
                     }
 
@@ -737,17 +851,24 @@ namespace Software.ViewModels
 
                     System.IO.File.Copy(filePath, destPath);
                     addedCount++;
+                    Logger.Debug("文件已复制: {Source} -> {Destination}", filePath, destPath);
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error(ex, "添加文件失败: {FilePath} - {ErrorMessage}", filePath, ex.Message);
                     Debug.WriteLine($"添加文件失败: {filePath} - {ex.Message}");
                 }
             }
 
             if (addedCount > 0)
             {
+                Logger.Information("成功添加 {AddedCount} 首音乐", addedCount);
                 RefreshMusicFiles();
                 OnPlaybackMessage?.Invoke(this, $"已添加 {addedCount} 首音乐");
+            }
+            else
+            {
+                Logger.Warning("未添加任何音乐文件");
             }
         }
         #endregion
@@ -755,26 +876,32 @@ namespace Software.ViewModels
         #region 私有方法
         private void HandleMediaEnded()
         {
+            Logger.Debug("处理媒体结束事件，当前循环模式: {LoopMode}", _currentLoopMode);
+
             // 随机模式结束时清除未来记录
             if (_isRandomPlay)
             {
                 _playbackFuture.Clear();
+                Logger.Debug("随机模式下清空未来记录");
             }
 
             switch (_currentLoopMode)
             {
                 case LoopMode.Single:
+                    Logger.Debug("单曲循环模式，重新播放当前歌曲");
                     // 单曲循环：重新播放当前歌曲
                     _mediaElement.Position = TimeSpan.Zero;
                     _mediaElement.Play();
                     break;
 
                 case LoopMode.List:
+                    Logger.Debug("列表循环模式，播放下一首");
                     // 列表循环：播放下一首
                     PlayNextMusic();
                     break;
 
                 default:
+                    Logger.Debug("无循环模式，播放下一首或停止");
                     // 无循环：播放下一首或停止
                     if (_currentMusicIndex < MusicFiles.Count - 1)
                     {
@@ -793,10 +920,12 @@ namespace Software.ViewModels
         {
             try
             {
+                Logger.Debug("保存最后播放的音乐: {MusicPath}", musicPath);
                 System.IO.File.WriteAllText(_lastPlayedMusicFilePath, musicPath);
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "保存播放记录失败: {ErrorMessage}", ex.Message);
                 Debug.WriteLine($"保存播放记录失败: {ex.Message}");
             }
         }
@@ -805,9 +934,13 @@ namespace Software.ViewModels
         {
             try
             {
+                Logger.Debug("尝试恢复最后播放的音乐");
+
                 if (System.IO.File.Exists(_lastPlayedMusicFilePath))
                 {
                     string lastPlayedMusicPath = System.IO.File.ReadAllText(_lastPlayedMusicFilePath);
+                    Logger.Debug("最后播放的音乐路径: {MusicPath}", lastPlayedMusicPath);
+
                     if (System.IO.File.Exists(lastPlayedMusicPath))
                     {
                         var music = MusicFiles.FirstOrDefault(m =>
@@ -819,15 +952,30 @@ namespace Software.ViewModels
                             _currentMusicIndex = index;
                             _mediaElement.Source = new Uri(lastPlayedMusicPath);
 
+                            Logger.Debug("成功恢复最后播放的音乐: {MusicName}", music.DisplayName);
+
                             // 通知UI更新
                             UpdateMusicInfoDisplay();
                             OnMusicChanged?.Invoke(this, music);
                         }
+                        else
+                        {
+                            Logger.Warning("最后播放的音乐不在当前列表中");
+                        }
                     }
+                    else
+                    {
+                        Logger.Warning("最后播放的音乐文件不存在");
+                    }
+                }
+                else
+                {
+                    Logger.Debug("未找到最后播放的音乐记录文件");
                 }
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "恢复播放记录失败: {ErrorMessage}", ex.Message);
                 Debug.WriteLine($"恢复播放记录失败: {ex.Message}");
             }
         }
@@ -878,11 +1026,14 @@ namespace Software.ViewModels
 
             if (disposing)
             {
+                Logger.Information("MusicPlayer 正在释放资源");
+
                 if (_progressTimer != null)
                 {
                     _progressTimer.Stop();
                     _progressTimer.Tick -= ProgressTimer_Tick;
                     _progressTimer = null;
+                    Logger.Debug("进度定时器已停止");
                 }
 
                 if (_mediaElement != null)
@@ -891,10 +1042,18 @@ namespace Software.ViewModels
                     _mediaElement.MediaEnded -= MediaElement_MediaEnded;
                     _mediaElement.MediaFailed -= MediaElement_MediaFailed;
                     _mediaElement.Stop();
+                    Logger.Debug("媒体元素已清理");
+                }
+
+                if (_lyricManager != null)
+                {
+                    _lyricManager.OnLyricsLoaded -= LyricManager_OnLyricsLoaded;
+                    Logger.Debug("歌词管理器已清理");
                 }
             }
 
             _isDisposed = true;
+            Logger.Information("MusicPlayer 资源释放完成");
         }
 
         ~MusicPlayer()
