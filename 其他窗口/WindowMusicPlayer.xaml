@@ -261,6 +261,7 @@
             <TextBlock
                 x:Name="musicNameTextBlock"
                 Width="240"
+                Height="40"
                 Margin="0,15,0,0"
                 HorizontalAlignment="Center"
                 FontSize="16"
@@ -503,6 +504,17 @@
                     Content="高密度卡片"
                     Foreground="White"
                     Tag="DenseCard" />
+                <Button
+                    x:Name="StatsButton"
+                    Width="auto"
+                    Height="35"
+                    Margin="10,0,0,0"
+                    Background="#0078D7"
+                    BorderThickness="0"
+                    Click="ShowStatsButton_Click"
+                    Content="播放统计"
+                    Foreground="White"
+                    Tag="StatsCard" />
             </StackPanel>
         </Grid>
     </Grid>

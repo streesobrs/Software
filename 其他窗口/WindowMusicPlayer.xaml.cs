@@ -390,5 +390,26 @@ namespace Software.其他窗口
                 }
             }
         }
+
+        private async void ShowStatsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MusicPlayer.CurrentMusic != null)
+            {
+                var songStats = await MusicPlayer.GetSongPlayStatsAsync(MusicPlayer.CurrentMusic.FilePath);
+                var totalStats = await MusicPlayer.GetTotalPlayStatsAsync();
+
+                string message = $"当前歌曲: {MusicPlayer.CurrentMusic.DisplayName}\n" +
+                                $"播放次数: {songStats["PlayCount"]}\n" +
+                                $"总播放时长: {songStats["TotalPlayDuration"]:hh\\:mm\\:ss}\n\n" +
+                                $"所有歌曲总播放次数: {totalStats["TotalPlayCount"]}\n" +
+                                $"所有歌曲总播放时长: {totalStats["TotalPlayDuration"]:hh\\:mm\\:ss}";
+
+                MessageBox.Show(message, "播放统计", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("没有正在播放的歌曲", "播放统计", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
     }
 }

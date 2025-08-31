@@ -11,6 +11,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TagLib;
 using Serilog;
+using Microsoft.Data.Sqlite;
+using Software.Models;
+using System.Threading.Tasks;
 
 namespace Software.ViewModels
 {
@@ -64,6 +67,11 @@ namespace Software.ViewModels
         // 音乐文件相关
         private readonly string _lastPlayedMusicFilePath;
         private readonly string _defaultMusicFolder;
+
+        // 播放统计相关
+        private DateTime _lastRecordedTime = DateTime.MinValue;
+        private string _lastRecordedSong = string.Empty;
+        private bool _isRecordingPlay = false;
         #endregion
 
         #region 公共属性
@@ -249,7 +257,7 @@ namespace Software.ViewModels
         // 添加歌词加载事件处理
         private void LyricManager_OnLyricsLoaded(object sender, List<LyricManager.LyricLine> e)
         {
-            Logger.Debug("歌词加载完成，共 {LyricCount} 行", e?.Count ?? 0);
+            Logger.Debug("歌词加载完成事件处理，歌词行数: {LyricCount}", e?.Count ?? 0);
             OnLyricsLoaded?.Invoke(this, e);
         }
 
@@ -649,6 +657,18 @@ namespace Software.ViewModels
 
             try
             {
+                // 记录上一首歌的播放时长（如果播放时间超过10秒）
+                if (CurrentMusic != null && _mediaElement.NaturalDuration.HasTimeSpan)
+                {
+                    TimeSpan currentPosition = _mediaElement.Position;
+
+                    // 如果播放时间超过10秒，记录为一次播放
+                    if (currentPosition.TotalSeconds >= 10)
+                    {
+                        RecordPlay(currentPosition);
+                    }
+                }
+
                 // 停止当前播放
                 _mediaElement.Stop();
 
@@ -885,6 +905,16 @@ namespace Software.ViewModels
                 Logger.Debug("随机模式下清空未来记录");
             }
 
+            // 只有在歌曲完整播放时才记录
+            // 避免与PlayMusicAtIndex中的记录冲突
+            if (CurrentMusic != null && _mediaElement.NaturalDuration.HasTimeSpan)
+            {
+                TimeSpan totalDuration = _mediaElement.NaturalDuration.TimeSpan;
+
+                // 记录完整播放
+                RecordPlay(totalDuration);
+            }
+
             switch (_currentLoopMode)
             {
                 case LoopMode.Single:
@@ -913,6 +943,82 @@ namespace Software.ViewModels
                         OnPlaybackMessage?.Invoke(this, "播放已结束");
                     }
                     break;
+            }
+        }
+
+        // 记录播放统计信息
+        private async void RecordPlay(TimeSpan duration)
+        {
+            // 如果正在记录中，则跳过
+            if (_isRecordingPlay)
+            {
+                Logger.Debug("跳过重复记录: 正在记录中");
+                return;
+            }
+
+            try
+            {
+                _isRecordingPlay = true; // 设置记录标志
+
+                // 防止短时间内重复记录同一首歌（30秒内不重复记录）
+                if (CurrentMusic != null &&
+                    CurrentMusic.FilePath == _lastRecordedSong &&
+                    (DateTime.Now - _lastRecordedTime).TotalSeconds < 30)
+                {
+                    Logger.Debug("跳过重复记录: {SongName}", CurrentMusic.DisplayName);
+                    return;
+                }
+
+                string databasePath = DatabaseHelper.GetDatabasePath();
+
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    await connection.OpenAsync();
+
+                    // 更新歌曲的播放统计
+                    string updateSongStats = @"
+                        INSERT INTO SongPlayStats (FilePath, PlayCount, TotalPlayDuration)
+                        VALUES (@FilePath, 1, @Duration)
+                        ON CONFLICT(FilePath) DO UPDATE SET
+                            PlayCount = PlayCount + 1,
+                            TotalPlayDuration = TotalPlayDuration + @Duration;
+                    ";
+
+                    using (var command = new SqliteCommand(updateSongStats, connection))
+                    {
+                        command.Parameters.AddWithValue("@FilePath", CurrentMusic.FilePath);
+                        command.Parameters.AddWithValue("@Duration", duration.TotalSeconds);
+                        await command.ExecuteNonQueryAsync();
+                    }
+
+                    // 更新总播放统计
+                    string updateTotalStats = @"
+                        UPDATE TotalPlayStats 
+                        SET TotalPlayCount = TotalPlayCount + 1,
+                            TotalPlayDuration = TotalPlayDuration + @Duration
+                        WHERE Id = 1;
+                    ";
+
+                    using (var command = new SqliteCommand(updateTotalStats, connection))
+                    {
+                        command.Parameters.AddWithValue("@Duration", duration.TotalSeconds);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+
+                // 更新最后记录的时间和歌曲
+                _lastRecordedTime = DateTime.Now;
+                _lastRecordedSong = CurrentMusic.FilePath;
+
+                Logger.Information($"记录播放统计: {CurrentMusic.DisplayName}, 时长: {duration.TotalSeconds}秒");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "记录播放统计失败");
+            }
+            finally
+            {
+                _isRecordingPlay = false; // 释放记录标志
             }
         }
 
@@ -1059,6 +1165,90 @@ namespace Software.ViewModels
         ~MusicPlayer()
         {
             Dispose(false);
+        }
+        #endregion
+
+        #region 播放统计方法
+        // 获取歌曲播放统计
+        public static async Task<Dictionary<string, object>> GetSongPlayStatsAsync(string filePath)
+        {
+            try
+            {
+                string databasePath = DatabaseHelper.GetDatabasePath();
+
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    await connection.OpenAsync();
+
+                    string query = "SELECT PlayCount, TotalPlayDuration FROM SongPlayStats WHERE FilePath = @FilePath;";
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@FilePath", filePath);
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                return new Dictionary<string, object>
+                                {
+                                    { "PlayCount", reader.GetInt32(0) },
+                                    { "TotalPlayDuration", TimeSpan.FromSeconds(reader.GetDouble(1)) }
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "获取歌曲播放统计失败");
+            }
+
+            return new Dictionary<string, object>
+            {
+                { "PlayCount", 0 },
+                { "TotalPlayDuration", TimeSpan.Zero }
+            };
+        }
+
+        // 获取总播放统计
+        public static async Task<Dictionary<string, object>> GetTotalPlayStatsAsync()
+        {
+            try
+            {
+                string databasePath = DatabaseHelper.GetDatabasePath();
+
+                using (var connection = new SqliteConnection($"Data Source={databasePath}"))
+                {
+                    await connection.OpenAsync();
+
+                    string query = "SELECT TotalPlayCount, TotalPlayDuration FROM TotalPlayStats WHERE Id = 1;";
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                return new Dictionary<string, object>
+                                {
+                                    { "TotalPlayCount", reader.GetInt32(0) },
+                                    { "TotalPlayDuration", TimeSpan.FromSeconds(reader.GetDouble(1)) }
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "获取总播放统计失败");
+            }
+
+            return new Dictionary<string, object>
+            {
+                { "TotalPlayCount", 0 },
+                { "TotalPlayDuration", TimeSpan.Zero }
+            };
         }
         #endregion
     }

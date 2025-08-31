@@ -334,6 +334,8 @@ namespace Software
                         Log.Logger.Information("检测到新数据库，开始初始化");
                         await CreateSettingsTableAsync(connection);
                         await InsertInitialSettingsDataAsync(connection);
+                        await CreateSongPlayStatsTableAsync(connection);
+                        await CreateTotalPlayStatsTableAsync(connection);
                     }
                     else
                     {
@@ -346,6 +348,8 @@ namespace Software
                         await CreateSettingsTableAsync(connection);
                         await CheckSettingsKeysAsync(connection);
                         await PerformOriginalMigrationAsync(connection);
+                        await CreateSongPlayStatsTableAsync(connection);
+                        await CreateTotalPlayStatsTableAsync(connection);
                     }
                 }
 
@@ -443,6 +447,45 @@ namespace Software
                         }
                     }
                 }
+            }
+        }
+
+        // 创建歌曲播放统计表
+        private async Task CreateSongPlayStatsTableAsync(SqliteConnection connection)
+        {
+            string createTableQuery = @"
+        CREATE TABLE IF NOT EXISTS SongPlayStats (
+            FilePath TEXT NOT NULL PRIMARY KEY,
+            PlayCount INTEGER NOT NULL DEFAULT 0,
+            TotalPlayDuration REAL NOT NULL DEFAULT 0
+        );";
+            using (var command = new SqliteCommand(createTableQuery, connection))
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        // 创建总播放统计表
+        private async Task CreateTotalPlayStatsTableAsync(SqliteConnection connection)
+        {
+            string createTableQuery = @"
+        CREATE TABLE IF NOT EXISTS TotalPlayStats (
+            Id INTEGER NOT NULL PRIMARY KEY DEFAULT 1,
+            TotalPlayCount INTEGER NOT NULL DEFAULT 0,
+            TotalPlayDuration REAL NOT NULL DEFAULT 0
+        );";
+            using (var command = new SqliteCommand(createTableQuery, connection))
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+
+            // 插入初始行（如果不存在）
+            string insertQuery = @"
+        INSERT OR IGNORE INTO TotalPlayStats (Id, TotalPlayCount, TotalPlayDuration)
+        VALUES (1, 0, 0);";
+            using (var command = new SqliteCommand(insertQuery, connection))
+            {
+                await command.ExecuteNonQueryAsync();
             }
         }
 
