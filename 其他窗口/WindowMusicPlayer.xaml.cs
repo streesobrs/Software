@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media; // 添加 Brushes 支持
+using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.Win32;
-using Software.ViewModels; // 添加 LyricManager 支持
-using Serilog; // 添加日志命名空间
+using Software.ViewModels;
+using Serilog;
+using System.Windows.Media.Animation;
 
 namespace Software.其他窗口
 {
@@ -80,6 +81,10 @@ namespace Software.其他窗口
 
                 // 设置数据上下文以便绑定
                 DataContext = this;
+
+                // 默认显示卡片视图
+                MusicList.Tag = "Card";
+                CardButton.IsEnabled = false;
 
                 Logger.Information("音乐播放器初始化完成");
             }
@@ -310,6 +315,80 @@ namespace Software.其他窗口
 
             // 释放资源
             MusicPlayer?.Dispose();
+        }
+
+        private void SwitchLayout_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button != null)
+            {
+                string viewMode = button.Tag.ToString();
+
+                // 设置当前布局类型
+                MusicList.Tag = viewMode;
+
+                // 更新按钮状态
+                CardButton.IsEnabled = (viewMode != "Card");
+                DenseCardButton.IsEnabled = (viewMode != "DenseCard");
+
+                try
+                {
+                    // 切换视图
+                    if (viewMode == "Card")
+                    {
+                        // 检查资源是否存在
+                        var cardTemplate = FindResource("StandardCardTemplate") as DataTemplate;
+                        var cardPanel = FindResource("StandardCardItemsPanel") as ItemsPanelTemplate;
+
+                        if (cardTemplate == null || cardPanel == null)
+                        {
+                            Logger.Error("卡片视图资源未找到");
+                            return;
+                        }
+
+                        // 标准卡片视图
+                        MusicList.ItemTemplate = cardTemplate;
+                        MusicList.ItemsPanel = cardPanel;
+                    }
+                    else if (viewMode == "DenseCard")
+                    {
+                        // 检查资源是否存在
+                        var denseTemplate = FindResource("HighDensityCardTemplate") as DataTemplate;
+                        var densePanel = FindResource("CardItemsPanel") as ItemsPanelTemplate;
+
+                        if (denseTemplate == null || densePanel == null)
+                        {
+                            Logger.Error("高密度卡片视图资源未找到");
+                            return;
+                        }
+
+                        // 高密度卡片视图
+                        MusicList.ItemTemplate = denseTemplate;
+                        MusicList.ItemsPanel = densePanel;
+                    }
+
+                    // 确保数据源正确
+                    if (MusicList.ItemsSource == null)
+                    {
+                        Logger.Warning("ItemsSource 为 null，重新设置");
+                        MusicList.ItemsSource = MusicPlayer.MusicFiles;
+                    }
+
+                    // 强制刷新ListView
+                    MusicList.Items.Refresh();
+                    MusicList.UpdateLayout();
+
+                    Logger.Information("成功切换到 {ViewMode} 视图", viewMode);
+
+                    // 可选：添加布局切换动画
+                    MusicList.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200)));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "切换视图失败: {ErrorMessage}", ex.Message);
+                    MessageBox.Show($"切换视图失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 }
