@@ -1,10 +1,10 @@
 {
 	"jsonVersion": "1.0.0",
-	"version": "0.2.11.0",
+	"version": "0.2.12.0",
 	"updates": [
 		{
-			"version": "",
-			"updateTime": "",
+			"version": "0.2.12.0",
+			"updateTime": "2025/08/31",
 			"updateContent": [
 				"优化了软件启动速度",
 				"添加了歌词",
