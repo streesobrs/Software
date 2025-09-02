@@ -3,6 +3,14 @@
 	"version": "0.2.12.0",
 	"updates": [
 		{
+			"version": "0.2.12.1",
+			"updateTime": "2025/09/",
+			"updateContent": [
+				"修复了播放时长显示不全的问题",
+				"修复了播放列表文字显示不全的问题"
+			]
+		},
+		{
 			"version": "0.2.12.0",
 			"updateTime": "2025/08/31",
 			"updateContent": [

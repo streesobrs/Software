@@ -398,11 +398,18 @@ namespace Software.其他窗口
                 var songStats = await MusicPlayer.GetSongPlayStatsAsync(MusicPlayer.CurrentMusic.FilePath);
                 var totalStats = await MusicPlayer.GetTotalPlayStatsAsync();
 
+                // 自定义格式化时间，支持更多小时数
+                string FormatLongTimeSpan(TimeSpan timeSpan)
+                {
+                    long totalHours = (long)timeSpan.TotalHours;
+                    return $"{totalHours:D}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                }
+
                 string message = $"当前歌曲: {MusicPlayer.CurrentMusic.DisplayName}\n" +
                                 $"播放次数: {songStats["PlayCount"]}\n" +
-                                $"总播放时长: {songStats["TotalPlayDuration"]:hh\\:mm\\:ss}\n\n" +
+                                $"总播放时长: {FormatLongTimeSpan((TimeSpan)songStats["TotalPlayDuration"])}\n\n" +
                                 $"所有歌曲总播放次数: {totalStats["TotalPlayCount"]}\n" +
-                                $"所有歌曲总播放时长: {totalStats["TotalPlayDuration"]:hh\\:mm\\:ss}";
+                                $"所有歌曲总播放时长: {FormatLongTimeSpan((TimeSpan)totalStats["TotalPlayDuration"])}";
 
                 MessageBox.Show(message, "播放统计", MessageBoxButton.OK, MessageBoxImage.Information);
             }

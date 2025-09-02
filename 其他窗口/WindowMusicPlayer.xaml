@@ -140,7 +140,7 @@
         <DataTemplate x:Key="StandardCardTemplate">
             <Border
                 Width="160"
-                Height="200"
+                Height="202"
                 Background="#4A4A4A"
                 CornerRadius="8"
                 Effect="{StaticResource DropShadowEffect}">
