@@ -376,6 +376,7 @@ namespace Software.ViewModels
         }
 
         // 加载音乐元数据（艺术家、专辑、封面、时长等）
+        // 修改 MusicPlayer.cs 中的 LoadMusicMetadata 方法，在加载专辑封面时增加异常处理
         private void LoadMusicMetadata(MusicInfo musicInfo)
         {
             try
@@ -404,35 +405,57 @@ namespace Software.ViewModels
                         musicInfo.Duration = file.Properties.Duration;
                         Logger.Debug("读取时长信息: {Duration}", musicInfo.Duration);
                     }
-                    else
-                    {
-                        // 尝试通过文件大小估算时长
-                        var fileInfo = new FileInfo(musicInfo.FilePath);
-                        double sizeMB = fileInfo.Length / (1024.0 * 1024.0);
-                        musicInfo.Duration = TimeSpan.FromMinutes(sizeMB * 0.1); // 估算：1MB ≈ 0.1分钟
-                        Logger.Debug("估算时长: {Duration}", musicInfo.Duration);
-                    }
 
-                    // 读取专辑封面
-                    var pictures = file.Tag.Pictures;
-                    if (pictures != null && pictures.Length > 0)
+                    // 读取专辑封面（增加更健壮的异常处理）
+                    try
                     {
-                        var picture = pictures[0];
-                        using (var ms = new MemoryStream(picture.Data.Data))
+                        var pictures = file.Tag.Pictures;
+                        if (pictures != null && pictures.Length > 0)
                         {
-                            var bitmap = new BitmapImage();
-                            bitmap.BeginInit();
-                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmap.StreamSource = ms;
-                            bitmap.EndInit();
-                            bitmap.Freeze();  // 使其可在其他线程使用
-                            musicInfo.AlbumCover = bitmap;
+                            var picture = pictures[0];
+                            using (var ms = new MemoryStream(picture.Data.Data))
+                            {
+                                // 尝试多种图片格式解码器
+                                BitmapImage bitmap = null;
+                                try
+                                {
+                                    bitmap = new BitmapImage();
+                                    bitmap.BeginInit();
+                                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                    bitmap.StreamSource = ms;
+                                    bitmap.EndInit();
+                                    bitmap.Freeze();
+                                    musicInfo.AlbumCover = bitmap;
+                                    Logger.Debug("成功加载专辑封面");
+                                }
+                                catch
+                                {
+                                    // 尝试使用另一种方式加载
+                                    ms.Position = 0;
+                                    var decoder = BitmapDecoder.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                                    if (decoder.Frames.Count > 0)
+                                    {
+                                        bitmap = new BitmapImage();
+                                        bitmap.BeginInit();
+                                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                        bitmap.StreamSource = ms;
+                                        bitmap.EndInit();
+                                        bitmap.Freeze();
+                                        musicInfo.AlbumCover = bitmap;
+                                        Logger.Debug("使用备用方式加载专辑封面");
+                                    }
+                                }
+                            }
                         }
-                        Logger.Debug("成功加载专辑封面");
+                        else
+                        {
+                            Logger.Debug("未找到专辑封面");
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Logger.Debug("未找到专辑封面");
+                        Logger.Warning(ex, "加载专辑封面失败，将使用默认封面: {FilePath}", musicInfo.FilePath);
+                        musicInfo.AlbumCover = LoadDefaultAlbumCover();
                     }
                 }
 
@@ -441,16 +464,13 @@ namespace Software.ViewModels
             catch (Exception ex)
             {
                 Logger.Error(ex, "读取音乐元数据失败: {FilePath} - {ErrorMessage}", musicInfo.FilePath, ex.Message);
-                Debug.WriteLine($"读取音乐元数据失败: {musicInfo.FilePath} - {ex.Message}");
-
                 // 使用默认封面
                 musicInfo.AlbumCover = LoadDefaultAlbumCover();
-
                 // 设置默认时长
                 musicInfo.Duration = TimeSpan.FromMinutes(3);
             }
 
-            // 如果没有封面，使用默认封面
+            // 确保始终有封面图
             if (musicInfo.AlbumCover == null)
             {
                 musicInfo.AlbumCover = LoadDefaultAlbumCover();

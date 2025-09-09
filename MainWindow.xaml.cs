@@ -251,7 +251,7 @@ namespace Software
                     }
                 }
 
-                其他界面.PageSettings pageSettings = new 其他界面.PageSettings();
+                //其他界面.PageSettings pageSettings = new 其他界面.PageSettings();
                 pageSettings.HandleLaunchCount();
             }
             catch (Exception ex)

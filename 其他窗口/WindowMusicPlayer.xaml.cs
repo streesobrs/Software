@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using Software.ViewModels;
 using Serilog;
 using System.Windows.Media.Animation;
+using System.Threading.Tasks;
 
 namespace Software.其他窗口
 {
@@ -32,6 +33,7 @@ namespace Software.其他窗口
         private DispatcherTimer _updateTimer;
 
         private int _lastLyricIndex = -1;
+        private bool _isAnimating = false;
 
         // 添加标志位，用于区分是用户拖动还是程序更新
         private bool _isUserDragging = false;
@@ -85,6 +87,12 @@ namespace Software.其他窗口
                 // 默认显示卡片视图
                 MusicList.Tag = "Card";
                 CardButton.IsEnabled = false;
+
+                // 应用初始动画
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    ApplyItemAnimations();
+                }), DispatcherPriority.Loaded);
 
                 Logger.Information("音乐播放器初始化完成");
             }
@@ -266,8 +274,15 @@ namespace Software.其他窗口
             {
                 Logger.Information("用户选择了 {FileCount} 个文件", openFileDialog.FileNames.Length);
                 MusicPlayer?.AddMusicFiles(openFileDialog.FileNames);
-                // 刷新列表显示
-                MusicList.Items.Refresh();
+
+                // 使用动画刷新列表
+                Dispatcher.BeginInvoke(new Action(async () =>
+                {
+                    await AnimateListTransition(() =>
+                    {
+                        MusicList.Items.Refresh();
+                    });
+                }), DispatcherPriority.Normal);
             }
             else
             {
@@ -275,12 +290,136 @@ namespace Software.其他窗口
             }
         }
 
+        // 添加动画方法
+        private async Task AnimateListTransition(Action transitionAction)
+        {
+            if (_isAnimating) return;
+
+            _isAnimating = true;
+
+            try
+            {
+                // 创建淡出动画
+                var fadeOutAnimation = new DoubleAnimation
+                {
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                MusicList.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
+                await Task.Delay(200); // 等待动画完成
+
+                // 执行实际的过渡操作
+                transitionAction?.Invoke();
+
+                // 刷新列表
+                MusicList.Items.Refresh();
+
+                // 创建淡入动画
+                var fadeInAnimation = new DoubleAnimation
+                {
+                    To = 1,
+                    Duration = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                };
+
+                MusicList.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
+
+                // 为每个列表项添加入场动画
+                await Task.Delay(50); // 稍等片刻让UI更新
+                ApplyItemAnimations();
+            }
+            finally
+            {
+                _isAnimating = false;
+            }
+        }
+
+        // 为列表项应用动画
+        private void ApplyItemAnimations()
+        {
+            // 等待列表容器生成
+            if (MusicList.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
+            {
+                Dispatcher.BeginInvoke(new Action(ApplyItemAnimations), DispatcherPriority.Loaded);
+                return;
+            }
+
+            // 先清除所有现有动画
+            for (int i = 0; i < MusicList.Items.Count; i++)
+            {
+                if (MusicList.ItemContainerGenerator.ContainerFromIndex(i) is ListViewItem item)
+                {
+                    // 停止所有正在运行的动画
+                    item.BeginAnimation(UIElement.OpacityProperty, null);
+
+                    // 获取或创建TranslateTransform
+                    var translateTransform = item.RenderTransform as TranslateTransform;
+                    if (translateTransform == null)
+                    {
+                        translateTransform = new TranslateTransform();
+                        item.RenderTransform = translateTransform;
+                    }
+                    item.RenderTransformOrigin = new Point(0.5, 0.5);
+
+                    // 重置动画起始状态
+                    translateTransform.Y = 20;
+                    item.Opacity = 0;
+
+                    // 应用新动画
+                    var index = i;
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        // 淡入动画
+                        var opacityAnim = new DoubleAnimation
+                        {
+                            To = 1,
+                            Duration = TimeSpan.FromMilliseconds(400),
+                            BeginTime = TimeSpan.FromMilliseconds(index * 30),
+                            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        item.BeginAnimation(UIElement.OpacityProperty, opacityAnim);
+
+                        // 平移动画
+                        var translateAnim = new DoubleAnimation
+                        {
+                            To = 0,
+                            Duration = TimeSpan.FromMilliseconds(400),
+                            BeginTime = TimeSpan.FromMilliseconds(index * 30),
+                            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        translateTransform.BeginAnimation(TranslateTransform.YProperty, translateAnim);
+                    }), DispatcherPriority.Loaded);
+                }
+            }
+        }
+
+        // 添加一个辅助方法来查找子元素
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result)
+                    return result;
+
+                var descendant = FindVisualChild<T>(child);
+                if (descendant != null)
+                    return descendant;
+            }
+            return null;
+        }
+
         // 手动刷新按钮点击事件
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             Logger.Debug("刷新按钮点击");
-            MusicPlayer?.RefreshMusicFiles();
-            MusicList.ItemsSource = MusicPlayer.MusicFiles;
+            await AnimateListTransition(() =>
+            {
+                MusicPlayer?.RefreshMusicFiles();
+                MusicList.ItemsSource = MusicPlayer.MusicFiles;
+            });
         }
 
         // 进度条拖动开始事件
@@ -317,77 +456,52 @@ namespace Software.其他窗口
             MusicPlayer?.Dispose();
         }
 
-        private void SwitchLayout_Click(object sender, RoutedEventArgs e)
+        private async void SwitchLayout_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
-            if (button != null)
+            if (button != null && !_isAnimating)
             {
                 string viewMode = button.Tag.ToString();
+                DataTemplate newItemTemplate = null;
+                ItemsPanelTemplate newItemsPanel = null;
 
-                // 设置当前布局类型
-                MusicList.Tag = viewMode;
-
-                // 更新按钮状态
-                CardButton.IsEnabled = (viewMode != "Card");
-                DenseCardButton.IsEnabled = (viewMode != "DenseCard");
-
-                try
+                // 提前加载模板资源，避免切换时才加载
+                if (viewMode == "Card")
                 {
-                    // 切换视图
-                    if (viewMode == "Card")
-                    {
-                        // 检查资源是否存在
-                        var cardTemplate = FindResource("StandardCardTemplate") as DataTemplate;
-                        var cardPanel = FindResource("StandardCardItemsPanel") as ItemsPanelTemplate;
-
-                        if (cardTemplate == null || cardPanel == null)
-                        {
-                            Logger.Error("卡片视图资源未找到");
-                            return;
-                        }
-
-                        // 标准卡片视图
-                        MusicList.ItemTemplate = cardTemplate;
-                        MusicList.ItemsPanel = cardPanel;
-                    }
-                    else if (viewMode == "DenseCard")
-                    {
-                        // 检查资源是否存在
-                        var denseTemplate = FindResource("HighDensityCardTemplate") as DataTemplate;
-                        var densePanel = FindResource("CardItemsPanel") as ItemsPanelTemplate;
-
-                        if (denseTemplate == null || densePanel == null)
-                        {
-                            Logger.Error("高密度卡片视图资源未找到");
-                            return;
-                        }
-
-                        // 高密度卡片视图
-                        MusicList.ItemTemplate = denseTemplate;
-                        MusicList.ItemsPanel = densePanel;
-                    }
-
-                    // 确保数据源正确
-                    if (MusicList.ItemsSource == null)
-                    {
-                        Logger.Warning("ItemsSource 为 null，重新设置");
-                        MusicList.ItemsSource = MusicPlayer.MusicFiles;
-                    }
-
-                    // 强制刷新ListView
-                    MusicList.Items.Refresh();
-                    MusicList.UpdateLayout();
-
-                    Logger.Information("成功切换到 {ViewMode} 视图", viewMode);
-
-                    // 可选：添加布局切换动画
-                    MusicList.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200)));
+                    newItemTemplate = FindResource("StandardCardTemplate") as DataTemplate;
+                    newItemsPanel = FindResource("StandardCardItemsPanel") as ItemsPanelTemplate;
                 }
-                catch (Exception ex)
+                else if (viewMode == "DenseCard")
                 {
-                    Logger.Error(ex, "切换视图失败: {ErrorMessage}", ex.Message);
-                    MessageBox.Show($"切换视图失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    newItemTemplate = FindResource("HighDensityCardTemplate") as DataTemplate;
+                    newItemsPanel = FindResource("CardItemsPanel") as ItemsPanelTemplate;
                 }
+
+                // 确保模板已加载再执行动画
+                if (newItemTemplate == null || newItemsPanel == null)
+                {
+                    Logger.Warning("布局模板加载失败");
+                    return;
+                }
+
+                await AnimateListTransition(() =>
+                {
+                    MusicList.Tag = viewMode;
+                    CardButton.IsEnabled = (viewMode != "Card");
+                    DenseCardButton.IsEnabled = (viewMode != "DenseCard");
+
+                    // 先清空现有项容器（关键优化）
+                    MusicList.ItemsSource = null;
+                    MusicList.UpdateLayout(); // 强制清理旧容器
+
+                    // 应用新模板
+                    MusicList.ItemTemplate = newItemTemplate;
+                    MusicList.ItemsPanel = newItemsPanel;
+
+                    // 重新绑定数据源
+                    MusicList.ItemsSource = MusicPlayer.MusicFiles;
+                    MusicList.UpdateLayout(); // 强制生成新容器
+                });
             }
         }
 
