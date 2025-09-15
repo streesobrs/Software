@@ -38,5 +38,26 @@
       ],
       "mandatoryUpdate": false
     }
-  ]
+  ],
+  "incrementalPackages": {
+    "minRequiredVersion": "0.3.0.0",
+    "0.2.11.0→0.2.11.1": {
+      "packages": [
+        {
+          "updateSource": "gitee",
+          "updateURL": "http://192.168.1.60/incremental_0.2.11.0_to_0.2.11.1.zip",
+          "fileSize": "2,100 KB",
+          "checksum": { "MD5": "zzz1" },
+          "mandatoryUpdate": false
+        },
+        {
+          "updateSource": "github",
+          "updateURL": "https://github.com/.../incremental_0.2.11.0_to_0.2.11.1.zip",
+          "fileSize": "2,100 KB",
+          "checksum": { "MD5": "zzz1" },
+          "mandatoryUpdate": false
+        }
+      ]
+    }
+  }
 }
