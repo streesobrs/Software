@@ -7,11 +7,11 @@
 # 解决方案文件：Software.sln（根目录）
 # 打包项目：默认命名为Software.Package（可按需修改）
 
-name: .NET Core Desktop
+name: .NET Core Desktop (No Signing)
 
 on:
   push:
-    branches: [ "main" ]  # 可根据实际主分支名调整（如"master"）
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -19,75 +19,47 @@ jobs:
   build:
     strategy:
       matrix:
-        configuration: [Debug, Release]  # 同时构建调试和发布版本
+        configuration: [Debug, Release]
 
-    runs-on: windows-latest  # Windows环境必需（桌面应用依赖）
+    runs-on: windows-latest
 
     env:
-      # 1. 核心环境变量（已根据你的需求配置）
-      Solution_Name: Software.sln  # 解决方案文件名（根目录，无需改路径）
-      Test_Project_Path: ""  # 测试项目路径（无测试项目可留空，下方测试步骤需注释）
-      # 2. 打包项目配置（自定义命名，可按需修改）
-      Wap_Project_Directory: Software.Package  # 打包项目目录（根目录下新建此文件夹）
-      Wap_Project_Path: Software.Package\Software.Package.wapproj  # 打包项目文件路径
+      Solution_Name: Software.sln  # 根目录的解决方案
+      Test_Project_Path: ""  # 测试项目路径（无则留空）
+      Wap_Project_Directory: Software.Package  # 打包项目目录
+      Wap_Project_Path: Software.Package\Software.Package.wapproj  # 打包项目路径
 
     steps:
-      # 1. 检出代码（根目录，直接获取Software.sln）
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 完整检出历史（用于版本控制，可选）
 
-      # 2. 安装.NET Core SDK（8.0.x为当前稳定版，可按需切换为6.0.x/7.0.x）
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 6.0.x
 
-      # 3. 配置MSBuild（构建Windows应用打包项目必需）
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      # 4. 执行单元测试（若有测试项目，需替换Test_Project_Path；无则注释此步骤）
+      # 可选：运行单元测试（有测试项目才需要）
       - name: Run unit tests
-        if: env.Test_Project_Path != ''  # 仅当测试项目路径非空时执行
+        if: env.Test_Project_Path != ''
         run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }}
 
-      # 5. 恢复项目依赖（根目录的Software.sln）
       - name: Restore dependencies
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=${{ matrix.configuration }}
 
-      # 6. 解码签名证书（从GitHub Secrets获取，安全存储敏感信息）
-      - name: Decode PFX certificate
-        run: |
-          # 将Base64编码的证书解码为本地文件（保存到打包项目目录）
-          $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-          $certificatePath = Join-Path -Path $env:Wap_Project_Directory -ChildPath "SignCert.pfx"
-          [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-
-      # 7. 构建并打包应用（生成MSIX包）
-      - name: Build and package app
+      - name: Build and package app (unsigned)
         run: |
           msbuild $env:Wap_Project_Path `
             /p:Configuration=${{ matrix.configuration }} `
-            /p:UapAppxPackageBuildMode=StoreUpload `  # 打包模式（StoreUpload/ SideLoadOnly）
-            /p:AppxBundle=Always `  # 始终生成捆绑包（包含x86/x64）
-            /p:AppxBundlePlatforms="x86|x64" `  # 支持的平台（可加arm64）
-            /p:PackageCertificateKeyFile="SignCert.pfx" `  # 签名证书文件名
-            /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}  # 证书密码（从Secrets获取）
+            /p:UapAppxPackageBuildMode=SideLoadOnly `  # 旁加载模式（无需商店）
+            /p:AppxBundle=Always `
+            /p:AppxBundlePlatforms="x86|x64" `
+            /p:PackageCertificateKeyFile=""  # 清空证书配置
 
-      # 8. 清理证书文件（避免残留敏感信息）
-      - name: Remove PFX certificate
-        run: |
-          $certificatePath = Join-Path -Path $env:Wap_Project_Directory -ChildPath "SignCert.pfx"
-          if (Test-Path $certificatePath) {
-            Remove-Item -Path $certificatePath -Force
-          }
-
-      # 9. 上传打包产物（MSIX包）
-      - name: Upload MSIX package
+      - name: Upload MSIX package (unsigned)
         uses: actions/upload-artifact@v4
         with:
-          name: MSIX-Package-${{ matrix.configuration }}  # 产物名称（区分构建配置）
-          path: ${{ env.Wap_Project_Directory }}\AppPackages  # 打包产物默认输出目录
-          retention-days: 7  # 产物保留时间（可选，默认90天）
+          name: Unsigned-MSIX-${{ matrix.configuration }}
+          path: ${{ env.Wap_Project_Directory }}\AppPackages
