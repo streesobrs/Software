@@ -1,73 +1,77 @@
-# .NET Desktop Build & Upload to GitHub Releases（修复YAML语法）
+# .NET Desktop Build & Upload to GitHub Releases（根目录项目版）
 name: .NET Desktop Build & Permanent Save
 
 on:
   push:
     branches: [ "main" ]
-    tags: [ "v*" ]
+    tags: [ "v*" ]  # 推送TAG触发永久保存
   release:
-    types: [published]
+    types: [published]  # 手动发布Release触发
 
 jobs:
   build:
     strategy:
       matrix:
         configuration: [Release]
-        platform: [ "Any CPU" ]  # 支持带空格的平台名
+        platform: [ "Any CPU" ]  # 通用平台，避免配置错误
 
     runs-on: windows-latest
 
     env:
-      Solution_Name: Software.sln
-      Main_Project_Name: YourMainProject  # 替换实际项目名
-      Main_Project_Path: YourMainProject\YourMainProject.csproj  # 替换实际路径
+      Solution_Name: Software.sln  # 根目录的解决方案文件
+      # 👇 核心修改：指向根目录的.csproj文件（无需子文件夹）
+      Main_Project_Name: Software  # 你的项目名（如.csproj文件名是Software.csproj，这里就填Software）
+      Main_Project_Path: Software.csproj  # 根目录的.csproj文件名（必须和本地实际文件名一致）
+      # 输出目录（根目录下新建output文件夹，避免和源码混放）
       Output_Directory: ${{ github.workspace }}\output\${{ matrix.configuration }}\${{ matrix.platform }}
-      Zip_Output_Dir: ${{ github.workspace }}
+      Zip_Output_Dir: ${{ github.workspace }}  # ZIP包生成在根目录
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # 检出后，.csproj直接在根目录
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v2  # 配置.NET Framework构建工具
 
-      # 还原依赖（修复语法：反引号后无空格/注释）
+      # 还原解决方案依赖（根目录的Software.sln）
       - name: Restore NuGet packages
         run: msbuild $env:Solution_Name /t:Restore `
           /p:Configuration=${{ matrix.configuration }} `
           /p:Platform="${{ matrix.platform }}"
 
-      # 构建主项目（关键修复：移除反引号后的注释，确保语法正确）
-      - name: Build main project
+      # 构建根目录的.csproj项目（核心修复：路径无任何子文件夹）
+      - name: Build main project（根目录）
         run: msbuild $env:Main_Project_Path `
           /p:Configuration=${{ matrix.configuration }} `
           /p:Platform="${{ matrix.platform }}" `
           /p:OutputPath="$env:Output_Directory" `
           /p:DeployOnBuild=true
-        # 注意：注释不能跟在反引号后面，必须单独成行
 
+      # 生成ZIP包（文件名不含子文件夹，更简洁）
       - name: Create ZIP package
         run: |
-          $version = "${{ github.ref_name }}"
+          $version = "${{ github.ref_name }}"  # 自动获取TAG/分支名（如v1.0.0）
           $zipFileName = "${{ env.Main_Project_Name }}-$version-${{ matrix.platform }}.zip"
-          $zipFileName = $zipFileName -replace ' ', '_'  # 替换空格为下划线
+          $zipFileName = $zipFileName -replace ' ', '_'  # 替换空格为下划线（如Any_CPU）
           $zipFilePath = Join-Path -Path "${{ env.Zip_Output_Dir }}" -ChildPath $zipFileName
 
+          # 压缩输出目录的所有文件（exe、dll等）
           if (Test-Path "${{ env.Output_Directory }}") {
             Compress-Archive -Path "${{ env.Output_Directory }}\*" -DestinationPath $zipFilePath -Force
             echo "ZIP_FILE_PATH=$zipFilePath" >> $env:GITHUB_ENV
             echo "ZIP_FILE_NAME=$zipFileName" >> $env:GITHUB_ENV
-            Write-Host "✅ 生成ZIP包：$zipFilePath"
+            Write-Host "✅ 根目录ZIP包生成成功：$zipFilePath"
           } else {
             Write-Error "❌ 输出目录不存在：${{ env.Output_Directory }}"
             exit 1
           }
 
-      - name: Upload to GitHub Releases
+      # 上传到GitHub Releases（永久保存，仅TAG/Release触发）
+      - name: Upload to GitHub Releases（永久保存）
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动生成，无需配置
         with:
           upload_url: >-
             ${{ 
@@ -76,6 +80,6 @@ jobs:
                 github.repository, 
                 github.ref_name) 
             }}
-          asset_path: ${{ env.ZIP_FILE_PATH }}
-          asset_name: ${{ env.ZIP_FILE_NAME }}
+          asset_path: ${{ env.ZIP_FILE_PATH }}  # 根目录的ZIP包路径
+          asset_name: ${{ env.ZIP_FILE_NAME }}  # Releases中显示的文件名
           asset_content_type: application/zip
