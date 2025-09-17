@@ -27,7 +27,7 @@ jobs:
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.36
+          dotnet-version: 6.0.16
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
