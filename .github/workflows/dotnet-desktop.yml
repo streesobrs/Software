@@ -1,13 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# 自动化.NET Core桌面应用（WPF/Windows Forms）的构建、测试、签名和打包
-# 解决方案文件：Software.sln（根目录）
-# 打包项目：默认命名为Software.Package（可按需修改）
-
-name: .NET Core Desktop (No Signing)
+name: .NET Core Desktop (Fixed)
 
 on:
   push:
@@ -24,10 +15,10 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Name: Software.sln  # 根目录的解决方案
-      Test_Project_Path: ""  # 测试项目路径（无则留空）
-      Wap_Project_Directory: Software.Package  # 打包项目目录
-      Wap_Project_Path: Software.Package\Software.Package.wapproj  # 打包项目路径
+      Solution_Name: Software.sln
+      Test_Project_Path: ""
+      Wap_Project_Directory: Software.Package
+      Wap_Project_Path: Software.Package\Software.Package.wapproj
 
     steps:
       - name: Checkout code
@@ -36,27 +27,26 @@ jobs:
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 6.0.36
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      # 可选：运行单元测试（有测试项目才需要）
-      - name: Run unit tests
+      - name: Run unit tests (if exists)
         if: env.Test_Project_Path != ''
         run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }}
 
       - name: Restore dependencies
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=${{ matrix.configuration }}
 
+      # 修复命令换行语法：确保反引号后无空格，且参数正确衔接
       - name: Build and package app (unsigned)
-        run: |
-          msbuild $env:Wap_Project_Path `
-            /p:Configuration=${{ matrix.configuration }} `
-            /p:UapAppxPackageBuildMode=SideLoadOnly `  # 旁加载模式（无需商店）
-            /p:AppxBundle=Always `
-            /p:AppxBundlePlatforms="x86|x64" `
-            /p:PackageCertificateKeyFile=""  # 清空证书配置
+        run: msbuild $env:Wap_Project_Path `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:UapAppxPackageBuildMode=SideLoadOnly `
+          /p:AppxBundle=Always `
+          /p:AppxBundlePlatforms="x86|x64" `
+          /p:PackageCertificateKeyFile=""
 
       - name: Upload MSIX package (unsigned)
         uses: actions/upload-artifact@v4
