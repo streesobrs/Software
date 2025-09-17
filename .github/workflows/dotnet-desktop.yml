@@ -1,55 +1,70 @@
-name: .NET Core Desktop (Fixed)
+# .NET Desktop Build & Upload to GitHub Releases（永久保留）
+name: .NET Desktop Build & Permanent Save
 
 on:
+  # 1. 推送代码时仍触发构建（产物临时保留，用于测试）
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # 2. 打 TAG 时触发构建 + 上传到 Releases（永久保留，用于正式版本）
+  release:
+    types: [published]  # 当你在 GitHub 手动创建并发布 Release 时触发
+  # （可选）也可以设置为“创建 TAG 时自动触发”，无需手动创建 Release：
+  # tag_push:
+  #   tags: [ "v*" ]  # 匹配 v1.0.0、v2.1.1 这类 TAG
 
 jobs:
   build:
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        configuration: [Release]  # 永久保存建议只保留 Release 版本（Debug 无需永久）
+        platform: [x64]  # 按需调整为 x86/AnyCPU
 
     runs-on: windows-latest
 
     env:
       Solution_Name: Software.sln
-      Test_Project_Path: ""
-      Wap_Project_Directory: Software.Package
-      Wap_Project_Path: Software.Package\Software.Package.wapproj
+      Main_Project_Name: YourMainProject  # 替换为主项目名称（如 MyWpfApp）
+      Main_Project_Path: YourMainProject\YourMainProject.csproj  # 替换为主项目路径
+      Output_Directory: ${{ github.workspace }}\output\${{ matrix.configuration }}\${{ matrix.platform }}
+      # ZIP 文件名（包含版本信息，TAG 触发时自动获取版本号）
+      Zip_File_Name: ${{ env.Main_Project_Name }}-${{ github.ref_name }}-${{ matrix.platform }}.zip
+      Zip_Output_Path: ${{ github.workspace }}\${{ env.Zip_File_Name }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install .NET Core SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Run unit tests (if exists)
-        if: env.Test_Project_Path != ''
-        run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }}
+      - name: Restore NuGet packages
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }}
 
-      - name: Restore dependencies
-        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=${{ matrix.configuration }}
-
-      # 修复命令换行语法：确保反引号后无空格，且参数正确衔接
-      - name: Build and package app (unsigned)
-        run: msbuild $env:Wap_Project_Path `
+      - name: Build main project
+        run: msbuild $env:Main_Project_Path `
           /p:Configuration=${{ matrix.configuration }} `
-          /p:UapAppxPackageBuildMode=SideLoadOnly `
-          /p:AppxBundle=Always `
-          /p:AppxBundlePlatforms="x86|x64" `
-          /p:PackageCertificateKeyFile=""
+          /p:Platform=${{ matrix.platform }} `
+          /p:OutputPath=$env:Output_Directory `
+          /p:DeployOnBuild=true
 
-      - name: Upload MSIX package (unsigned)
-        uses: actions/upload-artifact@v4
+      - name: Create ZIP package
+        run: |
+          if (Test-Path $env:Output_Directory) {
+            Compress-Archive -Path "$env:Output_Directory\*" -DestinationPath $env:Zip_Output_Path -Force
+            Write-Host "ZIP 包已生成：$env:Zip_Output_Path"
+          } else {
+            Write-Error "输出目录不存在：$env:Output_Directory"
+            exit 1
+          }
+
+      # 核心步骤：只有“发布 Release”或“推送 TAG”时，才上传到 Releases（永久保存）
+      - name: Upload ZIP to GitHub Releases（永久保存）
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1  # 用于上传 Release 附件的官方 Action
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动生成的 Token（无需手动配置）
         with:
-          name: Unsigned-MSIX-${{ matrix.configuration }}
-          path: ${{ env.Wap_Project_Directory }}\AppPackages
+          upload_url: ${{ github.event.release.upload_url || format('https://uploads.github.com/{0}/releases/{1}/assets{2}', github.repository_owner, github.ref_name, '?name={3}') }}
+          asset_path: ${{ env.Zip_Output_Path }}  # 本地 ZIP 包路径
+          asset_name: ${{ env.Zip_File_Name }}  # 显示在 Releases 中的文件名
+          asset_content_type: application/zip  # 文件类型（固定为 zip）
