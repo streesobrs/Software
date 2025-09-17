@@ -2,33 +2,33 @@
 name: .NET Desktop Build & Permanent Save
 
 on:
-  # 1. 推送代码时仍触发构建（产物临时保留，用于测试）
+  # 1. 推送代码时触发构建（临时保留产物，用于测试）
   push:
     branches: [ "main" ]
-  # 2. 打 TAG 时触发构建 + 上传到 Releases（永久保留，用于正式版本）
+  # 2. 手动发布Release时触发（永久保存产物）
   release:
-    types: [published]  # 当你在 GitHub 手动创建并发布 Release 时触发
-  # （可选）也可以设置为“创建 TAG 时自动触发”，无需手动创建 Release：
-  # tag_push:
-  #   tags: [ "v*" ]  # 匹配 v1.0.0、v2.1.1 这类 TAG
+    types: [published]
+  # 3. 推送TAG时自动触发（可选，无需手动创建Release）
+  tag_push:
+    tags: [ "v*" ]  # 匹配 v1.0.0、v2.1.0 这类版本号TAG
 
 jobs:
   build:
     strategy:
       matrix:
-        configuration: [Release]  # 永久保存建议只保留 Release 版本（Debug 无需永久）
+        configuration: [Release]  # 只构建Release版本（永久保存无需Debug）
         platform: [x64]  # 按需调整为 x86/AnyCPU
 
     runs-on: windows-latest
 
     env:
+      # 基础环境变量（不交叉引用，避免语法错误）
       Solution_Name: Software.sln
       Main_Project_Name: YourMainProject  # 替换为主项目名称（如 MyWpfApp）
       Main_Project_Path: YourMainProject\YourMainProject.csproj  # 替换为主项目路径
       Output_Directory: ${{ github.workspace }}\output\${{ matrix.configuration }}\${{ matrix.platform }}
-      # ZIP 文件名（包含版本信息，TAG 触发时自动获取版本号）
-      Zip_File_Name: ${{ env.Main_Project_Name }}-${{ github.ref_name }}-${{ matrix.platform }}.zip
-      Zip_Output_Path: ${{ github.workspace }}\${{ env.Zip_File_Name }}
+      # ZIP包输出路径（文件名后续在步骤中动态生成）
+      Zip_Output_Dir: ${{ github.workspace }}
 
     steps:
       - name: Checkout code
@@ -37,9 +37,11 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      # 还原NuGet依赖
       - name: Restore NuGet packages
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }}
 
+      # 构建主项目（生成exe和依赖）
       - name: Build main project
         run: msbuild $env:Main_Project_Path `
           /p:Configuration=${{ matrix.configuration }} `
@@ -47,24 +49,41 @@ jobs:
           /p:OutputPath=$env:Output_Directory `
           /p:DeployOnBuild=true
 
-      - name: Create ZIP package
+      # 动态生成ZIP文件名（解决env内部引用错误）
+      - name: Create ZIP package (with dynamic name)
         run: |
-          if (Test-Path $env:Output_Directory) {
-            Compress-Archive -Path "$env:Output_Directory\*" -DestinationPath $env:Zip_Output_Path -Force
-            Write-Host "ZIP 包已生成：$env:Zip_Output_Path"
+          # 1. 拼接ZIP文件名：项目名-版本号-平台.zip（版本号从TAG或Release中获取）
+          $version = "${{ github.ref_name }}"  # 自动获取TAG名（如v1.0.0）或Release名
+          $zipFileName = "${{ env.Main_Project_Name }}-$version-${{ matrix.platform }}.zip"
+          $zipFilePath = Join-Path -Path "${{ env.Zip_Output_Dir }}" -ChildPath $zipFileName
+
+          # 2. 检查输出目录并压缩
+          if (Test-Path "${{ env.Output_Directory }}") {
+            Compress-Archive -Path "${{ env.Output_Directory }}\*" -DestinationPath $zipFilePath -Force
+            Write-Host "✅ ZIP包生成成功：$zipFilePath"
+            # 3. 将ZIP路径存入环境变量，供后续上传步骤使用
+            echo "ZIP_FILE_PATH=$zipFilePath" >> $env:GITHUB_ENV
+            echo "ZIP_FILE_NAME=$zipFileName" >> $env:GITHUB_ENV
           } else {
-            Write-Error "输出目录不存在：$env:Output_Directory"
+            Write-Error "❌ 输出目录不存在：${{ env.Output_Directory }}"
             exit 1
           }
 
-      # 核心步骤：只有“发布 Release”或“推送 TAG”时，才上传到 Releases（永久保存）
-      - name: Upload ZIP to GitHub Releases（永久保存）
+      # 核心：上传到GitHub Releases（永久保存，仅在Release或TAG触发时执行）
+      - name: Upload ZIP to GitHub Releases (Permanent Save)
         if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-release-asset@v1  # 用于上传 Release 附件的官方 Action
+        uses: actions/upload-release-asset@v1  # 稳定的Release上传Action
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动生成的 Token（无需手动配置）
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动生成，无需手动配置
         with:
-          upload_url: ${{ github.event.release.upload_url || format('https://uploads.github.com/{0}/releases/{1}/assets{2}', github.repository_owner, github.ref_name, '?name={3}') }}
-          asset_path: ${{ env.Zip_Output_Path }}  # 本地 ZIP 包路径
-          asset_name: ${{ env.Zip_File_Name }}  # 显示在 Releases 中的文件名
-          asset_content_type: application/zip  # 文件类型（固定为 zip）
+          # 处理两种触发场景的上传地址：
+          upload_url: >-
+            ${{ 
+              github.event.release.upload_url || 
+              format('https://uploads.github.com/{0}/releases/{1}/assets', 
+                github.repository, 
+                github.ref_name) 
+            }}
+          asset_path: ${{ env.ZIP_FILE_PATH }}  # 从前面步骤获取的ZIP路径
+          asset_name: ${{ env.ZIP_FILE_NAME }}  # 从前面步骤获取的ZIP文件名
+          asset_content_type: application/zip  # 固定为ZIP文件类型
