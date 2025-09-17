@@ -1,10 +1,10 @@
-# .NET Desktop Build & Upload to GitHub Releases（修复平台配置）
+# .NET Desktop Build & Upload to GitHub Releases（修复YAML语法）
 name: .NET Desktop Build & Permanent Save
 
 on:
   push:
     branches: [ "main" ]
-    tags: [ "v*" ]  # 推送TAG触发永久保存
+    tags: [ "v*" ]
   release:
     types: [published]
 
@@ -13,18 +13,14 @@ jobs:
     strategy:
       matrix:
         configuration: [Release]
-        # 关键修复：使用"Any CPU"平台（大多数.NET项目默认支持）
-        # 注意：平台名称中的空格需要保留，且与项目配置一致
-        platform: [ "Any CPU" ]
+        platform: [ "Any CPU" ]  # 支持带空格的平台名
 
     runs-on: windows-latest
 
     env:
       Solution_Name: Software.sln
-      # 替换为你的实际项目名称和路径
-      Main_Project_Name: YourMainProject
-      Main_Project_Path: YourMainProject\YourMainProject.csproj
-      # 输出目录（平台名称带空格需特殊处理，这里用变量自动拼接）
+      Main_Project_Name: YourMainProject  # 替换实际项目名
+      Main_Project_Path: YourMainProject\YourMainProject.csproj  # 替换实际路径
       Output_Directory: ${{ github.workspace }}\output\${{ matrix.configuration }}\${{ matrix.platform }}
       Zip_Output_Dir: ${{ github.workspace }}
 
@@ -35,26 +31,26 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      # 修复：MSBuild命令中平台参数带空格需用引号包裹
+      # 还原依赖（修复语法：反引号后无空格/注释）
       - name: Restore NuGet packages
         run: msbuild $env:Solution_Name /t:Restore `
           /p:Configuration=${{ matrix.configuration }} `
-          /p:Platform="${{ matrix.platform }}"  # 空格平台名必须用引号
+          /p:Platform="${{ matrix.platform }}"
 
-      # 构建命令同样修复平台参数
+      # 构建主项目（关键修复：移除反引号后的注释，确保语法正确）
       - name: Build main project
         run: msbuild $env:Main_Project_Path `
           /p:Configuration=${{ matrix.configuration }} `
-          /p:Platform="${{ matrix.platform }}" `  # 空格平台名必须用引号
-          /p:OutputPath="$env:Output_Directory" `  # 输出目录带空格也需引号
+          /p:Platform="${{ matrix.platform }}" `
+          /p:OutputPath="$env:Output_Directory" `
           /p:DeployOnBuild=true
+        # 注意：注释不能跟在反引号后面，必须单独成行
 
       - name: Create ZIP package
         run: |
           $version = "${{ github.ref_name }}"
           $zipFileName = "${{ env.Main_Project_Name }}-$version-${{ matrix.platform }}.zip"
-          # 处理平台名中的空格（替换为下划线，避免ZIP文件名带空格）
-          $zipFileName = $zipFileName -replace ' ', '_'
+          $zipFileName = $zipFileName -replace ' ', '_'  # 替换空格为下划线
           $zipFilePath = Join-Path -Path "${{ env.Zip_Output_Dir }}" -ChildPath $zipFileName
 
           if (Test-Path "${{ env.Output_Directory }}") {
